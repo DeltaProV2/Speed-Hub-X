@@ -1,1 +1,617 @@
-return(function(...)local I={"\120\089\104\098\076\120\101\097\070\121\118\049\057\121\114\061";"\070\086\116\108\109\086\050\081";"\086\083\101\110\057\082\097\120\070\080\085\117";"\070\121\118\049\057\121\114\061","\112\080\101\099\055\086\116\122","\055\065\073\078\112\103\083\043\055\088\097\098\077\089\047\061";"\086\086\085\083\112\080\078\102\051\118\075\066\077\120\073\114\055\108\061\061","\051\049\047\078\076\119\054\067\051\047\061\061","","\057\115\084\061";"\112\088\118\069\076\121\104\098","\070\121\104\069\070\086\089\049\076\120\084\061";"\101\121\067\107\055\089\078\081\056\086\116\086\071\052\073\071\077\047\061\061","\120\089\104\122\109\108\061\061","\085\053\098\120\075\083\083\065\057\083\116\082\112\053\089\090\050\047\061\061";"\076\088\110\117\057\080\084\061","\112\121\050\097\057\121\108\061","\112\088\085\098\057\080\076\078";"\085\065\085\049\055\121\104\117\055\108\061\061";"\112\052\073\099\056\080\076\122\086\088\114\043\055\089\097\075","\070\121\118\066\055\108\061\061","\057\121\104\097\076\052\050\103\112\088\078\069\076\108\061\061","\101\110\120\115\114\053\050\109\087\057\056\099\047\116\075\112\083\088\107\121\108\103\057\054\079\043\107\113\079\077\049\107\118\078\049\110\043\088\068\098\043\116\108\061";"\057\086\118\103\055\105\061\061";"\114\103\076\049\109\114\116\099\101\082\075\099\112\083\101\055","\085\120\050\078\112\088\116\097\057\086\114\061","\112\103\110\055\101\077\085\077\112\089\085\098\050\089\085\082\075\075\061\061","\088\115\119\109\115\054\055\050\099\043\043\105\113\087\098\088\054\088\088\052\112\101\079\084\081\104\090\097\083\099\098\104\080\108\061\061","\075\089\118\115\050\103\098\090\076\118\114\061";"\085\121\118\098\112\121\085\099\084\053\101\078\070\121\085\082\070\121\085\083\084\075\061\061","\057\121\085\069";"\051\047\061\061","\071\052\101\103\112\053\070\078\070\105\061\061","\109\065\104\069\109\065\118\103","\070\121\104\066\070\052\073\067\057\088\112\061","\056\077\052\120\078\087\065\066\047\111\078\117\050\108\115\067\078\047\061\061";"\109\065\097\097\112\047\061\061";"\076\120\073\099\057\080\084\061";"\119\102\078\119\074\099\108\120\110\090\097\106\083\098\114\084\052\074\048\070\113\087\070\049\069\068\080\112\072\049\083\116\118\101\087\111\084\076\112\043\114\083\047\090\102\098\111\103\090\085\119\102\078\084\082\055\049\098\106\070\105\109\121\121\081\048\080\106\068\074\067\107\066\072\122\109\074\110\048\104\085\088\050\119\077\102\104\056\052\070\118\111\076\076\075\089\066\068\101\065\047\067\097\120\073\108\061\061";"\056\053\111\099\057\078\053\103\057\080\078\113\114\080\078\108\055\047\061\061";"\109\122\078\103\076\075\061\061";"\112\065\085\103\057\086\085\103\109\120\101\097\109\088\110\078","\076\080\050\089\109\047\061\061";"\076\065\089\097\070\121\050\054";"\105\103\073\069\054\100\102\061";"\120\089\104\067\057\088\101\078\074\105\061\061","\101\083\118\121\076\078\050\069\109\065\056\099\112\082\076\053","\120\089\104\102\076\086\043\061","\077\121\053\065\071\114\110\085\057\085\085\071\086\120\073\115\056\118\056\061";"\101\082\109\043\112\066\097\107\056\077\048\050\077\120\070\068","\068\084\056\120\088\103\050\076\081\075\050\072\083\084\067\053\107\100\107\112\065\065\057\073\077\110\049\117\117\069\075\061","\114\066\118\121\056\065\089\090\112\080\101\043\114\052\085\082\086\053\103\061","\057\115\053\061";"\070\053\116\078\077\065\073\065\086\088\118\080\074\086\109\061";"\076\065\118\098\076\075\061\061","\114\052\073\117\074\052\083\061";"\101\080\085\050\051\086\089\065\101\085\076\054\076\118\085\107\055\105\061\061"}for M,i in ipairs({{381229-381228;1010104-1010047};{544817+-544816;-669078-(-669109)};{-450830-(-450862);-929796-(-929853)}})do while i[126436+-126435]<i[-488239+488241]do I[i[-268903-(-268904)]],I[i[570226+-570224]],i[-202214+202215],i[-592498+592500]=I[i[8416+-8414]],I[i[492656-492655]],i[307371-307370]+(89123+-89122),i[-144356+144358]-(-465774+465775)end end local function M(M)return I[M+(-412427-(-420013))]end do local M=table.concat local i=string.char local D=type local K=string.len local N={x=569801-569778,s=-156645+156648,["\052"]=330730+-330723;b=196518+-196473;P=-184934+184989;v=-79965-(-79970);K=523376+-523360,a=-63586+63619;m=-177486-(-177510),O=57442+-57380,["\053"]=821437-821433;E=52048-52002,Q=-912465-(-912508),["\055"]=703568-703542,["\047"]=-973054+973086;F=-117639-(-117668),Z=377110-377068,Y=-561596-(-561649),J=760184+-760154;w=-107169-(-107171);["\050"]=-940784-(-940797);V=151291-151269,L=-1024448+1024473;N=622643+-622606,S=-1021440+1021476;j=-321775-(-321834);B=-853562+853613,["\057"]=751826-751799;k=-942578-(-942589),["\054"]=-326186+326226;h=264357-264296;["\051"]=644546-644532,e=-290520-(-290537),X=269608+-269570,W=140196+-140165,f=-100023-(-100067);o=-491439+491499;y=223213-223207,M=170149+-170130;C=-538161+538202,c=-256630-(-256680),["\056"]=-43861-(-43873),G=453614+-453596;r=1012671+-1012651;l=-118388-(-118436);t=728439+-728382;I=274290-274281,z=-476847+476886;T=-521328+521336,U=541105+-541084,D=-973310+973368;u=-567922+567969,A=40161+-40107;R=986914-986879;H=14943-14880;i=-5344+5344,["\043"]=-697014+697070,["\048"]=473519+-473518;["\049"]=-376394-(-376428);d=-850411-(-850426);g=807597-807545;n=624307+-624258,q=-60578+60588,p=-807481+807509}local X=string.sub local h=table.insert local b=I local o=math.floor for I=-235111+235112,#b,-818296-(-818297)do local T=b[I]if D(T)=="\115\116\114\105\110\103"then local D=K(T)local d={}local U=60387-60386 local y=689333+-689333 local f=-448622-(-448622)while U<=D do local I=X(T,U,U)local M=N[I]if M then y=y+M*(413741-413677)^((-23966-(-23969))-f)f=f+(-624115+624116)if f==959490-959486 then f=-428397+428397 local I=o(y/(-479663+545199))local M=o((y%(-193960-(-259496)))/(-338090-(-338346)))local D=y%(-338346+338602)h(d,i(I,M,D))y=-984191-(-984191)end elseif I=="\061"then h(d,i(o(y/(-782072+847608))))if U>=D or X(T,U+(-969597-(-969598)),U+(301930-301929))~="\061"then h(d,i(o((y%(954428-888892))/(731639-731383))))end break end U=U+(368171+-368170)end b[I]=M(d)end end end return(function(I,D,K,N,X,h,b,o,d,T,i,f,p,a,C,J,y,U,H,m,Q)H,o,m,C,T,d,J,p,Q,U,i,y,a,f=function(I,M)local D=y(M)local K=function(...)return i(I,{...},M,D)end return K end,{},function(I,M)local D=y(M)local K=function(K,N,X)return i(I,{K,N;X},M,D)end return K end,function(I,M)local D=y(M)local K=function(K,N,X,h)return i(I,{K;N,X;h},M,D)end return K end,{},function()U=U+(149350-149349)T[U]=161-160 return U end,function(I)T[I]=T[I]-(-877306-(-877307))if T[I]==760248-760248 then T[I],o[I]=nil,nil end end,function(I,M)local D=y(M)local K=function()return i(I,{},M,D)end return K end,function(I,M)local D=y(M)local K=function(K)return i(I,{K},M,D)end return K end,904060+-904060,function(i,K,N,X)local y,E,t,j,r,Z,f,l,T,c,s,O,B,L,W,U,z,P,b,k,F,e,R,g,x,n,Y,A,H,G,u,q,w,V while i do if i<8643007-(-281257)then if i<2195645-(-791865)then if i<451246+745612 then if i<648936-(-151397)then if i<-253140-(-458862)then if i<512368+-352047 then if i<-375404+513577 then i=2224484-872763 U=o[N[-328104-(-328106)]]y=o[N[128039-128036]]T=U==y b=T else o[U]=b i=9592964-(-930493)end else i=12814567-(-515760)end else if i<258483-(-175141)then U=o[N[-914876+914879]]y=-704501-(-704502)T=U~=y i=T and-980926+4705839 or 10523361-(-87651)else E=M(754745-762296)z=I[E]E=M(-12577-(-5024))i=969086+1727188 e=z[E]F=e end end else if i<1965486-853562 then if i<259765-(-692917)then if i<706102+209467 then b={}i=I[M(-623283+615741)]else O=586232-586226 P=-972606+972607 i=o[n]G=i(P,O)i=M(381676+-389221)I[i]=G O=M(-197471-(-189926))P=I[O]O=289707-289705 i=P>O i=i and-194470+6910579 or 12917291-911548 end else y=593539-593330 U=o[N[-872763+872765]]T=U*y U=4004105439088-(-18209)b=T+U U=-280297+280298 T=845178+35184371243654 i=b%T o[N[902908+-902906]]=i T=o[N[-3357-(-3360)]]b=T~=U i=-446766+11057778 end else if i<264232+900988 then j=#E O=456110-456110 r=j==O i=-485039+16759968 else i=-386092+15010283 end end end else if i<3259087-687669 then if i<452398+1862315 then if i<683317+1517832 then if i<2481116-341099 then i=b and-472111+15799299 or-870459+16729631 else b={}n=nil r={}j=d()x=M(-242920+235354)R=nil o[j]=r E=nil w=M(671795-679349)B=M(-214264-(-206694))g=d()r=d()A={}O=p(12036687-(-341803),{j,F;k,H})y=nil o[r]=O O={}o[g]=O O=I[B]H=J(H)V=o[g]W=nil s=nil c={[x]=V,[w]=R}B=O(A,c)E=M(720950+-728506)O=a(-833146+4319972,{g;j;z,F,k,r})o[f]=B z=J(z)e=nil F=J(F)e=19151843176254-(-464494)g=J(g)j=J(j)k=J(k)s=M(542595-550129)o[U]=O r=J(r)H=I[s]n=o[f]W=o[U]k=M(-415789+408222)F=W(k,e)i=I[M(739323-746871)]s=n[F]y=H[s]s=a(14168912-108963,{f,U})g=M(996799+-1004360)W=M(229647-237223)k=23080785668272-791737 F=279273+510042652402 e=-554929+24205027430335 H=y(s)H=o[f]s=o[U]n=s(W,F)y=H[n]H=M(66210+-73739)I[H]=y s=o[f]n=o[U]F=M(671605+-679137)W=n(F,k)H=s[W]s=M(886651+-894187)I[s]=H n=o[f]k=M(411149-418733)W=o[U]F=W(k,e)s=n[F]W=M(-80931+73398)k=M(-905340+897783)A=17789223365325-(-316906)n=M(-504435-(-496879))I[n]=s n=I[W]F=I[k]z=I[E]r=o[f]j=o[U]O=j(g,A)f=J(f)E=r[O]e=z..E z=M(-309610+302031)U=J(U)z=F[z]k={z(F,e)}W=n(D(k))n=W()end else g=not O q=q+P b=q<=G b=g and b g=q>=G g=O and g b=g or b g=3611982-965886 i=b and g b=-1046400+14235411 i=i or b end else if i<-748023+3114879 then i=9528515-562097 else i=m(742007-576114,{f})G={i()}b={D(G)}i=I[M(-760459-(-752887))]end end else if i<3428168-766776 then if i<334122+2276326 then s=o[H]b=s i=11918668-(-257064)else B=M(-268904+261373)g=d()w=638452+-638450 o[g]=q b=I[B]t=785400+-775400 B=M(928901-936445)i=b[B]B=-531951-(-531952)A=918496-918396 b=i(B,A)B=d()V=915452+-915451 o[B]=b A=360299+-360299 i=o[n]c=-845946+846201 b=i(A,c)A=d()c=989248-989247 R=M(-805714-(-798137))o[A]=b i=o[n]x=o[B]b=i(c,x)c=d()o[c]=b b=o[n]Y=714614-714614 x=b(V,w)b=-283433+283434 i=x==b x=d()w=M(-33213-(-25633))b=M(-304809+297262)o[x]=i Z=I[R]u=o[n]L={u(Y,t)}i=M(-598067+590498)R=Z(D(L))i=r[i]Z=M(-599438-(-591858))l=R..Z V=w..l w=M(-471215+463677)i=i(r,b,V)V=d()o[V]=i l=a(1046144+13510461,{n;g,k,y,U;j;x,V,B,c;A,F})b=I[w]w={b(l)}i={D(w)}w=i i=o[x]i=i and-831098+16931430 or 473519+6491429 end else if i<-1760+2691699 then W=k P=M(1028226-1035776)G=I[P]P=M(-959934+952363)q=G[P]G=q(T,W)W=nil q=o[N[-236897-(-236903)]]P=q()j=G+P r=j+s j=760568+-760312 E=r%j i=-102243+8903280 j=y[U]s=E P=-45984-(-45985)G=s+P q=f[G]r=j..q y[U]=r else b=F i=k i=F and 8531749-(-462830)or 9618566-(-166565)end end end end else if i<5866927-(-647796)then if i<-263912+4272538 then if i<250600+3203010 then if i<2780136-(-631028)then if i<-486959+3544735 then b=M(-765944+758370)T=M(-1021760+1014178)i=I[b]b=i(T)b={}i=I[M(-472625-(-465070))]else i=true i=-1021312+3389896 end else i=o[N[543547-543537]]U=o[N[-686570-(-686581)]]T[i]=U i=o[N[-12948-(-12960)]]U={i(T)}b={D(U)}i=I[M(259956-267496)]end else if i<3796394-273128 then i=o[N[-225959+225960]]y=i T=K[-179365-(-179366)]U=K[741369-741367]i=y[U]i=i and 722102+14978858 or 104995+6513319 else U=o[N[525424+-525421]]y=539857-539825 T=U%y f=o[N[-24861-(-24865)]]n=o[N[899198-899196]]F=735671+-735669 e=-720758+720771 r=o[N[564917-564914]]E=r-T r=273960+-273928 z=E/r k=e-z W=F^k s=n/W H=f(s)f=4294848284-(-119012)y=H%f H=456112-456110 f=H^T U=y/f W=-195622+195623 f=o[N[775416+-775412]]n=U%W W=4294498449-(-468847)s=n*W T=nil H=f(s)f=o[N[-497071+497075]]s=f(U)n=-657588+723124 y=H+s F=885563-885307 H=665205+-599669 f=y%H e=-395820-(-396076)s=y-f H=s/n n=-858427+858683 i=-1015871+16971302 s=f%n W=f-s n=W/F F=338922-338666 W=H%F U=nil k=H-W H=nil F=k/e k={s;n,W,F}n=nil F=nil s=nil y=nil W=nil o[N[-241062-(-241063)]]=k f=nil end end else if i<848506+4253915 then if i<5400738-923453 then i=659316+13964875 else L=-796537+796539 u=w[L]L=o[V]i=436526+14996649 R=u==L l=R end else if i<337642+5986837 then j=j+g A=not B r=j<=O r=A and r A=j>=O A=B and A r=A or r A=15301748-(-10080)i=r and A r=423789+694965 i=i or r else y=-714998+4654959 U=M(438705-446254)b=13643329-261288 T=U^y i=b-T T=i b=M(346283+-353866)i=b/T b={i}i=I[M(991615+-999180)]end end end else if i<337962+7187318 then if i<313002+6658236 then if i<176549+6543358 then if i<6677712-13152 then n=-193254+193509 i={}H=757111+35184371331721 o[N[398510-398508]]=i b=o[N[736119+-736116]]f=b b=U%H o[N[258988-258984]]=b s=U%n n=767672+-767670 H=s+n o[N[921986-921981]]=H W=M(-329514+321964)n=I[W]W=M(-870488-(-862907))s=n[W]n=s(T)s=M(-298915-(-291369))y[U]=s W=153190-153189 s=825338+-825211 F=n k=-579250+579251 e=k k=780280-780280 z=e<k k=W-e i=393452+8407585 else P=M(-949910-(-942333))g=M(184095-191654)i=I[P]O=I[g]P=i(O)i=M(235559+-243104)I[i]=P i=1953243-757687 end else Z=o[U]l=Z i=Z and 14929448-(-644020)or 310058+12537950 end else if i<-805433+7935522 then T=M(-310000-(-302441))b=M(550008-557553)i=I[b]b=I[T]T=M(63714+-71273)I[T]=i i=13965707-635380 T=M(904252+-911797)I[T]=b T=o[N[975743-975742]]U=T()else s=nil n=nil i=-718006+14825061 f=nil end end else if i<7796183-(-771640)then if i<635508+7674260 then o[U]=q i=o[U]i=i and 2940154-574130 or-155237+3237059 else G=e==z i=8120856-(-4320)q=G end else if i<9372377-573426 then Z=i L=539890-539889 u=w[L]L=false R=u==L i=R and 593394+4279971 or 15493049-59874 l=R else E=not z k=k+e W=k<=F W=E and W E=k>=F E=z and E W=E or W E=-908028+3596622 i=W and E W=59234+7087992 i=i or W end end end end end else if i<962174+12491933 then if i<12618748-921533 then if i<845946+9865345 then if i<9514142-(-463598)then if i<-760120+9888046 then if i<9189003-210983 then e=nil z=nil W=nil r=nil n=J(n)y=J(y)j=J(j)W=M(-349482-(-341931))F=J(F)y=nil H=J(H)k=J(k)U=J(U)E=nil s=nil U=nil f=J(f)f=d()z=d()n=M(-427181+419650)o[f]=U U=d()r=-317290+317291 o[U]=y s=M(984084-991615)H=I[s]s=M(-225690-(-218151))k=d()y=H[s]F=M(745721-753271)H=d()o[H]=y s=I[n]n=M(-299361-(-291817))E={}y=s[n]n=I[W]W=M(144740+-152277)s=n[W]W=I[F]F=M(-948884-(-941309))e={}n=W[F]W=-151909-(-151909)F=d()o[F]=W W=752121-752119 o[k]=W j=204454+-204198 W={}O=j i=5005816-(-951998)j=61091-61090 o[z]=e e=-662581-(-662581)g=j j=-119332+119332 B=g<j j=r-g else F=d()o[F]=b e=-797368-(-797433)i=o[n]k=-526704+526707 b=i(k,e)P=M(-167934-(-160357))k=d()i=-749943-(-749943)r=C(321898+14587485,{})E=M(472189-479727)e=i i=-793145-(-793145)o[k]=b b=I[E]z=i E={b(r)}i={D(E)}b=19425+-19423 E=i i=E[b]r=i b=M(-485030-(-477487))i=I[b]j=o[y]G=I[P]P=G(r)G=M(167850-175397)q=j(P,G)j={q()}b=i(D(j))j=d()o[j]=b q=o[k]b=-200805-(-200806)G=q q=-907899-(-907900)P=q q=-140004+140004 O=P<q q=b-P i=2527021-291049 end else i=9599494-604915 k=M(-124773-(-117220))F=I[k]b=F end else if i<10630901-64162 then x=J(x)i=831866+1404106 B=J(B)c=J(c)A=J(A)w=nil g=J(g)V=J(V)else y=-70206-(-70370)U=o[N[-236132-(-236135)]]T=U*y i=383275-106275 U=-759544+759801 b=T%U o[N[-336938+336941]]=b end end else if i<-937853+12031282 then if i<11629061-641780 then y=-915580-(-915580)T=M(177125+-184699)i=I[T]U=o[N[474231-474223]]T=i(U,y)i=12261782-590386 else O=-242344+242344 j=#E r=j==O i=r and-969854+3114687 or 16552474-277545 end else if i<256936+11221190 then n=not s y=y+H U=y<=f U=n and U n=y>=f n=s and n U=n or U n=17061097-555249 i=U and n U=2759028-(-691445)i=i or U else i={}T=i y=o[N[1025472+-1025463]]f=y y=-425261+425262 H=y U=-998206-(-998207)y=933373-933373 s=H<y i=12341849-964350 y=U-H end end end else if i<13811849-973182 then if i<12208038-13216 then if i<-361771+12407061 then if i<346603+11451033 then b={}i=I[M(157349+-164909)]else O=M(-1004351+996806)i=I[O]O=M(501488+-509047)I[O]=i i=850810+344746 end else s=b n=M(-529968+522437)W=M(-504494-(-496943))b=I[n]n=M(-573802-(-566258))i=b[n]n=d()o[n]=i b=I[W]W=M(524502-532080)i=b[W]z=M(-140452+132901)e=I[z]F=e W=i k=i i=e and-805177+1535823 or 322666+2373608 end else if i<360875+12144499 then T=o[N[-168868-(-168869)]]b=#T T=521904+-521904 i=b==T i=i and 1325832-264424 or-391852+16347283 else i=true b={}o[N[-649076+649077]]=i i=I[M(854330+-861893)]end end else if i<97443+12962597 then if i<13220650-327402 then o[U]=l L=o[c]Y=-669685+669686 u=L+Y R=w[u]Z=e+R R=-396012-(-396268)i=Z%R u=o[A]R=z+u u=-68258-(-68514)Z=R%u e=i i=10813930-290473 z=Z else y=o[N[949949+-949943]]U=y==T i=122852+16362004 b=U end else if i<-862395+14171129 then G=o[U]i=G and 918716+7613000 or 7772429-(-352747)q=G else i=true i=i and 6899763-(-105123)or 340523+525807 end end end end else if i<-920061+16386847 then if i<13852356-(-1001855)then if i<13421183-(-775352)then if i<13199252-(-873147)then if i<13656841-(-220647)then i=true i=i and 3862678-(-530416)or 3339846-971262 else U=M(948793-956350)b=M(-260648+253115)W=-142628+12141169465679 i=I[b]T=I[U]f=o[N[78178+-78177]]H=o[N[851898+-851896]]n=M(-130340+122767)s=H(n,W)y=f[s]f=true H=M(-66749-(-59170))H=T[H]U={H(T,y,f)}b=i(D(U))i=b()i=I[M(452014+-459549)]b={}end else b={U}i=I[M(900443-908028)]end else if i<15396230-816057 then H=224935+-224933 U=o[N[-775096+775097]]f=-900924+900925 y=U(f,H)U=-258024+258025 T=y==U b=T i=T and 1236101-(-115620)or-852603-(-978558)else i=true i=i and 176357-(-740663)or-843002+12592225 end end else if i<14581306-(-733623)then if i<16056059-846970 then y=881915+8038422 b=-192614+6896435 U=M(-321770+314218)T=U^y i=b-T b=M(462569-470127)T=i i=b/T b={i}i=I[M(-271890-(-264360))]else i=1025280+4932534 r=j A=r E[r]=A r=nil end else if i<524144+14827698 then b=M(-363051+355508)f=M(-110627+103050)F=Q(5799120-(-572402),{})i=I[b]T=o[N[-899324+899328]]W=M(463022+-470560)y=I[f]n=I[W]W={n(F)}n=1032704+-1032702 s={D(W)}H=s[n]f=y(H)y=M(972286+-979833)U=T(f,y)T={U()}b=i(D(T))T=b U=o[N[-591986+591991]]b=U i=U and 13596224-631476 or 15917446-(-567410)else b=l i=Z i=-332843-(-487983)end end end else if i<-367915+16581631 then if i<-311658+16225457 then if i<15731026-(-29729)then if i<-229095+15871798 then i=308842+12539166 R=508208+-508207 Z=w[R]l=Z else i=14107663-608 end else i=o[N[133547-133540]]i=i and 727735+10102932 or 11113267-(-558129)end else if i<-896828+16980750 then i=I[M(589170+-596732)]y=M(418925+-426476)U=I[y]y=M(-452767-(-445230))T=U[y]y=o[N[-337897-(-337898)]]U={T(y)}b={D(U)}else l=o[U]i=l and-544433+9253819 or 546481+-391341 b=l end end else if i<619059+15863413 then if i<-86883+16380191 then O=#E i=11218167-184230 j=-1019264+1019265 r=y(j,O)j=s(E,r)O=o[z]r=nil A=268008+-268007 B=j-A g=n(B)O[j]=g j=nil else i=true U=d()n=M(1012622-1020160)o[U]=i f=d()y=M(261096+-268646)b=I[y]T=K y=M(-960254+952686)i=b[y]y=d()o[y]=i H=d()i=Q(2860855-(-175909),{})o[f]=i i=false o[H]=i W=Q(13293558-457838,{H})s=I[n]n=s(W)b=n i=n and 280809+2299237 or 506736+11668996 end else if i<17458379-971966 then i=15414326-(-444846)T=nil o[N[1015108-1015103]]=b else W=-795577+795577 U=y F=-627763+628018 i=o[N[-426477+426478]]n=i(W,F)T[U]=n i=-710774+12088273 U=nil end end end end end end end i=#X return D(b)end,function(I)for M=-613938-(-613939),#I,-864059+864060 do T[I[M]]=(-507055-(-507056))+T[I[M]]end if K then local i=K(true)local D=X(i)D[M(820729+-828295)],D[M(202546-210087)],D[M(-278772-(-271208))]=I,f,function()return 2857080-(-757623)end return i else return N({},{[M(14176+-21717)]=f,[M(406189+-413755)]=I;[M(197414+-204978)]=function()return 4188897-574194 end})end end,function(I,M)local D=y(M)local K=function(K,N)return i(I,{K,N},M,D)end return K end,function(I)local M,i=-605170-(-605171),I[-823674+823675]while i do T[i],M=T[i]-(-450286+450287),M+(930877+-930876)if-200550+200550==T[i]then T[i],o[i]=nil,nil end i=I[M]end end return(H(-310634+16744288,{}))(D(b))end)(getfenv and getfenv()or _ENV,unpack or table[M(432237+-439790)],newproxy,setmetatable,getmetatable,select,{...})end)(...)
+--// Pet Spawner LocalScript
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local Mouse = Player:GetMouse()
+local TweenService = game:GetService("TweenService")
+
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "PetSpawnerGui"
+ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+
+-- Create Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 180)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -90)
+MainFrame.BackgroundColor3 = Color3.fromRGB(255, 150, 200) -- light pink
+MainFrame.BorderSizePixel = 0
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.Parent = ScreenGui
+
+-- Gradient Background
+local UIGradient = Instance.new("UIGradient")
+UIGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 180, 220)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 140, 210))
+})
+UIGradient.Rotation = 90
+UIGradient.Parent = MainFrame
+
+-- Neon Animated Border
+local Stroke = Instance.new("UIStroke")
+Stroke.Thickness = 3
+Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+Stroke.Color = Color3.fromRGB(255, 0, 200)
+Stroke.Parent = MainFrame
+
+local neonColors = {
+	Color3.fromRGB(255, 0, 200),   -- Pink
+	Color3.fromRGB(0, 220, 255),   -- Cyan
+	Color3.fromRGB(180, 0, 255),   -- Purple
+	Color3.fromRGB(255, 120, 0),   -- Orange
+}
+
+task.spawn(function()
+	while true do
+		for _, neonColor in ipairs(neonColors) do
+			local tween = TweenService:Create(
+				Stroke,
+				TweenInfo.new(1.5, Enum.EasingStyle.Linear),
+				{ Color = neonColor }
+			)
+			tween:Play()
+			tween.Completed:Wait()
+		end
+	end
+end)
+
+-- Add UICorner
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "amina pets nyo"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 20
+-- Title Frame (darker see-through black background)
+local TitleFrame = Instance.new("Frame")
+TitleFrame.Size = UDim2.new(1, -20, 0, 35)
+TitleFrame.Position = UDim2.new(0, 10, 0, 5)
+TitleFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+TitleFrame.BackgroundTransparency = 0.1 -- darker (0 = solid black, 1 = invisible)
+TitleFrame.BorderSizePixel = 0
+TitleFrame.Parent = MainFrame
+
+local TitleFrameCorner = Instance.new("UICorner")
+TitleFrameCorner.CornerRadius = UDim.new(0, 8)
+TitleFrameCorner.Parent = TitleFrame
+
+-- Title Text
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "amina pets nyo"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 20
+Title.Parent = TitleFrame
+
+-- TextBox for Pet Name
+local PetNameBox = Instance.new("TextBox")
+PetNameBox.Size = UDim2.new(0.9, 0, 0, 30)
+PetNameBox.Position = UDim2.new(0.05, 0, 0, 50)
+PetNameBox.PlaceholderText = "Enter Pet Name"
+PetNameBox.Text = ""
+PetNameBox.ClearTextOnFocus = false
+PetNameBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+PetNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+PetNameBox.Font = Enum.Font.SourceSans
+PetNameBox.TextSize = 18
+PetNameBox.Parent = MainFrame
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 5)
+BoxCorner.Parent = PetNameBox
+
+-- Button creation helper
+local function CreateButton(name, color, posY)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0.25, 0, 0, 30)
+	btn.Position = UDim2.new(posY, 0, 0, 90)
+	btn.BackgroundColor3 = color
+	btn.Text = name
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Font = Enum.Font.SourceSansBold
+	btn.TextSize = 18
+	btn.Parent = MainFrame
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0,5)
+	corner.Parent = btn
+	return btn
+end
+
+-- Rarity Buttons
+local MFRBtn = CreateButton("MFR", Color3.fromRGB(255, 100, 100), 0.05)
+local NFRBtn = CreateButton("NFR", Color3.fromRGB(100, 255, 100), 0.375)
+local FRBtn = CreateButton("FR", Color3.fromRGB(100, 100, 255), 0.7)
+
+-- Spawn Pet Button
+local SpawnBtn = Instance.new("TextButton")
+SpawnBtn.Size = UDim2.new(0.9, 0, 0, 40)
+SpawnBtn.Position = UDim2.new(0.05, 0, 0, 140)
+SpawnBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 255)
+SpawnBtn.Text = "Spawn Pet"
+SpawnBtn.TextColor3 = Color3.fromRGB(255,255,255)
+SpawnBtn.Font = Enum.Font.SourceSansBold
+SpawnBtn.TextSize = 20
+SpawnBtn.Parent = MainFrame
+
+local SpawnCorner = Instance.new("UICorner")
+SpawnCorner.CornerRadius = UDim.new(0,5)
+SpawnCorner.Parent = SpawnBtn
+
+-- Movable GUI logic
+-- Draggable GUI logic
+-- Draggable GUI logic (drag only using the Title)
+-- Draggable GUI (Title only) + Hide mouse while dragging
+local UserInputService = game:GetService("UserInputService")
+
+local dragging = false
+local dragStart
+local startPos
+local dragInput
+
+local function update(input)
+	local delta = input.Position - dragStart
+	MainFrame.Position = UDim2.new(
+		0, startPos.X + delta.X,
+		0, startPos.Y + delta.Y
+	)
+end
+
+Title.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = Vector2.new(MainFrame.AbsolutePosition.X, MainFrame.AbsolutePosition.Y)
+
+		-- Hide mouse
+		UserInputService.MouseIconEnabled = false
+
+		-- Stop dragging when mouse released
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+				UserInputService.MouseIconEnabled = true -- show mouse again
+			end
+		end)
+	end
+end)
+
+Title.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input == dragInput then
+		update(input)
+	end
+end)
+
+-- Rarity selection logic
+local selectedRarity = "MFR"
+
+local function selectRarity(rarity)
+	selectedRarity = rarity
+	MFRBtn.BackgroundColor3 = (rarity == "MFR" and Color3.fromRGB(255,100,100)) or Color3.fromRGB(60,60,60)
+	NFRBtn.BackgroundColor3 = (rarity == "NFR" and Color3.fromRGB(100,255,100)) or Color3.fromRGB(60,60,60)
+	FRBtn.BackgroundColor3 = (rarity == "FR" and Color3.fromRGB(100,100,255)) or Color3.fromRGB(60,60,60)
+end
+
+MFRBtn.MouseButton1Click:Connect(function() selectRarity("MFR") end)
+NFRBtn.MouseButton1Click:Connect(function() selectRarity("NFR") end)
+FRBtn.MouseButton1Click:Connect(function() selectRarity("FR") end)
+
+-- Spawn pet logic (replace with your own spawning code)
+SpawnBtn.MouseButton1Click:Connect(function()
+	local petName = PetNameBox.Text
+	if petName ~= "" then
+		print("Spawning pet:", petName, "with rarity:", selectedRarity)
+		-- Example: fire a remote event to server to give pet
+		-- game.ReplicatedStorage.SpawnPet:FireServer(petName, selectedRarity)
+	end
+end)
+
+-- Pet Spawner + Adopt-Me style Backpack
+-- Put this in a LocalScript under StarterPlayerScripts or inside your existing LocalScript
+-- Requires a RemoteEvent at ReplicatedStorage: "EquipPet" (optional, used to notify server)
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Ensure RemoteEvent exists (optional)
+local EquipPetEvent = ReplicatedStorage:FindFirstChild("EquipPet")
+if not EquipPetEvent then
+	EquipPetEvent = Instance.new("RemoteEvent")
+	EquipPetEvent.Name = "EquipPet"
+	EquipPetEvent.Parent = ReplicatedStorage
+end
+
+-- ---------- (Your existing PetSpawner GUI creation code should remain above this or be merged)
+-- For brevity this script creates the Backpack GUI and expects SpawnBtn, PetNameBox, selectedRarity to exist
+-- If you already have SpawnBtn and PetNameBox defined in your earlier script, comment out the below GUI creation
+-- ----------
+
+-- If your script already created ScreenGui/MainFrame/SpawnBtn/PetNameBox/selectedRarity, skip the next block.
+-- (This block assumes the earlier provided GUI exists. If not, you must create or merge accordingly.)
+
+-- Try to find your existing ScreenGui and SpawnBtn
+local ScreenGui = Player:WaitForChild("PlayerGui"):FindFirstChild("PetSpawnerGui")
+local MainFrame, SpawnBtn, PetNameBox
+
+if ScreenGui then
+	MainFrame = ScreenGui:FindFirstChildWhichIsA("Frame")
+	SpawnBtn = ScreenGui:FindFirstChild("SpawnBtn") -- if you gave it a name earlier
+	PetNameBox = ScreenGui:FindFirstChildWhichIsA("TextBox")
+end
+
+-- If SpawnBtn or MainFrame not found, create minimal ones to avoid errors (fallback)
+if not ScreenGui or not MainFrame then
+	ScreenGui = Instance.new("ScreenGui")
+	ScreenGui.Name = "PetSpawnerGui"
+	ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+
+	MainFrame = Instance.new("Frame")
+	MainFrame.Size = UDim2.new(0, 300, 0, 180)
+	MainFrame.Position = UDim2.new(0.5, -150, 0.5, -90)
+	MainFrame.BackgroundColor3 = Color3.fromRGB(255, 150, 200)
+	MainFrame.BorderSizePixel = 0
+	MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+	MainFrame.Parent = ScreenGui
+
+	PetNameBox = Instance.new("TextBox")
+	PetNameBox.Size = UDim2.new(0.9, 0, 0, 30)
+	PetNameBox.Position = UDim2.new(0.05, 0, 0, 50)
+	PetNameBox.PlaceholderText = "Enter Pet Name"
+	PetNameBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	PetNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+	PetNameBox.Parent = MainFrame
+
+	SpawnBtn = Instance.new("TextButton")
+	SpawnBtn.Size = UDim2.new(0.9, 0, 0, 40)
+	SpawnBtn.Position = UDim2.new(0.05, 0, 0, 140)
+	SpawnBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 255)
+	SpawnBtn.Text = "Spawn Pet"
+	SpawnBtn.TextColor3 = Color3.fromRGB(255,255,255)
+	SpawnBtn.Parent = MainFrame
+end
+
+-- ---------- Backpack GUI (Adopt Me style) ----------
+local BackpackGui = Instance.new("ScreenGui")
+BackpackGui.Name = "PetBackpackGui"
+BackpackGui.Parent = Player:WaitForChild("PlayerGui")
+
+local BackpackFrame = Instance.new("Frame")
+BackpackFrame.Name = "BackpackFrame"
+BackpackFrame.Size = UDim2.new(0, 420, 0, 360)
+BackpackFrame.Position = UDim2.new(0.02, 0, 0.55, 0)
+BackpackFrame.AnchorPoint = Vector2.new(0, 0.5)
+BackpackFrame.BackgroundTransparency = 0.05
+BackpackFrame.BackgroundColor3 = Color3.fromRGB(20,20,20)
+BackpackFrame.BorderSizePixel = 0
+BackpackFrame.Parent = BackpackGui
+
+local BackpackCorner = Instance.new("UICorner")
+BackpackCorner.CornerRadius = UDim.new(0, 8)
+BackpackCorner.Parent = BackpackFrame
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, 0, 0, 36)
+TitleLabel.Position = UDim2.new(0, 0, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "Pets"
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextSize = 20
+TitleLabel.TextColor3 = Color3.fromRGB(255,255,255)
+TitleLabel.Parent = BackpackFrame
+
+-- Scroll area for pet cards
+local Scroller = Instance.new("ScrollingFrame")
+Scroller.Name = "PetScroller"
+Scroller.Size = UDim2.new(1, -20, 1, -56)
+Scroller.Position = UDim2.new(0, 10, 0, 40)
+Scroller.CanvasSize = UDim2.new(0, 0, 0, 0) -- dynamic
+Scroller.ScrollBarThickness = 8
+Scroller.BackgroundTransparency = 1
+Scroller.Parent = BackpackFrame
+
+local UIGrid = Instance.new("UIGridLayout")
+UIGrid.CellSize = UDim2.new(0, 96, 0, 96) -- card size
+UIGrid.CellPadding = UDim2.new(0, 8, 0, 8)
+UIGrid.Parent = Scroller
+
+-- Storage for pets (local cache). Each pet is a table: {id, name, rarity, favorite, equipped}
+local localPets = {}
+local equippedPetId = nil
+local nextPetId = 0
+
+-- Utility: create unique id
+local function newPetId()
+	nextPetId = nextPetId + 1
+	return tostring(tick() .. "-" .. nextPetId)
+end
+
+-- Utility: add CanvasSize update
+local function updateCanvasSize()
+	-- wait for layout to update
+	Scroller.CanvasSize = UDim2.new(0, 0, 0, UIGrid.AbsoluteContentSize.Y + 12)
+end
+
+-- Create a pet card
+local function CreatePetCard(pet)
+	-- pet: {id, name, rarity, favorite, equipped}
+	local card = Instance.new("Frame")
+	card.Name = "PetCard_" .. pet.id
+	card.Size = UDim2.new(0, 96, 0, 96)
+	card.BackgroundColor3 = Color3.fromRGB(28,28,28)
+	card.BorderSizePixel = 0
+	card.Parent = Scroller
+
+	local cr = Instance.new("UICorner")
+	cr.CornerRadius = UDim.new(0, 8)
+	cr.Parent = card
+
+	-- Pet Icon (placeholder)
+	local icon = Instance.new("ImageLabel")
+	icon.Name = "Icon"
+	icon.Size = UDim2.new(0, 56, 0, 56)
+	icon.Position = UDim2.new(0.5, -28, 0, 8)
+	icon.BackgroundTransparency = 1
+	icon.Image = "" -- set to a pet image asset id if available
+	icon.Parent = card
+
+	-- Pet name
+	local nameLbl = Instance.new("TextLabel")
+	nameLbl.Size = UDim2.new(1, -8, 0, 18)
+	nameLbl.Position = UDim2.new(0, 4, 0, 64)
+	nameLbl.BackgroundTransparency = 1
+	nameLbl.Text = pet.name
+	nameLbl.TextSize = 14
+	nameLbl.Font = Enum.Font.Gotham
+	nameLbl.TextColor3 = Color3.fromRGB(255,255,255)
+	nameLbl.TextXAlignment = Enum.TextXAlignment.Left
+	nameLbl.Parent = card
+
+	-- Rarity Tag
+	local rarityTag = Instance.new("TextLabel")
+	rarityTag.Size = UDim2.new(0, 44, 0, 18)
+	rarityTag.Position = UDim2.new(1, -48, 0, 6)
+	rarityTag.BackgroundTransparency = 0
+	rarityTag.BorderSizePixel = 0
+	rarityTag.TextSize = 12
+	rarityTag.Font = Enum.Font.GothamBold
+	rarityTag.TextColor3 = Color3.fromRGB(255,255,255)
+	rarityTag.Text = pet.rarity
+	rarityTag.Parent = card
+
+	local rtCorner = Instance.new("UICorner")
+	rtCorner.CornerRadius = UDim.new(0, 6)
+	rtCorner.Parent = rarityTag
+
+	-- Favorite Star
+	local favBtn = Instance.new("ImageButton")
+	favBtn.Size = UDim2.new(0, 20, 0, 20)
+	favBtn.Position = UDim2.new(0, 6, 0, 6)
+	favBtn.BackgroundTransparency = 1
+	favBtn.Image = pet.favorite and "rbxassetid://6262105480" or "rbxassetid://6262105480" -- placeholder star; you can set different image or color
+	favBtn.Parent = card
+
+	-- Equipped overlay
+	local equipOverlay = Instance.new("Frame")
+	equipOverlay.Size = UDim2.new(1,0,1,0)
+	equipOverlay.BackgroundTransparency = pet.equipped and 0.3 or 1
+	equipOverlay.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+	equipOverlay.BorderSizePixel = 0
+	equipOverlay.Parent = card
+
+	local eqLabel = Instance.new("TextLabel")
+	eqLabel.Size = UDim2.new(1,0,0,18)
+	eqLabel.Position = UDim2.new(0,0,1,-18)
+	eqLabel.BackgroundTransparency = 1
+	eqLabel.Text = pet.equipped and "Equipped" or ""
+	eqLabel.Font = Enum.Font.GothamBold
+	eqLabel.TextColor3 = Color3.fromRGB(0,0,0)
+	eqLabel.TextSize = 12
+	eqLabel.Parent = card
+
+	-- Set rarity visuals
+	local function applyRarityVisuals()
+		if pet.rarity == "FR" then
+			rarityTag.BackgroundColor3 = Color3.fromRGB(100, 140, 255)
+			-- no neon
+		elseif pet.rarity == "NFR" then
+			rarityTag.BackgroundColor3 = Color3.fromRGB(255, 120, 40)
+			-- single neon: add a UIStroke that stays one color
+			local stroke = Instance.new("UIStroke")
+			stroke.Thickness = 2
+			stroke.Parent = card
+			stroke.Color = Color3.fromRGB(0, 255, 200) -- example neon color
+		elseif pet.rarity == "MFR" then
+			rarityTag.BackgroundColor3 = Color3.fromRGB(200, 80, 255)
+			-- mega neon: rainbow stroke
+			local stroke = Instance.new("UIStroke")
+			stroke.Thickness = 2
+			stroke.Parent = card
+			-- Animated rainbow
+			local colors = {
+				Color3.fromRGB(255,0,0),
+				Color3.fromRGB(255,127,0),
+				Color3.fromRGB(255,255,0),
+				Color3.fromRGB(0,255,0),
+				Color3.fromRGB(0,127,255),
+				Color3.fromRGB(139,0,255)
+			}
+			task.spawn(function()
+				local idx = 1
+				while stroke.Parent do
+					local nextIdx = idx % #colors + 1
+					local tween = TweenService:Create(stroke, TweenInfo.new(0.8, Enum.EasingStyle.Linear), {Color = colors[nextIdx]})
+					tween:Play()
+					tween.Completed:Wait()
+					idx = idx + 1
+				end
+			end)
+		else
+			rarityTag.BackgroundColor3 = Color3.fromRGB(80,80,80)
+		end
+	end
+
+	applyRarityVisuals()
+
+	-- Favorite toggle
+	favBtn.MouseButton1Click:Connect(function()
+		pet.favorite = not pet.favorite
+		-- Quick visual: scale star
+		local scale = Instance.new("UIScale")
+		scale.Parent = favBtn
+		scale.Scale = 1.4
+		game:GetService("TweenService"):Create(scale, TweenInfo.new(0.18), {Scale = 1}):Play()
+		-- You can change the image/colour to reflect favorite state
+		if pet.favorite then
+			favBtn.ImageTransparency = 0
+		else
+			favBtn.ImageTransparency = 0.6
+		end
+		-- Optionally move favorites on top (simple approach: update sort)
+		table.sort(localPets, function(a,b)
+			if a.favorite == b.favorite then
+				return a.name:lower() < b.name:lower()
+			else
+				return a.favorite and not b.favorite
+			end
+		end)
+		-- Rebuild UI
+		for _, child in ipairs(Scroller:GetChildren()) do
+			if child:IsA("Frame") then child:Destroy() end
+		end
+		for _, p in ipairs(localPets) do
+			CreatePetCard(p)
+		end
+		updateCanvasSize()
+	end)
+
+	-- Equip on click
+	card.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			-- Equip this pet
+			for _, p in ipairs(localPets) do
+				p.equipped = (p.id == pet.id)
+			end
+			equippedPetId = pet.id
+			-- Visual update: rebuild cards quickly (simple)
+			for _, child in ipairs(Scroller:GetChildren()) do
+				if child:IsA("Frame") then child:Destroy() end
+			end
+			for _, p in ipairs(localPets) do
+				CreatePetCard(p)
+			end
+			updateCanvasSize()
+
+			-- Notify server to spawn/equip pet (server must implement EquipPet RemoteEvent)
+			-- Send pet data: name, rarity, id
+			EquipPetEvent:FireServer({name = pet.name, rarity = pet.rarity, id = pet.id})
+			print("Equipped pet:", pet.name, pet.rarity)
+		end
+	end)
+
+	-- set initial visual state for favorite & equipped
+	if pet.favorite then favBtn.ImageTransparency = 0 else favBtn.ImageTransparency = 0.6 end
+	if pet.equipped then
+		equipOverlay.BackgroundTransparency = 0.3
+		eqLabel.Text = "Equipped"
+	else
+		equipOverlay.BackgroundTransparency = 1
+		eqLabel.Text = ""
+	end
+
+	return card
+end
+
+-- Add pet to local inventory and UI
+local function AddPetToBackpack(petName, rarity)
+	local id = newPetId()
+	local pet = {
+		id = id,
+		name = petName,
+		rarity = rarity or "FR",
+		favorite = false,
+		equipped = false
+	}
+	table.insert(localPets, pet)
+
+	-- Basic sort: favorites first then name
+	table.sort(localPets, function(a,b)
+		if a.favorite == b.favorite then
+			return a.name:lower() < b.name:lower()
+		else
+			return a.favorite and not b.favorite
+		end
+	end)
+
+	-- Create card
+	CreatePetCard(pet)
+	updateCanvasSize()
+end
+
+-- Hook the SpawnBtn to add pet to backpack when pressed
+if SpawnBtn then
+	SpawnBtn.MouseButton1Click:Connect(function()
+		local petName = PetNameBox and PetNameBox.Text or "Pet"
+		petName = petName ~= "" and petName or "Pet"
+		if petName then
+			-- Use selectedRarity from your earlier code if present, otherwise default "FR"
+			local rarity = _G and _G.selectedRarity or (selectedRarity or "FR")
+			-- If your earlier script used variable 'selectedRarity', it will be read here.
+			AddPetToBackpack(petName, rarity)
+			print("Added to backpack:", petName, rarity)
+		end
+	end)
+end
+
+-- Example: add a few sample pets on join (optional, for testing)
+AddPetToBackpack("Bat Dragon", "MFR")
+AddPetToBackpack("Shadow Cat", "NFR")
+AddPetToBackpack("Panda", "FR")
+
+-- Final: make Backpack draggable (small touch)
+local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
+local UserInputService = game:GetService("UserInputService")
+
+BackpackFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = Vector2.new(BackpackFrame.AbsolutePosition.X, BackpackFrame.AbsolutePosition.Y)
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+BackpackFrame.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input == dragInput then
+		local delta = input.Position - dragStart
+		BackpackFrame.Position = UDim2.new(0, startPos.X + delta.X, 0, startPos.Y + delta.Y)
+	end
+end)
+
+-- Call updateCanvasSize initially (UIGrid might need a tick)
+task.defer(updateCanvasSize)
