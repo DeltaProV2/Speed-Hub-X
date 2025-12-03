@@ -1,1 +1,345 @@
-gdsgsd
+--// Pet Spawner LocalScript
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local Mouse = Player:GetMouse()
+local TweenService = game:GetService("TweenService")
+
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "PetSpawnerGui"
+ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+
+-- Create Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 180)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -90)
+MainFrame.BackgroundColor3 = Color3.fromRGB(255, 150, 200) -- light pink
+MainFrame.BorderSizePixel = 0
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.Parent = ScreenGui
+
+-- Gradient Background
+local UIGradient = Instance.new("UIGradient")
+UIGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 180, 220)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 140, 210))
+})
+UIGradient.Rotation = 90
+UIGradient.Parent = MainFrame
+
+-- Neon Animated Border
+local Stroke = Instance.new("UIStroke")
+Stroke.Thickness = 3
+Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+Stroke.Color = Color3.fromRGB(255, 0, 200)
+Stroke.Parent = MainFrame
+
+local neonColors = {
+	Color3.fromRGB(255, 0, 200),   -- Pink
+	Color3.fromRGB(0, 220, 255),   -- Cyan
+	Color3.fromRGB(180, 0, 255),   -- Purple
+	Color3.fromRGB(255, 120, 0),   -- Orange
+}
+
+task.spawn(function()
+	while true do
+		for _, neonColor in ipairs(neonColors) do
+			local tween = TweenService:Create(
+				Stroke,
+				TweenInfo.new(1.5, Enum.EasingStyle.Linear),
+				{ Color = neonColor }
+			)
+			tween:Play()
+			tween.Completed:Wait()
+		end
+	end
+end)
+
+-- Add UICorner
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "amina pets nyo"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 20
+-- Title Frame (darker see-through black background)
+local TitleFrame = Instance.new("Frame")
+TitleFrame.Size = UDim2.new(1, -20, 0, 35)
+TitleFrame.Position = UDim2.new(0, 10, 0, 5)
+TitleFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+TitleFrame.BackgroundTransparency = 0.1 -- darker (0 = solid black, 1 = invisible)
+TitleFrame.BorderSizePixel = 0
+TitleFrame.Parent = MainFrame
+
+local TitleFrameCorner = Instance.new("UICorner")
+TitleFrameCorner.CornerRadius = UDim.new(0, 8)
+TitleFrameCorner.Parent = TitleFrame
+
+-- Title Text
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "amina pets nyo"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 20
+Title.Parent = TitleFrame
+
+-- TextBox for Pet Name
+local PetNameBox = Instance.new("TextBox")
+PetNameBox.Size = UDim2.new(0.9, 0, 0, 30)
+PetNameBox.Position = UDim2.new(0.05, 0, 0, 50)
+PetNameBox.PlaceholderText = "Enter Pet Name"
+PetNameBox.Text = ""
+PetNameBox.ClearTextOnFocus = false
+PetNameBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+PetNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+PetNameBox.Font = Enum.Font.SourceSans
+PetNameBox.TextSize = 18
+PetNameBox.Parent = MainFrame
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 5)
+BoxCorner.Parent = PetNameBox
+
+-- Button creation helper
+local function CreateButton(name, color, posY)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0.25, 0, 0, 30)
+	btn.Position = UDim2.new(posY, 0, 0, 90)
+	btn.BackgroundColor3 = color
+	btn.Text = name
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Font = Enum.Font.SourceSansBold
+	btn.TextSize = 18
+	btn.Parent = MainFrame
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0,5)
+	corner.Parent = btn
+	return btn
+end
+
+-- Rarity Buttons
+local MFRBtn = CreateButton("MFR", Color3.fromRGB(255, 100, 100), 0.05)
+local NFRBtn = CreateButton("NFR", Color3.fromRGB(100, 255, 100), 0.375)
+local FRBtn = CreateButton("FR", Color3.fromRGB(100, 100, 255), 0.7)
+
+-- Spawn Pet Button
+local SpawnBtn = Instance.new("TextButton")
+SpawnBtn.Size = UDim2.new(0.9, 0, 0, 40)
+SpawnBtn.Position = UDim2.new(0.05, 0, 0, 140)
+SpawnBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 255)
+SpawnBtn.Text = "Spawn Pet"
+SpawnBtn.TextColor3 = Color3.fromRGB(255,255,255)
+SpawnBtn.Font = Enum.Font.SourceSansBold
+SpawnBtn.TextSize = 20
+SpawnBtn.Parent = MainFrame
+
+local SpawnCorner = Instance.new("UICorner")
+SpawnCorner.CornerRadius = UDim.new(0,5)
+SpawnCorner.Parent = SpawnBtn
+
+-- Movable GUI logic
+-- Draggable GUI logic
+-- Draggable GUI logic (drag only using the Title)
+-- Draggable GUI (Title only) + Hide mouse while dragging
+local UserInputService = game:GetService("UserInputService")
+
+local dragging = false
+local dragStart
+local startPos
+local dragInput
+
+local function update(input)
+	local delta = input.Position - dragStart
+	MainFrame.Position = UDim2.new(
+		0, startPos.X + delta.X,
+		0, startPos.Y + delta.Y
+	)
+end
+
+Title.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = Vector2.new(MainFrame.AbsolutePosition.X, MainFrame.AbsolutePosition.Y)
+
+		-- Hide mouse
+		UserInputService.MouseIconEnabled = false
+
+		-- Stop dragging when mouse released
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+				UserInputService.MouseIconEnabled = true -- show mouse again
+			end
+		end)
+	end
+end)
+
+Title.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input == dragInput then
+		update(input)
+	end
+end)
+
+-- Rarity selection logic
+local selectedRarity = "MFR"
+
+local function selectRarity(rarity)
+	selectedRarity = rarity
+	MFRBtn.BackgroundColor3 = (rarity == "MFR" and Color3.fromRGB(255,100,100)) or Color3.fromRGB(60,60,60)
+	NFRBtn.BackgroundColor3 = (rarity == "NFR" and Color3.fromRGB(100,255,100)) or Color3.fromRGB(60,60,60)
+	FRBtn.BackgroundColor3 = (rarity == "FR" and Color3.fromRGB(100,100,255)) or Color3.fromRGB(60,60,60)
+end
+
+MFRBtn.MouseButton1Click:Connect(function() selectRarity("MFR") end)
+NFRBtn.MouseButton1Click:Connect(function() selectRarity("NFR") end)
+FRBtn.MouseButton1Click:Connect(function() selectRarity("FR") end)
+
+-- Spawn pet logic (replace with your own spawning code)
+SpawnBtn.MouseButton1Click:Connect(function()
+	local petName = PetNameBox.Text
+	if petName ~= "" then
+		print("Spawning pet:", petName, "with rarity:", selectedRarity)
+		-- Example: fire a remote event to server to give pet
+		-- game.ReplicatedStorage.SpawnPet:FireServer(petName, selectedRarity)
+	end
+end)
+
+-- Table to store player pets (client-side only)
+local PlayerPets = {}
+
+-- Backpack UI inside LocalScript
+-- Parent it to PlayerGui automatically
+local BackpackGui = Instance.new("Frame")
+BackpackGui.Size = UDim2.new(0, 300, 0, 250)
+BackpackGui.Position = UDim2.new(1, -310, 0.5, -125)
+BackpackGui.BackgroundColor3 = Color3.fromRGB(20,20,20)
+BackpackGui.BackgroundTransparency = 0.1
+BackpackGui.BorderSizePixel = 0
+BackpackGui.AnchorPoint = Vector2.new(0,0.5)
+BackpackGui.Visible = true
+BackpackGui.Parent = Player:WaitForChild("PlayerGui")
+
+local BackpackTitle = Instance.new("TextLabel")
+BackpackTitle.Size = UDim2.new(1,0,0,30)
+BackpackTitle.BackgroundTransparency = 1
+BackpackTitle.Text = "Pet Backpack"
+BackpackTitle.TextColor3 = Color3.fromRGB(255,255,255)
+BackpackTitle.Font = Enum.Font.SourceSansBold
+BackpackTitle.TextSize = 18
+BackpackTitle.Parent = BackpackGui
+
+-- Scrollable area for pet cards
+local PetList = Instance.new("ScrollingFrame")
+PetList.Size = UDim2.new(1, -10, 1, -40)
+PetList.Position = UDim2.new(0, 5, 0, 35)
+PetList.BackgroundTransparency = 1
+PetList.BorderSizePixel = 0
+PetList.CanvasSize = UDim2.new(0,0,0,0)
+PetList.ScrollBarThickness = 6
+PetList.Parent = BackpackGui
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0,5)
+UIListLayout.Parent = PetList
+
+-- Function to create a pet card
+local function CreatePetCard(petName, rarity)
+	local card = Instance.new("Frame")
+	card.Size = UDim2.new(1,0,0,50)
+	card.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	card.BorderSizePixel = 0
+	card.Parent = PetList
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0,5)
+	corner.Parent = card
+
+	-- Pet name label
+	local nameLabel = Instance.new("TextLabel")
+	nameLabel.Size = UDim2.new(0.6,0,1,0)
+	nameLabel.BackgroundTransparency = 1
+	nameLabel.Text = petName
+	nameLabel.TextColor3 = Color3.fromRGB(255,255,255)
+	nameLabel.Font = Enum.Font.SourceSansBold
+	nameLabel.TextSize = 16
+	nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+	nameLabel.Position = UDim2.new(0.05,0,0,0)
+	nameLabel.Parent = card
+
+	-- Rarity label
+	local rarityLabel = Instance.new("TextLabel")
+	rarityLabel.Size = UDim2.new(0.2,0,1,0)
+	rarityLabel.BackgroundTransparency = 1
+	rarityLabel.Text = rarity
+	rarityLabel.TextColor3 = Color3.fromRGB(255,255,0)
+	rarityLabel.Font = Enum.Font.SourceSansBold
+	rarityLabel.TextSize = 16
+	rarityLabel.Parent = card
+	rarityLabel.Position = UDim2.new(0.7,0,0,0)
+
+	-- Favorite star
+	local fav = Instance.new("TextButton")
+	fav.Size = UDim2.new(0.1,0,1,0)
+	fav.Position = UDim2.new(0.9,0,0,0)
+	fav.BackgroundTransparency = 1
+	fav.Text = "☆"
+	fav.TextColor3 = Color3.fromRGB(255,255,0)
+	fav.Font = Enum.Font.SourceSansBold
+	fav.TextSize = 20
+	fav.Parent = card
+
+	local isFavorite = false
+	fav.MouseButton1Click:Connect(function()
+		isFavorite = not isFavorite
+		fav.Text = isFavorite and "★" or "☆"
+		-- Optional: Move favorite pets to top
+		if isFavorite then
+			card.LayoutOrder = 0
+		else
+			card.LayoutOrder = #PlayerPets
+		end
+	end)
+
+	-- Equip visual effect (outline glow)
+	card.MouseButton1Click:Connect(function()
+		-- Remove glow from all others
+		for _, p in pairs(PlayerPets) do
+			if p.Card then
+				p.Card.BackgroundColor3 = Color3.fromRGB(40,40,40)
+			end
+		end
+		card.BackgroundColor3 = Color3.fromRGB(70,70,70) -- selected pet highlight
+	end)
+
+	-- Save card reference
+	table.insert(PlayerPets, {Name=petName, Rarity=rarity, Card=card})
+
+	-- Update CanvasSize for scrolling
+	PetList.CanvasSize = UDim2.new(0,0,0,UIListLayout.AbsoluteContentSize.Y)
+end
+
+-- Hook into Spawn Button
+SpawnBtn.MouseButton1Click:Connect(function()
+	local petName = PetNameBox.Text
+	if petName ~= "" then
+		CreatePetCard(petName, selectedRarity)
+		PetNameBox.Text = ""
+	end
+end)
