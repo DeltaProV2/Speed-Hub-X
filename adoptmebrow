@@ -133,27 +133,26 @@ local LocalInventory = {}
 -- Pet spawner
 SpawnBtn.MouseButton1Click:Connect(function()
     local petName = PetNameBox.Text
-    if petName == "" then
-        warn("DEBUG: No pet name entered")
-        return
-    end
+    if petName == "" then return end
 
     print("DEBUG: Attempting to spawn:", petName)
+    local petTemplate = findPetAnywhere(petName)
 
-    local petModel = PetFolder:FindFirstChild(petName)
-    if not petModel then
-        warn("Pet not found in PetFolder:", petName)
+    if not petTemplate then
+        warn("Pet not found:", petName)
         return
     end
 
-    local clone = petModel:Clone()
-    local hrp = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
-    if hrp then
-        clone:SetPrimaryPartCFrame(hrp.CFrame * CFrame.new(3,0,0))
+    local char = Player.Character or Player.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+
+    local petClone = petTemplate:Clone()
+    petClone.Parent = workspace -- or PetFolder if you want local folder
+    if petClone.PrimaryPart then
+        petClone:SetPrimaryPartCFrame(hrp.CFrame * CFrame.new(3, 0, 0))
     end
-    clone.Parent = PetFolder
 
-    table.insert(LocalInventory, {Name=petName, Rarity=selectedRarity, Model=clone})
-
-    print("DEBUG: Pet spawned and added to LocalInventory")
+    table.insert(LocalInventory, {Name = petName, Rarity = selectedRarity, Model = petClone})
+    print("DEBUG: Pet spawned successfully!")
 end)
+
