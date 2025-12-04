@@ -209,68 +209,177 @@ spawnBtn.Text = "Spawn Pet"
 spawnBtn.Parent = frame
 Instance.new("UICorner", spawnBtn)
 
+-- Visual Pet Injector (client-only)
+-- Paste this at the bottom of your GUI LocalScript (replaces previous spawn handler)
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local player = game.Players.LocalPlayer
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
+local player = Players.LocalPlayer
 
 spawnBtn.MouseButton1Click:Connect(function()
     local petTemplate = petName.Text
-    if petTemplate == "" then
+    if not petTemplate or petTemplate == "" then
         warn("[PetSpawner] No pet name entered!")
         return
     end
 
-    -- Get client data
-    local success, clientData = pcall(function()
+    -- require ClientData safely
+    local ok, clientData = pcall(function()
         return require(ReplicatedStorage.ClientModules.Core.ClientData)
     end)
-    if not success or not clientData then
+    if not ok or not clientData then
         warn("[PetSpawner] ERROR: Could not require ClientData!")
         return
     end
 
-    local playerData = clientData.get_data()[tostring(player)]
-    if not playerData then
-        warn("[PetSpawner] ERROR: Player data not found!")
+    local allData = clientData.get_data()
+    if not allData then
+        warn("[PetSpawner] ERROR: clientData.get_data() returned nil")
         return
     end
 
-    -- Determine rarity automatically (for demo, MFR = Legendary)
-    local rarity = "MFR"
+    local playerData = allData[tostring(player)]
+    if not playerData or not playerData.inventory or not playerData.inventory.pets then
+        warn("[PetSpawner] ERROR: playerData.inventory.pets not found!")
+        return
+    end
 
-    -- Add pet to inventory
-    local newPet = {
-        template = petTemplate,
-        properties = {
-            rideable = true,
-            flyable = true,
-            neon = petTemplate:lower():find("neon") and true or false,
-            mega = petTemplate:lower():find("mega") and true or false
+    -- Find an existing pet to clone (so we don't miss required fields for the UI)
+    local templateToClone = nil
+    for i, pet in ipairs(playerData.inventory.pets) do
+        templateToClone = pet
+        break
+    end
+
+    -- Fallback: if player has no pets, try to create a minimal valid structure
+    if not templateToClone then
+        warn("[PetSpawner] No existing pet to clone. Creating a minimal entry (may be risky).")
+        templateToClone = {
+            template = petTemplate,
+            properties = {
+                rideable = true,
+                flyable = true,
+                neon = false,
+                mega = false
+            }
         }
-    }
+    end
+
+    -- Deep copy function (keeps nested tables)
+    local function deepCopy(t)
+        if type(t) ~= "table" then return t end
+        local copy = {}
+        for k, v in pairs(t) do
+            if type(v) == "table" then
+                copy[k] = deepCopy(v)
+            else
+                copy[k] = v
+            end
+        end
+        return copy
+    end
+
+    local newPet = deepCopy(templateToClone)
+
+    -- Set template and properties explicitly (use logic you requested)
+    newPet.template = petTemplate
+    newPet.properties = newPet.properties or {}
+    newPet.properties.rideable = true
+    newPet.properties.flyable = true
+    -- If name contains "neon" or "mega", set those flags accordingly
+    local lname = petTemplate:lower()
+    newPet.properties.neon = lname:find("neon") and true or false
+    newPet.properties.mega = lname:find("mega") and true or false
+
+    -- Ensure the new pet has a unique id / uid fields the UI might expect
+    -- We'll attempt to set common id keys if they exist in the cloned template
+    local generatedId = HttpService:GenerateGUID(false)
+
+    -- helper to set common id-like fields
+    local function assignIdLikeFields(petTable, idStr)
+        local possibleKeys = {"id", "uid", "instance_id", "template_id", "unique_id"}
+        for _, key in ipairs(possibleKeys) do
+            if petTable[key] ~= nil then
+                petTable[key] = idStr
+            end
+        end
+        -- some games put nested ids under "data" or "meta"
+        if petTable.data and type(petTable.data) == "table" then
+            for _, key in ipairs(possibleKeys) do
+                if petTable.data[key] ~= nil then
+                    petTable.data[key] = idStr
+                end
+            end
+        end
+    end
+
+    assignIdLikeFields(newPet, generatedId)
+    -- also set a couple of safe fields directly
+    newPet.id = newPet.id or generatedId
+    newPet.uid = newPet.uid or generatedId
+
+    -- Insert into inventory
     table.insert(playerData.inventory.pets, newPet)
 
-    -- Update GUI label
-    selectedLabel.Text = "Pet Spawned: "..petTemplate.." ("..rarity..")"
-    selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- green for success
+    -- Update the GUI label (keeps your "Pet Spawned: Owl (MFR)" pattern)
+    local rarityTag = "MFR" -- you can adjust logic later to determine rarity properly
+    if selectedLabel and selectedLabel.Text ~= nil then
+        selectedLabel.Text = "Pet Spawned: "..petTemplate.." ("..rarityTag..")"
+        selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- green
+    end
 
     print("--------------------------------------------------")
-    print("[PetSpawner] Pet spawned successfully into inventory!")
-    print("Pet Name:", newPet.template)
-    print("Flyable:", newPet.properties.flyable)
-    print("Rideable:", newPet.properties.rideable)
-    print("Neon:", newPet.properties.neon)
-    print("Mega:", newPet.properties.mega)
-    print("Total pets in inventory:", #playerData.inventory.pets)
+    print("[PetSpawner] Injected visual pet into inventory (client-only).")
+    print("Template:", newPet.template)
+    print("ID:", newPet.id)
+    print("Flyable:", tostring(newPet.properties.flyable))
+    print("Rideable:", tostring(newPet.properties.rideable))
+    print("Neon:", tostring(newPet.properties.neon))
+    print("Mega:", tostring(newPet.properties.mega))
+    print("Total pets now:", #playerData.inventory.pets)
 
-    -- OPTIONAL: refresh inventory GUI (if Backpack GUI exposes a refresh function)
-    local success2, backpackModule = pcall(function()
-        return require(ReplicatedStorage.ClientModules.Gui.BackpackGui)
-    end)
-    if success2 and backpackModule and backpackModule.refresh_inventory then
-        backpackModule.refresh_inventory()
+    -- Attempt to call backpack UI refresh safely (wrapped in pcall)
+    local function tryRefreshBackpack()
+        -- Common place for the backpack UI module (try multiple common names)
+        local tryModules = {
+            "ClientModules.Core.UIManager.Apps.BackpackApp",
+            "ClientModules.Gui.BackpackGui",
+            "ClientModules.Core.UIManager.Apps.BackpackApp.BackpackCategoryButtons"
+        }
+        for _, path in ipairs(tryModules) do
+            local success, mod = pcall(function() return require(ReplicatedStorage:WaitForChild(unpack(string.split(path, ".")))) end)
+            if success and mod then
+                -- try common refresh functions
+                local refreshFns = {"refresh_inventory", "refresh", "update", "rebuild"}
+                for _, fnName in ipairs(refreshFns) do
+                    if type(mod[fnName]) == "function" then
+                        pcall(mod[fnName])
+                        print("[PetSpawner] Called backpack UI function:", path.."."..fnName)
+                        return true
+                    end
+                end
+            end
+        end
+        -- As a last resort, try UIManager global (very safe pcall)
+        local ok2, uiManager = pcall(function()
+            return ReplicatedStorage.ClientModules and ReplicatedStorage.ClientModules.Core and ReplicatedStorage.ClientModules.Core.UIManager
+        end)
+        if ok2 and uiManager then
+            -- sometimes the UI listens to signals; we can't safely emit them without knowing structure
+            -- so we just return false here quietly
+            return false
+        end
+        return false
+    end
+
+    local refreshed = pcall(tryRefreshBackpack)
+    if not refreshed then
+        -- not critical; we injected the data and the GUI should be stable because we cloned a real entry
+        print("[PetSpawner] Backpack UI refresh not available or failed (this is okay).")
     end
 end)
-
 
 -------------------------------------------------------------
 -- MINIMIZE SYSTEM (fixed)
