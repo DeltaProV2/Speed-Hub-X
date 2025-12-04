@@ -1,112 +1,154 @@
---// Create ScreenGui
+--// Setup
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+
 local gui = Instance.new("ScreenGui")
-gui.Name = "PetSpawnerUI"
+gui.Name = "NotificationPanel"
 gui.ResetOnSpawn = false
-gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+gui.Parent = player:WaitForChild("PlayerGui")
 
---// Main Frame
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 240)
-frame.Position = UDim2.new(0.5, -175, 0.5, -120)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.BorderSizePixel = 0
-frame.Parent = gui
+--// Main Panel
+local panel = Instance.new("Frame")
+panel.Size = UDim2.new(0, 350, 0, 120)
+panel.Position = UDim2.new(0.5, -175, 0.15, 0)
+panel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+panel.BorderSizePixel = 0
+panel.Active = true
+panel.Draggable = false  -- we will custom-handle drag for mobile compatibility
+panel.Parent = gui
+Instance.new("UICorner", panel)
 
---// UI corner
-local corner = Instance.new("UICorner", frame)
-corner.CornerRadius = UDim.new(0, 12)
+--// Top Bar
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 30)
+topBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+topBar.BorderSizePixel = 0
+topBar.Parent = panel
+Instance.new("UICorner", topBar)
 
 --// Title
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 40)
 title.BackgroundTransparency = 1
+title.Size = UDim2.new(1, -60, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
 title.Font = Enum.Font.GothamBold
 title.TextScaled = true
-title.TextColor3 = Color3.fromRGB(255,255,255)
-title.Text = "Pet Spawner By Shxdrag"
-title.Parent = frame
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Text = "Notification"
+title.Parent = topBar
 
---// Pet name label
-local petName = Instance.new("TextLabel")
-petName.Position = UDim2.new(0, 0, 0, 50)
-petName.Size = UDim2.new(1, 0, 0, 30)
-petName.BackgroundTransparency = 1
-petName.Font = Enum.Font.GothamSemibold
-petName.TextScaled = true
-petName.TextColor3 = Color3.fromRGB(255,255,255)
-petName.Text = "Owl"
-petName.Parent = frame
+--// Minimize (-)
+local minimize = Instance.new("TextButton")
+minimize.Text = "-"
+minimize.Size = UDim2.new(0, 25, 0, 25)
+minimize.Position = UDim2.new(1, -55, 0.5, -12)
+minimize.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+minimize.Font = Enum.Font.GothamBold
+minimize.TextScaled = true
+minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimize.Parent = topBar
+Instance.new("UICorner", minimize)
 
---// Buttons container
-local buttonHolder = Instance.new("Frame")
-buttonHolder.Size = UDim2.new(1, 0, 0, 50)
-buttonHolder.Position = UDim2.new(0, 0, 0, 90)
-buttonHolder.BackgroundTransparency = 1
-buttonHolder.Parent = frame
+--// Close (X)
+local close = Instance.new("TextButton")
+close.Text = "X"
+close.Size = UDim2.new(0, 25, 0, 25)
+close.Position = UDim2.new(1, -25, 0.5, -12)
+close.BackgroundColor3 = Color3.fromRGB(120, 40, 40)
+close.Font = Enum.Font.GothamBold
+close.TextScaled = true
+close.TextColor3 = Color3.fromRGB(255, 255, 255)
+close.Parent = topBar
+Instance.new("UICorner", close)
 
-local uiList = Instance.new("UIListLayout", buttonHolder)
-uiList.FillDirection = Enum.FillDirection.Horizontal
-uiList.Padding = UDim.new(0, 10)
-uiList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+--// Message
+local message = Instance.new("TextLabel")
+message.Size = UDim2.new(1, -20, 0, 50)
+message.Position = UDim2.new(0, 10, 0, 40)
+message.BackgroundTransparency = 1
+message.Font = Enum.Font.GothamSemibold
+message.TextScaled = true
+message.TextColor3 = Color3.fromRGB(255, 255, 255)
+message.Text = "Successfully Saved Pet!"
+message.Parent = panel
 
--- Button data
-local options = {
-    {name = "MFR", color = Color3.fromRGB(255, 100, 100)},
-    {name = "NFR", color = Color3.fromRGB(120, 255, 120)},
-    {name = "FR",  color = Color3.fromRGB(120, 120, 255)}
-}
+-------------------------------------------------------------------
+-- DRAGGING (PC + MOBILE)
+-------------------------------------------------------------------
+local dragging = false
+local dragStart, startPos
 
-local selected = nil
-local rarityLabel = nil
-
---// Create rarity display label
-rarityLabel = Instance.new("TextLabel")
-rarityLabel.Position = UDim2.new(0, 0, 0, 200)
-rarityLabel.Size = UDim2.new(1, 0, 0, 25)
-rarityLabel.BackgroundTransparency = 1
-rarityLabel.Font = Enum.Font.GothamSemibold
-rarityLabel.TextScaled = true
-rarityLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-rarityLabel.Text = "Selected: None"
-rarityLabel.Parent = frame
-
---// Create MFR / NFR / FR buttons
-for _, data in ipairs(options) do
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 90, 1, 0)
-    btn.BackgroundColor3 = data.color
-    btn.Font = Enum.Font.GothamBold
-    btn.TextScaled = true
-    btn.TextColor3 = Color3.fromRGB(255,255,255)
-    btn.Text = data.name
-    btn.AutoButtonColor = false
-    btn.Parent = buttonHolder
-
-    Instance.new("UICorner", btn)
-
-    btn.MouseButton1Click:Connect(function()
-        selected = data.name
-        rarityLabel.Text = "Selected: " .. selected
-    end)
+local function update(input)
+    local delta = input.Position - dragStart
+    panel.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 end
 
---// Spawn button
-local spawnBtn = Instance.new("TextButton")
-spawnBtn.Size = UDim2.new(1, -20, 0, 45)
-spawnBtn.Position = UDim2.new(0, 10, 0, 150)
-spawnBtn.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
-spawnBtn.Font = Enum.Font.GothamBold
-spawnBtn.TextScaled = true
-spawnBtn.TextColor3 = Color3.fromRGB(255,255,255)
-spawnBtn.Text = "Spawn Pet"
-spawnBtn.Parent = frame
-Instance.new("UICorner", spawnBtn)
+topBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+       input.UserInputType == Enum.UserInputType.Touch then
 
-spawnBtn.MouseButton1Click:Connect(function()
-    if selected == nil then
-        rarityLabel.Text = "Please select a rarity!"
-        return
+        dragging = true
+        dragStart = input.Position
+        startPos = panel.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+topBar.InputChanged:Connect(function(input)
+    if dragging and 
+       (input.UserInputType == Enum.UserInputType.MouseMovement 
+       or input.UserInputType == Enum.UserInputType.Touch) then
+        update(input)
+    end
+end)
+
+-------------------------------------------------------------------
+-- MINIMIZE LOGIC
+-------------------------------------------------------------------
+local minimized = false
+
+minimize.MouseButton1Click:Connect(function()
+    if minimized == false then
+        minimized = true
+        TweenService:Create(panel, TweenInfo.new(0.3), {
+            Size = UDim2.new(0, 350, 0, 30)
+        }):Play()
+    else
+        minimized = false
+        TweenService:Create(panel, TweenInfo.new(0.3), {
+            Size = UDim2.new(0, 350, 0, 120)
+        }):Play()
+    end
+end)
+
+-------------------------------------------------------------------
+-- CLOSE LOGIC
+-------------------------------------------------------------------
+close.MouseButton1Click:Connect(function()
+    panel.Visible = false
+end)
+
+-------------------------------------------------------------------
+-- PUBLIC FUNCTION FOR SHOWING NOTIFICATION
+-------------------------------------------------------------------
+function ShowNotification(text)
+    if text then
+        message.Text = text
     end
 
-    rarityLabel.Text = "Pet Spawned: Owl ("..selected..")"
-end)
+    panel.Visible = true
+    panel.BackgroundTransparency = 1
+    message.TextTransparency = 1
+
+    TweenService:Create(panel, TweenInfo.new(0.3), {BackgroundTransparency = 0}):Play()
+    TweenService:Create(message, TweenInfo.new(0.3), {TextTransparency = 0}):Play()
+end
+
+-- Example:
+-- ShowNotification("Successfully Saved Pet!")
