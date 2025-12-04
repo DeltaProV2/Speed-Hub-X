@@ -282,32 +282,29 @@ spawnBtn.MouseButton1Click:Connect(function()
 	end
 
 	local newPet = {
-		id = "Injected_" .. tostring(os.clock()),  -- unique ID
-
+		id = "Injected_" .. tostring(os.clock()),
 		template = petTemplate,
 
 		properties = {
 			rideable = true,
 			flyable = true,
-
 			neon = false,
 			mega = false,
 
+			-- required for UI
 			age = 0,
 			level = 1,
 			unique = false,
 			placeId = 0,
 		},
 
-		-- These MUST exist or UI crashes (and hides all pets)
-		icon = "rbxassetid://152207377",
-		thumbnail = "rbxassetid://152207377",
-
 		data = {
-			icon = "rbxassetid://152207377",
-			thumbnail = "rbxassetid://152207377",
-		},
+			-- UI will override these automatically
+			icon = nil,
+			thumbnail = nil,
+		}
 	}
+
 
 
 	-- Ensure the new pet has a unique id / uid fields the UI might expect
