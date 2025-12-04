@@ -210,10 +210,7 @@ spawnBtn.Parent = frame
 Instance.new("UICorner", spawnBtn)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-
--- Your GUI elements: spawnBtn and petName already exist
+local player = game.Players.LocalPlayer
 
 spawnBtn.MouseButton1Click:Connect(function()
     local petTemplate = petName.Text
@@ -222,36 +219,39 @@ spawnBtn.MouseButton1Click:Connect(function()
         return
     end
 
-    -- Get the client data module
+    -- Get client data
     local success, clientData = pcall(function()
         return require(ReplicatedStorage.ClientModules.Core.ClientData)
     end)
-
-    if not success then
+    if not success or not clientData then
         warn("[PetSpawner] ERROR: Could not require ClientData!")
         return
     end
 
-    -- Get player data
     local playerData = clientData.get_data()[tostring(player)]
     if not playerData then
         warn("[PetSpawner] ERROR: Player data not found!")
         return
     end
 
-    -- Create the new pet entry
+    -- Determine rarity automatically (for demo, MFR = Legendary)
+    local rarity = "MFR"
+
+    -- Add pet to inventory
     local newPet = {
         template = petTemplate,
         properties = {
-            rideable = true, -- always true
-            flyable = true,  -- always true
+            rideable = true,
+            flyable = true,
             neon = petTemplate:lower():find("neon") and true or false,
             mega = petTemplate:lower():find("mega") and true or false
         }
     }
-
-    -- Add the pet to the player's inventory
     table.insert(playerData.inventory.pets, newPet)
+
+    -- Update GUI label
+    selectedLabel.Text = "Pet Spawned: "..petTemplate.." ("..rarity..")"
+    selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- green for success
 
     print("--------------------------------------------------")
     print("[PetSpawner] Pet spawned successfully into inventory!")
@@ -261,7 +261,16 @@ spawnBtn.MouseButton1Click:Connect(function()
     print("Neon:", newPet.properties.neon)
     print("Mega:", newPet.properties.mega)
     print("Total pets in inventory:", #playerData.inventory.pets)
+
+    -- OPTIONAL: refresh inventory GUI (if Backpack GUI exposes a refresh function)
+    local success2, backpackModule = pcall(function()
+        return require(ReplicatedStorage.ClientModules.Gui.BackpackGui)
+    end)
+    if success2 and backpackModule and backpackModule.refresh_inventory then
+        backpackModule.refresh_inventory()
+    end
 end)
+
 
 -------------------------------------------------------------
 -- MINIMIZE SYSTEM (fixed)
