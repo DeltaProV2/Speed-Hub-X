@@ -7,15 +7,17 @@ local RunService = game:GetService("RunService")
 local gui = Instance.new("ScreenGui")
 gui.Name = "PetSpawnerUI"
 gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true -- <<<< ***THE FIX FOR ANDROID DRAGGING***
 gui.Parent = player:WaitForChild("PlayerGui")
 
 -- Main Frame
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 350, 0, 270)
 frame.Position = UDim2.new(0.5, -175, 0.25, 0)
-frame.Active = true -- required for mobile input
+frame.Active = true
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
+frame.ClipsDescendants = false
 frame.Parent = gui
 Instance.new("UICorner", frame)
 
@@ -23,9 +25,10 @@ Instance.new("UICorner", frame)
 local top = Instance.new("Frame")
 top.Size = UDim2.new(1, 0, 0, 40)
 top.Position = UDim2.new(0, 0, 0, 0)
-top.Active = true -- required for mobile input
+top.Active = true
 top.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 top.BorderSizePixel = 0
+top.ClipsDescendants = false
 top.Parent = frame
 Instance.new("UICorner", top)
 
@@ -64,10 +67,10 @@ expand.TextColor3 = Color3.new(1,1,1)
 expand.Parent = top
 Instance.new("UICorner", expand)
 
--- Move Button (↕) - placed next to minimize/expand
+-- Move Button
 local moveBtn = Instance.new("TextButton")
 moveBtn.Size = UDim2.new(0, 30, 0, 30)
-moveBtn.Position = UDim2.new(1, -80, 0, 5) -- sits between title and minimize
+moveBtn.Position = UDim2.new(1, -80, 0, 5)
 moveBtn.Text = "↕"
 moveBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 moveBtn.TextScaled = true
@@ -157,7 +160,7 @@ spawnBtn.MouseButton1Click:Connect(function()
 end)
 
 -------------------------------------------------------------
--- Minimize system (robust)
+-- Minimize system
 -------------------------------------------------------------
 local savedVisibility = {}
 
@@ -198,45 +201,28 @@ expand.MouseButton1Click:Connect(function()
 end)
 
 -------------------------------------------------------------
--- REAL Mobile + PC Dragging for Move Button
+-- REAL Dragging (PC + MOBILE)
 -------------------------------------------------------------
 local dragging = false
 local dragStart = Vector2.zero
-local startPos = UDim2.new(0,0,0,0)
-local activeTouch = nil -- for Android/iOS
-
-local function getViewport()
-    local cam = workspace.CurrentCamera
-    return cam and cam.ViewportSize or Vector2.new(800,600)
-end
-
-local function clampPosition(x, y)
-    return x, y -- no locking, free movement
-end
-
+local startPos = frame.Position
+local activeTouch = nil
 
 local function updateDrag(pos)
     local delta = pos - dragStart
     local x = startPos.X.Offset + delta.X
     local y = startPos.Y.Offset + delta.Y
 
-    x, y = clampPosition(x, y)
-
     frame.Position = UDim2.new(startPos.X.Scale, x, startPos.Y.Scale, y)
 end
 
-
----------------------------
--- START DRAG (PC + MOBILE)
----------------------------
 moveBtn.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        -- PC
         dragging = true
         dragStart = UserInputService:GetMouseLocation()
         startPos = frame.Position
+
     elseif input.UserInputType == Enum.UserInputType.Touch then
-        -- Mobile
         dragging = true
         activeTouch = input
         dragStart = input.Position
@@ -244,9 +230,6 @@ moveBtn.InputBegan:Connect(function(input)
     end
 end)
 
----------------------------
--- STOP DRAG
----------------------------
 moveBtn.InputEnded:Connect(function(input)
     if input == activeTouch or input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = false
@@ -254,18 +237,12 @@ moveBtn.InputEnded:Connect(function(input)
     end
 end)
 
----------------------------
--- PC: Mouse movement
----------------------------
 UserInputService.InputChanged:Connect(function(input)
     if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
         updateDrag(UserInputService:GetMouseLocation())
     end
 end)
 
----------------------------
--- MOBILE: Touch movement
----------------------------
 UserInputService.TouchMoved:Connect(function(touch)
     if dragging and touch == activeTouch then
         updateDrag(touch.Position)
