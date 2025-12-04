@@ -2,12 +2,11 @@
 local player = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "PetSpawnerUI"
 gui.ResetOnSpawn = false
-gui.IgnoreGuiInset = true -- <<<< ***THE FIX FOR ANDROID DRAGGING***
+gui.IgnoreGuiInset = true
 gui.Parent = player:WaitForChild("PlayerGui")
 
 -- Main Frame
@@ -41,12 +40,14 @@ title.TextScaled = true
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Text = "Pet Spawner By Shxdrag"
 title.Parent = top
+
+-- Drag bar (used for dragging)
 local DragBar = Instance.new("Frame")
 DragBar.Name = "DragBar"
-DragBar.BackgroundTransparency = 1
-DragBar.Size = UDim2.new(1, 0, 1, 0)
+DragBar.Size = UDim2.new(1, -140, 1, 0) -- only the left area drags
 DragBar.Position = UDim2.new(0, 0, 0, 0)
-DragBar.Parent = TopBar
+DragBar.BackgroundTransparency = 1
+DragBar.Parent = top
 
 -- Minimize Button
 local minimize = Instance.new("TextButton")
@@ -59,47 +60,8 @@ minimize.Font = Enum.Font.GothamBold
 minimize.TextColor3 = Color3.new(1,1,1)
 minimize.Parent = top
 Instance.new("UICorner", minimize)
-local UIS = game:GetService("UserInputService")
 
-local dragging = false
-local dragStart
-local startPos
-
-local function updateDrag(input)
-    local delta = input.Position - dragStart
-    MainFrame.Position = UDim2.new(
-        startPos.X.Scale,
-        startPos.X.Offset + delta.X,
-        startPos.Y.Scale,
-        startPos.Y.Offset + delta.Y
-    )
-end
-
-DragBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 
-        or input.UserInputType == Enum.UserInputType.Touch then
-        
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-UIS.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement 
-        or input.UserInputType == Enum.UserInputType.Touch) then
-        
-        updateDrag(input)
-    end
-end)
-
--- Expand Button
+-- Expand Button (hidden by default)
 local expand = Instance.new("TextButton")
 expand.Size = UDim2.new(0, 30, 0, 30)
 expand.Position = UDim2.new(1, -120, 0, 5)
@@ -124,18 +86,52 @@ moveBtn.TextColor3 = Color3.new(1,1,1)
 moveBtn.Parent = top
 Instance.new("UICorner", moveBtn)
 
--- Invisible huge drag zone (fixes Android teleporting)
-local dragZone = Instance.new("TextButton")
-dragZone.Size = UDim2.new(1, 0, 1, 0)
-dragZone.Position = UDim2.new(0, 0, 0, 0)
-dragZone.BackgroundTransparency = 1
-dragZone.ZIndex = 1
-dragZone.Text = ""
-dragZone.Parent = top
-dragZone.AutoButtonColor = false
+-------------------------------------------------------------
+-- SINGLE DRAG SYSTEM (fixed for PC + Android)
+-------------------------------------------------------------
+local dragging = false
+local dragStart
+local startPos
 
+local function updateDrag(input)
+	local delta = input.Position - dragStart
+	frame.Position = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
+end
 
+moveBtn.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging then
+		if input.UserInputType == Enum.UserInputType.MouseMovement
+			or input.UserInputType == Enum.UserInputType.Touch then
+
+			updateDrag(input)
+		end
+	end
+end)
+
+-------------------------------------------------------------
 -- PET NAME BOX
+-------------------------------------------------------------
 local petName = Instance.new("TextBox")
 petName.Size = UDim2.new(1, -20, 0, 40)
 petName.Position = UDim2.new(0, 10, 0, 60)
@@ -149,7 +145,9 @@ petName.ClearTextOnFocus = false
 petName.Parent = frame
 Instance.new("UICorner", petName)
 
--- Rarity Buttons Holder
+-------------------------------------------------------------
+-- RARITY BUTTONS
+-------------------------------------------------------------
 local rarityFrame = Instance.new("Frame")
 rarityFrame.Size = UDim2.new(1, 0, 0, 60)
 rarityFrame.Position = UDim2.new(0, 0, 0, 110)
@@ -175,28 +173,30 @@ selectedLabel.Text = "Selected: None"
 selectedLabel.Parent = frame
 
 local function createRarityButton(name, color)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 90, 1, -5)
-    button.BackgroundColor3 = color
-    button.BorderSizePixel = 0
-    button.TextColor3 = Color3.fromRGB(255,255,255)
-    button.Font = Enum.Font.GothamBold
-    button.TextScaled = true
-    button.Text = name
-    button.Parent = rarityFrame
-    Instance.new("UICorner", button)
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(0, 90, 1, -5)
+	button.BackgroundColor3 = color
+	button.BorderSizePixel = 0
+	button.TextColor3 = Color3.fromRGB(255,255,255)
+	button.Font = Enum.Font.GothamBold
+	button.TextScaled = true
+	button.Text = name
+	button.Parent = rarityFrame
+	Instance.new("UICorner", button)
 
-    button.MouseButton1Click:Connect(function()
-        selectedRarity = name
-        selectedLabel.Text = "Selected: " .. name
-    end)
+	button.MouseButton1Click:Connect(function()
+		selectedRarity = name
+		selectedLabel.Text = "Selected: " .. name
+	end)
 end
 
 createRarityButton("MFR", Color3.fromRGB(255, 100, 100))
 createRarityButton("NFR", Color3.fromRGB(100, 255, 100))
 createRarityButton("FR", Color3.fromRGB(100, 100, 255))
 
--- Spawn Button
+-------------------------------------------------------------
+-- SPAWN BUTTON
+-------------------------------------------------------------
 local spawnBtn = Instance.new("TextButton")
 spawnBtn.Size = UDim2.new(1, -20, 0, 45)
 spawnBtn.Position = UDim2.new(0, 10, 0, 175)
@@ -210,95 +210,48 @@ spawnBtn.Parent = frame
 Instance.new("UICorner", spawnBtn)
 
 spawnBtn.MouseButton1Click:Connect(function()
-    local name = petName.Text ~= "" and petName.Text or "Unknown Pet"
-    local rarity = selectedRarity or "None"
-    selectedLabel.Text = "Pet Spawned: " .. name .. " (" .. rarity .. ")"
+	local name = petName.Text ~= "" and petName.Text or "Unknown Pet"
+	local rarity = selectedRarity or "None"
+	selectedLabel.Text = "Pet Spawned: " .. name .. " (" .. rarity .. ")"
 end)
 
 -------------------------------------------------------------
--- Minimize system
+-- MINIMIZE SYSTEM (fixed)
 -------------------------------------------------------------
 local savedVisibility = {}
 
 local function hideAllContent()
-    savedVisibility = {}
-    for _, obj in ipairs(frame:GetDescendants()) do
-        if obj:IsA("GuiObject") and obj ~= top and not obj:IsDescendantOf(top) then
-            savedVisibility[obj] = obj.Visible
-            obj.Visible = false
-        end
-    end
+	savedVisibility = {}
+	for _, obj in ipairs(frame:GetDescendants()) do
+		if obj:IsA("GuiObject") and obj ~= top and not obj:IsDescendantOf(top) then
+			savedVisibility[obj] = obj.Visible
+			obj.Visible = false
+		end
+	end
 end
 
 local function restoreAllContent()
-    for obj, state in pairs(savedVisibility) do
-        if obj and obj.Parent then
-            obj.Visible = state
-        end
-    end
-    savedVisibility = {}
+	for obj, state in pairs(savedVisibility) do
+		if obj and obj.Parent then
+			obj.Visible = state
+		end
+	end
+	savedVisibility = {}
 end
 
 local fullSize = UDim2.new(0, 350, 0, 270)
 local minimizedSize = UDim2.new(0, 350, 0, 40)
 
 minimize.MouseButton1Click:Connect(function()
-    TweenService:Create(frame, TweenInfo.new(0.3), {Size = minimizedSize}):Play()
-    minimize.Visible = false
-    expand.Visible = true
-    hideAllContent()
+	TweenService:Create(frame, TweenInfo.new(0.3), {Size = minimizedSize}):Play()
+	minimize.Visible = false
+	expand.Visible = true
+	hideAllContent()
 end)
 
 expand.MouseButton1Click:Connect(function()
-    TweenService:Create(frame, TweenInfo.new(0.3), {Size = fullSize}):Play()
-    minimize.Visible = true
-    expand.Visible = false
-    restoreAllContent()
-end)
--------------------------------------------------------------
--- ANDROID + PC DRAGGING (Using big invisible drag zone)
--------------------------------------------------------------
-frame.AnchorPoint = Vector2.new(0, 0)
-
-local dragging = false
-local dragStart
-local startPos
-local activeTouch
-
-local function updateDrag(inputPos)
-    local delta = inputPos - dragStart
-    frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-end
-
-dragZone.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = Vector2.new(input.Position.X, input.Position.Y)
-        startPos = frame.Position
-
-    elseif input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        activeTouch = input
-        dragStart = input.Position
-        startPos = frame.Position
-    end
-end)
-
-dragZone.InputEnded:Connect(function(input)
-    if input == activeTouch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-        activeTouch = nil
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        updateDrag(UserInputService:GetMouseLocation())
-    end
-end)
-
-UserInputService.TouchMoved:Connect(function(touch)
-    if dragging and touch == activeTouch then
-        updateDrag(touch.Position)
-    end
+	TweenService:Create(frame, TweenInfo.new(0.3), {Size = fullSize}):Play()
+	minimize.Visible = true
+	expand.Visible = false
+	restoreAllContent()
 end)
