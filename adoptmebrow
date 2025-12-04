@@ -1,13 +1,10 @@
--- Pet Spawner GUI (Owl Pet Example)
+-- Dynamic Pet Spawner (No Images)
 print("[PetSpawnerUI] Script started")
 
 local player = game.Players.LocalPlayer
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
 
--- === GUI Setup ===
+-- GUI Setup
 local gui = Instance.new("ScreenGui")
 gui.Name = "PetSpawnerUI"
 gui.ResetOnSpawn = false
@@ -16,12 +13,10 @@ gui.Parent = player:WaitForChild("PlayerGui")
 
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 270)
-frame.Position = UDim2.new(0.5, -175, 0.25, 0)
+frame.Size = UDim2.new(0, 400, 0, 400)
+frame.Position = UDim2.new(0.5, -200, 0.2, 0)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
-frame.Active = true
-frame.ClipsDescendants = false
 frame.Parent = gui
 Instance.new("UICorner", frame)
 
@@ -33,20 +28,19 @@ title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
 title.TextScaled = true
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Text = "Pet Spawner By Shxdrag"
+title.Text = "Pet Spawner"
 title.Parent = frame
 
--- Pet Name Box
+-- Pet Name TextBox
 local petName = Instance.new("TextBox")
 petName.Size = UDim2.new(1, -20, 0, 40)
 petName.Position = UDim2.new(0, 10, 0, 50)
+petName.PlaceholderText = "Enter Pet Name (Owl)"
 petName.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 petName.BorderSizePixel = 0
+petName.TextColor3 = Color3.fromRGB(255, 255, 255)
 petName.Font = Enum.Font.GothamBold
 petName.TextScaled = true
-petName.TextColor3 = Color3.fromRGB(255, 255, 255)
-petName.PlaceholderText = "Enter Pet Name (e.g. Owl)"
-petName.ClearTextOnFocus = false
 petName.Parent = frame
 Instance.new("UICorner", petName)
 
@@ -63,17 +57,17 @@ uiList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 uiList.Padding = UDim.new(0, 10)
 uiList.Parent = rarityFrame
 
-local selectedRarity = "MFR" -- Default
+local selectedRarity = "MFR"
 
 local function createRarityButton(name, color)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(0, 90, 1, -5)
 	btn.BackgroundColor3 = color
 	btn.BorderSizePixel = 0
+	btn.Text = name
 	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 	btn.Font = Enum.Font.GothamBold
 	btn.TextScaled = true
-	btn.Text = name
 	btn.Parent = rarityFrame
 	Instance.new("UICorner", btn)
 
@@ -87,10 +81,70 @@ createRarityButton("MFR", Color3.fromRGB(255, 100, 100))
 createRarityButton("NFR", Color3.fromRGB(100, 255, 100))
 createRarityButton("FR", Color3.fromRGB(100, 100, 255))
 
+-- Scrollable container for spawned pets
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1, -20, 0, 200)
+scrollFrame.Position = UDim2.new(0, 10, 0, 160)
+scrollFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+scrollFrame.BorderSizePixel = 0
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollFrame.ScrollBarThickness = 8
+scrollFrame.Parent = frame
+Instance.new("UICorner", scrollFrame)
+
+local listLayout = Instance.new("UIListLayout")
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.Padding = UDim.new(0, 5)
+listLayout.Parent = scrollFrame
+
+-- Status Label
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(1, -20, 0, 30)
+statusLabel.Position = UDim2.new(0, 10, 0, 370)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Font = Enum.Font.GothamBold
+statusLabel.TextScaled = true
+statusLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+statusLabel.Text = "No pet spawned yet"
+statusLabel.Parent = frame
+
+-- Function to create a pet frame (no image, just colored frame)
+local function createPetFrame(petNameText, rarity)
+	local petFrame = Instance.new("Frame")
+	petFrame.Size = UDim2.new(1, -10, 0, 50)
+	petFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	petFrame.BorderSizePixel = 0
+	petFrame.Parent = scrollFrame
+	Instance.new("UICorner", petFrame)
+
+	local nameLabel = Instance.new("TextLabel")
+	nameLabel.Size = UDim2.new(0.7, -10, 1, 0)
+	nameLabel.Position = UDim2.new(0, 5, 0, 0)
+	nameLabel.BackgroundTransparency = 1
+	nameLabel.Text = petNameText
+	nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	nameLabel.Font = Enum.Font.GothamBold
+	nameLabel.TextScaled = true
+	nameLabel.Parent = petFrame
+
+	local rarityLabel = Instance.new("TextLabel")
+	rarityLabel.Size = UDim2.new(0.3, -10, 1, 0)
+	rarityLabel.Position = UDim2.new(0.7, 5, 0, 0)
+	rarityLabel.BackgroundTransparency = 1
+	rarityLabel.Text = rarity
+	rarityLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+	rarityLabel.Font = Enum.Font.GothamBold
+	rarityLabel.TextScaled = true
+	rarityLabel.Parent = petFrame
+
+	-- Update scrollCanvas size
+	scrollFrame.CanvasSize = UDim2.new(0, 0, 0, #scrollFrame:GetChildren() * 55)
+end
+
 -- Spawn Button
 local spawnBtn = Instance.new("TextButton")
-spawnBtn.Size = UDim2.new(1, -20, 0, 45)
-spawnBtn.Position = UDim2.new(0, 10, 0, 170)
+spawnBtn.Size = UDim2.new(1, -20, 0, 40)
+spawnBtn.Position = UDim2.new(0, 10, 0, 320)
 spawnBtn.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
 spawnBtn.BorderSizePixel = 0
 spawnBtn.Font = Enum.Font.GothamBold
@@ -100,81 +154,16 @@ spawnBtn.Text = "Spawn Pet"
 spawnBtn.Parent = frame
 Instance.new("UICorner", spawnBtn)
 
--- Status Label
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Size = UDim2.new(1, -20, 0, 30)
-statusLabel.Position = UDim2.new(0, 10, 0, 225)
-statusLabel.BackgroundTransparency = 1
-statusLabel.Font = Enum.Font.GothamBold
-statusLabel.TextScaled = true
-statusLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-statusLabel.Text = "No pet spawned yet"
-statusLabel.Parent = frame
-
--- Dummy Image for testing
-local dummyImageId = "rbxassetid://6023426910"
-
--- Require ClientData safely
-local clientData
-local ok, err = pcall(function()
-	clientData = require(ReplicatedStorage.ClientModules.Core.ClientData)
-end)
-if not ok then
-	warn("[PetSpawnerUI] Failed to load ClientData:", err)
-end
-
-local data
-if clientData then
-	local success, d = pcall(function()
-		return clientData.get_data()[tostring(player)]
-	end)
-	if success then
-		data = d
-	else
-		warn("[PetSpawnerUI] Failed to get player data:", d)
-	end
-end
-
--- Spawn Function
+-- Spawn logic
 spawnBtn.MouseButton1Click:Connect(function()
-	local petTemplate = petName.Text
-	if not petTemplate or petTemplate == "" then
-		warn("[PetSpawnerUI] No pet name entered!")
+	local nameText = petName.Text
+	if nameText == "" then
+		warn("No pet name entered!")
 		return
 	end
 
-	if not data or not data.inventory then
-		warn("[PetSpawnerUI] Player data not loaded or invalid")
-		return
-	end
-
-	local newPet = {
-		id = HttpService:GenerateGUID(false),
-		uid = HttpService:GenerateGUID(false),
-		template = petTemplate,
-		category = "PETS",
-		icon = dummyImageId,
-		thumbnail = dummyImageId,
-		rarity = selectedRarity,
-		properties = {
-			rideable = true,
-			flyable = true,
-			neon = false,
-			mega = false,
-			age = 0,
-			level = 1,
-			unique = false,
-			placeId = 0,
-		},
-		data = {
-			category = "PETS"
-		}
-	}
-
-	table.insert(data.inventory.pets, newPet)
-	data.equippedPet = newPet
-	print("[PetSpawnerUI] Spawned and auto-equipped pet:", petTemplate, selectedRarity)
-
-	statusLabel.Text = "Spawned & Equipped: "..petTemplate.." ("..selectedRarity..")"
+	createPetFrame(nameText, selectedRarity)
+	statusLabel.Text = "Spawned: "..nameText.." ("..selectedRarity..")"
 	statusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+	print("[PetSpawnerUI] Spawned pet:", nameText, "Rarity:", selectedRarity)
 end)
