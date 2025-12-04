@@ -198,36 +198,15 @@ Instance.new("UICorner", spawnBtn)
 -- Require ClientData
 local clientData = require(ReplicatedStorage.ClientModules.Core.ClientData)
 local data = clientData.get_data()[tostring(player)]
--- Safe Backpack UI refresh (client-only)
-local function tryRefreshBackpack()
-	local success, uiManager = pcall(function()
-		return require(ReplicatedStorage:WaitForChild("ClientModules"):WaitForChild("Core"):WaitForChild("UIManager"))
-	end)
-
-	if success and uiManager then
-		-- Try common functions for updating backpack
-		local refreshFns = {"refresh_inventory", "refresh", "update", "rebuild"}
-		for _, fnName in ipairs(refreshFns) do
-			if type(uiManager[fnName]) == "function" then
-				pcall(uiManager[fnName])
-				print("[PetSpawner] Called backpack refresh:", fnName)
-				return true
-			end
-		end
-	end
-	return false
-end
-
-pcall(tryRefreshBackpack)
 
 -- Client-only: Make all pets rideable/flyable
 if data and data.inventory and data.inventory.pets then
-	for _, pet in pairs(data.inventory.pets) do
-		if pet.properties then
-			pet.properties.rideable = true
-			pet.properties.flyable = true
-		end
-	end
+    for _, pet in pairs(data.inventory.pets) do
+        if pet.properties then
+            pet.properties.rideable = true
+            pet.properties.flyable = true
+        end
+    end
 end
 
 -- Client-only spawn handler
