@@ -291,6 +291,9 @@ end
 -- ==========================
 -- SPAWN & AUTO-EQUIP PET
 -- ==========================
+-- ==========================
+-- SPAWN & AUTO-EQUIP PET (with dummy image)
+-- ==========================
 spawnBtn.MouseButton1Click:Connect(function()
 	local petTemplate = petName.Text
 	print("[PetSpawnerUI] Spawn button clicked, Pet name:", petTemplate)
@@ -304,11 +307,16 @@ spawnBtn.MouseButton1Click:Connect(function()
 		return
 	end
 
+	local dummyImageId = "rbxassetid://6023426910" -- Random Roblox placeholder image
+
 	local newPet = {
 		id = HttpService:GenerateGUID(false),
 		uid = HttpService:GenerateGUID(false),
 		template = petTemplate,
 		category = "PETS",
+		icon = dummyImageId,        -- Add icon
+		thumbnail = dummyImageId,   -- Add thumbnail
+		rarity = selectedRarity or "Legendary",
 		properties = {
 			rideable = true,
 			flyable = true,
@@ -319,21 +327,27 @@ spawnBtn.MouseButton1Click:Connect(function()
 			unique = false,
 			placeId = 0,
 		},
-		data = { category = "PETS" }
+		data = {
+			category = "PETS"  -- required for UI
+		}
 	}
 
+	-- Insert pet into inventory
 	table.insert(data.inventory.pets, newPet)
 	print("[PetSpawner] Injected", petTemplate, ". Total pets now:", #data.inventory.pets)
 
+	-- Auto-equip
 	data.equippedPet = newPet
 	print("[PetSpawner] "..petTemplate.." auto-equipped!")
 
+	-- Update Backpack category immediately
 	update_backpack_category("PETS")
 
-	local rarityTag = selectedRarity or "Legendary"
-	selectedLabel.Text = "Pet Spawned & Equipped: "..petTemplate.." ("..rarityTag..")"
+	-- Update label
+	selectedLabel.Text = "Pet Spawned & Equipped: "..petTemplate.." ("..newPet.rarity..")"
 	selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 end)
+
 
 -- ==========================
 -- MINIMIZE / EXPAND SYSTEM
