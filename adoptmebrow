@@ -219,5 +219,22 @@ end
 SpawnBtn.MouseButton1Click:Connect(function()
 	local petName = PetNameBox.Text
 	if petName == "" then return end
-	spawnPet(petName)
+
+	local petsFolder = ReplicatedStorage:FindFirstChild("Pets")
+	if not petsFolder then
+		warn("Pets folder not found in ReplicatedStorage!")
+		return
+	end
+
+	local petModel = petsFolder:FindFirstChild(petName)
+	if not petModel then
+		warn("Pet model not found:", petName)
+		return
+	end
+
+	local clone = petModel:Clone()
+	clone.Name = petName .. " - " .. selectedRarity
+	clone.Parent = Player:WaitForChild("Backpack")
+	print("Spawned pet locally:", clone.Name)
 end)
+
