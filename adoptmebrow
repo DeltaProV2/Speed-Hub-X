@@ -1,4 +1,4 @@
---// Pet Spawner LocalScript
+-- Pet Spawner LocalScript
 
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
