@@ -3,6 +3,38 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 
+local function findPetAnywhere(petName)
+    print("DEBUG: Searching entire Workspace for:", petName)
+    local found = nil
+
+    -- Recursive search function
+    local function search(parent)
+        for _, child in ipairs(parent:GetChildren()) do
+            if child.Name == petName and child:IsA("Model") then
+                found = child
+                return
+            else
+                search(child)
+                if found then return end
+            end
+        end
+    end
+
+    search(workspace)
+
+    if found then
+        print("DEBUG: Pet found at:", found:GetFullName())
+    else
+        print("DEBUG: Pet NOT found anywhere in Workspace")
+    end
+
+    return found
+end
+
+-- Example usage
+local testPetName = "Owl"
+local pet = findPetAnywhere(testPetName)
+
 print("DEBUG: LocalScript Loaded")
 
 --// Pet Storage
