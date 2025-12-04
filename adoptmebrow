@@ -1,15 +1,10 @@
--- Full Pet Spawner UI (client-only visual)
+-- Full Pet Spawner UI with Move button dragging (PC + Mobile)
 local player = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HttpService = game:GetService("HttpService")
 
--- Require ClientData safely
-local clientData = require(ReplicatedStorage.ClientModules.Core.ClientData)
-local data = clientData.get_data()[tostring(player)]
-
--- === GUI SETUP ===
+-- GUI Setup
 local gui = Instance.new("ScreenGui")
 gui.Name = "PetSpawnerUI"
 gui.ResetOnSpawn = false
@@ -39,7 +34,7 @@ top.Parent = frame
 Instance.new("UICorner", top)
 
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -100, 1, 0)
+title.Size = UDim2.new(1, -140, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
@@ -50,53 +45,85 @@ title.Parent = top
 
 -- Drag bar
 local DragBar = Instance.new("Frame")
-DragBar.Size = UDim2.new(1, -100, 1, 0)
+DragBar.Name = "DragBar"
+DragBar.Size = UDim2.new(1, -140, 1, 0)
 DragBar.Position = UDim2.new(0, 0, 0, 0)
 DragBar.BackgroundTransparency = 1
 DragBar.Parent = top
 
--- Minimize / Expand / Move Buttons
-local function createButton(text, posX)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 30, 0, 30)
-    btn.Position = UDim2.new(1, posX, 0, 5)
-    btn.Text = text
-    btn.BackgroundColor3 = Color3.fromRGB(80,80,80)
-    btn.TextScaled = true
-    btn.Font = Enum.Font.GothamBold
-    btn.TextColor3 = Color3.new(1,1,1)
-    btn.Parent = top
-    Instance.new("UICorner", btn)
-    return btn
-end
+-- Minimize/Expand/Move buttons
+local minimize = Instance.new("TextButton")
+minimize.Size = UDim2.new(0, 30, 0, 30)
+minimize.Position = UDim2.new(1, -120, 0, 5)
+minimize.Text = "-"
+minimize.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+minimize.TextScaled = true
+minimize.Font = Enum.Font.GothamBold
+minimize.TextColor3 = Color3.new(1,1,1)
+minimize.Parent = top
+Instance.new("UICorner", minimize)
 
-local minimize = createButton("-", -120)
-local expand = createButton("+", -120)
+local expand = Instance.new("TextButton")
+expand.Size = UDim2.new(0, 30, 0, 30)
+expand.Position = UDim2.new(1, -120, 0, 5)
+expand.Text = "+"
 expand.Visible = false
-local moveBtn = createButton("↕", -80)
+expand.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+expand.TextScaled = true
+expand.Font = Enum.Font.GothamBold
+expand.TextColor3 = Color3.new(1,1,1)
+expand.Parent = top
+Instance.new("UICorner", expand)
 
--- === DRAG SYSTEM ===
+local moveBtn = Instance.new("TextButton")
+moveBtn.Size = UDim2.new(0, 30, 0, 30)
+moveBtn.Position = UDim2.new(1, -80, 0, 5)
+moveBtn.Text = "↕"
+moveBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+moveBtn.TextScaled = true
+moveBtn.Font = Enum.Font.GothamBold
+moveBtn.TextColor3 = Color3.new(1,1,1)
+moveBtn.Parent = top
+Instance.new("UICorner", moveBtn)
+
+-- Drag system
 local dragging = false
-local dragStart, startPos
+local dragStart
+local startPos
+local function updateDrag(input)
+	local delta = input.Position - dragStart
+	frame.Position = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
+end
 moveBtn.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
 		dragging = true
 		dragStart = input.Position
 		startPos = frame.Position
+
 		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then dragging = false end
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
 		end)
 	end
 end)
 UserInputService.InputChanged:Connect(function(input)
-	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-		local delta = input.Position - dragStart
-		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-								   startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	if dragging then
+		if input.UserInputType == Enum.UserInputType.MouseMovement
+			or input.UserInputType == Enum.UserInputType.Touch then
+			updateDrag(input)
+		end
 	end
 end)
 
--- === PET NAME BOX ===
+-- Pet Name Box
 local petName = Instance.new("TextBox")
 petName.Size = UDim2.new(1, -20, 0, 40)
 petName.Position = UDim2.new(0, 10, 0, 60)
@@ -104,16 +131,61 @@ petName.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 petName.BorderSizePixel = 0
 petName.Font = Enum.Font.GothamBold
 petName.TextScaled = true
-petName.TextColor3 = Color3.fromRGB(255,255,255)
+petName.TextColor3 = Color3.fromRGB(255, 255, 255)
 petName.PlaceholderText = "Put Pet Name!"
 petName.ClearTextOnFocus = false
 petName.Parent = frame
 Instance.new("UICorner", petName)
 
--- === SPAWN BUTTON ===
+-- Rarity Buttons
+local rarityFrame = Instance.new("Frame")
+rarityFrame.Size = UDim2.new(1, 0, 0, 60)
+rarityFrame.Position = UDim2.new(0, 0, 0, 110)
+rarityFrame.BackgroundTransparency = 1
+rarityFrame.Parent = frame
+
+local uiList = Instance.new("UIListLayout")
+uiList.FillDirection = Enum.FillDirection.Horizontal
+uiList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uiList.Padding = UDim.new(0, 10)
+uiList.Parent = rarityFrame
+
+local selectedRarity = nil
+local selectedLabel = Instance.new("TextLabel")
+selectedLabel.Size = UDim2.new(1, -20, 0, 30)
+selectedLabel.Position = UDim2.new(0, 10, 0, 225)
+selectedLabel.BackgroundTransparency = 1
+selectedLabel.Font = Enum.Font.GothamSemibold
+selectedLabel.TextScaled = true
+selectedLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+selectedLabel.Text = "Selected: None"
+selectedLabel.Parent = frame
+
+local function createRarityButton(name, color)
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(0, 90, 1, -5)
+	button.BackgroundColor3 = color
+	button.BorderSizePixel = 0
+	button.TextColor3 = Color3.fromRGB(255,255,255)
+	button.Font = Enum.Font.GothamBold
+	button.TextScaled = true
+	button.Text = name
+	button.Parent = rarityFrame
+	Instance.new("UICorner", button)
+
+	button.MouseButton1Click:Connect(function()
+		selectedRarity = name
+		selectedLabel.Text = "Selected: " .. name
+	end)
+end
+createRarityButton("MFR", Color3.fromRGB(255, 100, 100))
+createRarityButton("NFR", Color3.fromRGB(100, 255, 100))
+createRarityButton("FR", Color3.fromRGB(100, 100, 255))
+
+-- Spawn Button
 local spawnBtn = Instance.new("TextButton")
 spawnBtn.Size = UDim2.new(1, -20, 0, 45)
-spawnBtn.Position = UDim2.new(0, 10, 0, 115)
+spawnBtn.Position = UDim2.new(0, 10, 0, 175)
 spawnBtn.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
 spawnBtn.BorderSizePixel = 0
 spawnBtn.Font = Enum.Font.GothamBold
@@ -123,18 +195,42 @@ spawnBtn.Text = "Spawn Pet"
 spawnBtn.Parent = frame
 Instance.new("UICorner", spawnBtn)
 
--- Label to show last spawned pet
-local selectedLabel = Instance.new("TextLabel")
-selectedLabel.Size = UDim2.new(1, -20, 0, 30)
-selectedLabel.Position = UDim2.new(0, 10, 0, 170)
-selectedLabel.BackgroundTransparency = 1
-selectedLabel.Font = Enum.Font.GothamSemibold
-selectedLabel.TextScaled = true
-selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-selectedLabel.Text = "Last Spawned: None"
-selectedLabel.Parent = frame
+-- Require ClientData
+local clientData = require(ReplicatedStorage.ClientModules.Core.ClientData)
+local data = clientData.get_data()[tostring(player)]
+-- Safe Backpack UI refresh (client-only)
+local function tryRefreshBackpack()
+	local success, uiManager = pcall(function()
+		return require(ReplicatedStorage:WaitForChild("ClientModules"):WaitForChild("Core"):WaitForChild("UIManager"))
+	end)
 
--- === SPAWN HANDLER ===
+	if success and uiManager then
+		-- Try common functions for updating backpack
+		local refreshFns = {"refresh_inventory", "refresh", "update", "rebuild"}
+		for _, fnName in ipairs(refreshFns) do
+			if type(uiManager[fnName]) == "function" then
+				pcall(uiManager[fnName])
+				print("[PetSpawner] Called backpack refresh:", fnName)
+				return true
+			end
+		end
+	end
+	return false
+end
+
+pcall(tryRefreshBackpack)
+
+-- Client-only: Make all pets rideable/flyable
+if data and data.inventory and data.inventory.pets then
+	for _, pet in pairs(data.inventory.pets) do
+		if pet.properties then
+			pet.properties.rideable = true
+			pet.properties.flyable = true
+		end
+	end
+end
+
+-- Client-only spawn handler
 spawnBtn.MouseButton1Click:Connect(function()
 	local petTemplate = petName.Text
 	if not petTemplate or petTemplate == "" then
@@ -142,12 +238,11 @@ spawnBtn.MouseButton1Click:Connect(function()
 		return
 	end
 
-	-- Ensure Owl template
+	-- Check for Owl template
 	if petTemplate:lower() == "owl" then
 		petTemplate = "Owl"
 	end
 
-	-- Create client-only injected pet
 	local newPet = {
 		id = "Injected_" .. tostring(os.clock()),
 		template = petTemplate,
@@ -156,43 +251,23 @@ spawnBtn.MouseButton1Click:Connect(function()
 			flyable = true,
 			neon = false,
 			mega = false,
-			age = 0,       -- Newborn
-			level = 1,
-			unique = false,
-			placeId = 0,
 		},
-		data = {}
+		data = {} -- Adopt Me client will populate thumbnail/icon automatically
 	}
 
-	-- Insert into numeric array (Backpack-friendly)
-	table.insert(data.inventory.pets, newPet)
+	-- Insert into client inventory
+	data.inventory.pets[newPet.id] = newPet
 
-	-- Safe Backpack refresh
-	local function tryRefreshBackpack()
-		local success, uiManager = pcall(function()
-			return require(ReplicatedStorage:WaitForChild("ClientModules"):WaitForChild("Core"):WaitForChild("UIManager"))
-		end)
-		if success and uiManager then
-			for _, fnName in ipairs({"refresh_inventory","refresh","update","rebuild"}) do
-				if type(uiManager[fnName]) == "function" then
-					pcall(uiManager[fnName])
-					return
-				end
-			end
-		end
-	end
-	pcall(tryRefreshBackpack)
+	-- Update GUI label
+	local rarityTag = selectedRarity or "None"
+	selectedLabel.Text = "Pet Spawned: "..petTemplate.." ("..rarityTag..")"
+	selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 
-	-- Update label
-	selectedLabel.Text = "Last Spawned: "..petTemplate
 	print("[PetSpawner] Injected pet into client inventory (visual only):", petTemplate)
 end)
 
--- === MINIMIZE / EXPAND ===
+-- Minimize/Expand system
 local savedVisibility = {}
-local fullSize = UDim2.new(0, 350, 0, 270)
-local minimizedSize = UDim2.new(0, 350, 0, 40)
-
 local function hideAllContent()
 	savedVisibility = {}
 	for _, obj in ipairs(frame:GetDescendants()) do
@@ -202,7 +277,6 @@ local function hideAllContent()
 		end
 	end
 end
-
 local function restoreAllContent()
 	for obj, state in pairs(savedVisibility) do
 		if obj and obj.Parent then
@@ -212,13 +286,14 @@ local function restoreAllContent()
 	savedVisibility = {}
 end
 
+local fullSize = UDim2.new(0, 350, 0, 270)
+local minimizedSize = UDim2.new(0, 350, 0, 40)
 minimize.MouseButton1Click:Connect(function()
 	TweenService:Create(frame, TweenInfo.new(0.3), {Size = minimizedSize}):Play()
 	minimize.Visible = false
 	expand.Visible = true
 	hideAllContent()
 end)
-
 expand.MouseButton1Click:Connect(function()
 	TweenService:Create(frame, TweenInfo.new(0.3), {Size = fullSize}):Play()
 	minimize.Visible = true
