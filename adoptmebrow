@@ -139,12 +139,35 @@ MFRBtn.MouseButton1Click:Connect(function() selectRarity("MFR") end)
 NFRBtn.MouseButton1Click:Connect(function() selectRarity("NFR") end)
 FRBtn.MouseButton1Click:Connect(function() selectRarity("FR") end)
 
--- Spawn pet logic (replace with your own spawning code)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PetModels = ReplicatedStorage:WaitForChild("PetModels")
+
 SpawnBtn.MouseButton1Click:Connect(function()
-	local petName = PetNameBox.Text
-	if petName ~= "" then
-		print("Spawning pet:", petName, "with rarity:", selectedRarity)
-		-- Example: fire a remote event to server to give pet
-		-- game.ReplicatedStorage.SpawnPet:FireServer(petName, selectedRarity)
-	end
+    local petName = PetNameBox.Text
+    if petName == "" then return end
+
+    -- Trim space (removes accidental spaces at start or end)
+    petName = petName:match("^%s*(.-)%s*$")
+
+    -- Find pet model EXACT NAME (Bat Dragon, Shadow Dragon, etc.)
+    local petModel = PetModels:FindFirstChild(petName)
+    if not petModel then
+        warn("PET NOT FOUND:", petName)
+        return
+    end
+
+    -- Clone for local player only
+    local clone = petModel:Clone()
+    clone.Parent = workspace
+
+    -- Spawn in front of the local player
+    local player = game.Players.LocalPlayer
+    local char = player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        local hrp = char.HumanoidRootPart
+        local spawnCF = hrp.CFrame * CFrame.new(0, 0, -5)
+        clone:PivotTo(spawnCF)
+    end
+
+    print("Spawned:", petName, "Rarity:", selectedRarity)
 end)
