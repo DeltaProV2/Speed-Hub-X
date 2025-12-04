@@ -199,39 +199,36 @@ expand.MouseButton1Click:Connect(function()
     expand.Visible = false
     restoreAllContent()
 end)
-
 -------------------------------------------------------------
--- FIXED DRAGGING (PC + MOBILE) — NEVER STUCK, NO LIMITS
+-- PERFECT DRAGGING (PC + MOBILE) — NO TELEPORT / NO LIMITS
 -------------------------------------------------------------
 
-frame.AnchorPoint = Vector2.new(0.5, 0.5) -- << THE FIX
-frame.Position = UDim2.new(0.5, 0, 0.3, 0) -- centered using anchor
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.Position = UDim2.new(0.5, 0, 0.3, 0)
 
 local dragging = false
-local dragStart
-local startPos
-local activeTouch
+local dragStart = Vector2.zero
+local frameStart = Vector2.zero
+local activeTouch = nil
 
 local function updateDrag(pos)
     local delta = pos - dragStart
-    local newX = startPos.X + delta.X
-    local newY = startPos.Y + delta.Y
+    local newPos = frameStart + delta
 
-    -- apply movement freely
-    frame.Position = UDim2.fromOffset(newX, newY)
+    frame.Position = UDim2.fromOffset(newPos.X, newPos.Y)
 end
 
 moveBtn.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
         dragStart = UserInputService:GetMouseLocation()
-        startPos = frame.AbsolutePosition
+        frameStart = Vector2.new(frame.Position.X.Offset, frame.Position.Y.Offset)
 
     elseif input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         activeTouch = input
         dragStart = input.Position
-        startPos = frame.AbsolutePosition
+        frameStart = Vector2.new(frame.Position.X.Offset, frame.Position.Y.Offset)
     end
 end)
 
