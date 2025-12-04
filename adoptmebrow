@@ -247,25 +247,56 @@ spawnBtn.MouseButton1Click:Connect(function()
 	end
 
 	-- Find an existing pet to clone (so we don't miss required fields for the UI)
+	-- Debug: try to grab any existing pet as a template
 	local templateToClone = nil
 	for i, pet in ipairs(playerData.inventory.pets) do
 		templateToClone = pet
 		break
 	end
 
-	-- Fallback: if player has no pets, try to create a minimal valid structure
-	if not templateToClone then
-		warn("[PetSpawner] No existing pet to clone. Creating a minimal entry (may be risky).")
-		templateToClone = {
-			template = petTemplate,
-			properties = {
-				rideable = true,
-				flyable = true,
-				neon = false,
-				mega = false
-			}
-		}
+	if templateToClone then
+		print("[PetSpawner] Found template pet to clone:", templateToClone.template)
+	else
+		warn("[PetSpawner] No existing pet to clone! Using default fallback structure.")
 	end
+
+	-- Create a new injected pet
+	local newPet = {
+		id = "Injected_" .. tostring(os.clock()),
+		template = petTemplate,
+
+		properties = {
+			rideable = true,
+			flyable = true,
+			neon = petTemplate:lower():find("neon") and true or false,
+			mega = petTemplate:lower():find("mega") and true or false,
+		},
+
+		data = {
+			icon = nil,        -- Adopt Me normally fills this automatically
+			thumbnail = nil,
+		}
+	}
+
+	print("===== NEW PET DEBUG =====")
+	print("Template:", newPet.template)
+	print("Rideable:", newPet.properties.rideable)
+	print("Flyable:", newPet.properties.flyable)
+	print("Neon:", newPet.properties.neon)
+	print("Mega:", newPet.properties.mega)
+	print("Generated ID:", newPet.id)
+	print("=========================")
+
+	-- Insert new pet into inventory table
+	playerData.inventory.pets[newPet.id] = newPet
+
+	-- Verify insert
+	if playerData.inventory.pets[newPet.id] then
+		print("[PetSpawner] Successfully injected new pet:", newPet.template)
+	else
+		warn("[PetSpawner] ERROR: Failed to insert pet!")
+	end
+
 
 	-- Deep copy function (keeps nested tables)
 	local function deepCopy(t)
