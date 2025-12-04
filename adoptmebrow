@@ -312,3 +312,24 @@ expand.MouseButton1Click:Connect(function()
     expand.Visible = false
     restoreAllContent()
 end)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local clientData = require(ReplicatedStorage.ClientModules.Core.ClientData)
+local player = game.Players.LocalPlayer
+
+local data = clientData.get_data()[tostring(player)]
+
+print("===== INVENTORY PET DATA DUMP =====")
+for i,v in pairs(data.inventory.pets) do
+    print("PET #"..i)
+    for k2,v2 in pairs(v) do
+        print("   ", k2, v2)
+        if typeof(v2) == "table" then
+            for k3,v3 in pairs(v2) do
+                print("      ", k3, v3)
+            end
+        end
+    end
+end
+print("====================================")
+
