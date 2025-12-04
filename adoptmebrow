@@ -210,9 +210,87 @@ spawnBtn.Parent = frame
 Instance.new("UICorner", spawnBtn)
 
 spawnBtn.MouseButton1Click:Connect(function()
-    local name = petName.Text ~= "" and petName.Text or "Unknown Pet"
-    local rarity = selectedRarity or "None"
-    selectedLabel.Text = "Pet Spawned: " .. name .. " (" .. rarity .. ")"
+    local pet = petName.Text
+
+    if pet == "" then
+        warn("[PetSpawner] No pet name entered!")
+        return
+    end
+
+    print("--------------------------------------------------")
+    print("[PetSpawner] Attempting to spawn pet...")
+    print("Pet Name:", pet)
+
+    -- Look for Pets folder in ReplicatedStorage
+    local petsFolder = game.ReplicatedStorage:FindFirstChild("Pets")
+    if not petsFolder then
+        warn("[PetSpawner] ERROR: Pets folder not found in ReplicatedStorage!")
+        return
+    end
+
+    local petModel = petsFolder:FindFirstChild(pet)
+    if not petModel then
+        warn("[PetSpawner] ERROR: Pet '"..pet.."' does NOT exist inside ReplicatedStorage > Pets!")
+        return
+    end
+
+    print("[PetSpawner] Pet Found ✓")
+
+    -- Clone and spawn pet in Workspace
+    local clone = petModel:Clone()
+    clone.Parent = workspace
+    clone.Name = pet.."_SpawnedPreview"
+    clone:SetPrimaryPartCFrame(CFrame.new(0,5,0)) -- spawn above ground
+
+    print("[PetSpawner] Spawned preview model into Workspace ✓")
+
+    -- Simulate Fly Potion
+    if clone:FindFirstChild("FlyPotion") then
+        print("[PetSpawner] Fly Potion detected! Pet can now fly ✓")
+        clone.PrimaryPart.Anchored = false
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Velocity = Vector3.new(0,5,0)
+        bodyVelocity.MaxForce = Vector3.new(0,1000,0)
+        bodyVelocity.Parent = clone.PrimaryPart
+        task.delay(2, function() bodyVelocity:Destroy() end)
+    end
+
+    -- Simulate Ride Potion
+    if clone:FindFirstChild("RidePotion") then
+        print("[PetSpawner] Ride Potion detected! Player can ride pet ✓")
+        local player = game.Players.LocalPlayer
+        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if hrp and clone.PrimaryPart then
+            hrp.CFrame = clone.PrimaryPart.CFrame + Vector3.new(0,2,0)
+        end
+    end
+
+    -- Neon / Mega Neon effect
+    if clone.Name:lower():find("mega") then
+        print("[PetSpawner] Mega Neon detected! Cycling colors ✓")
+        task.spawn(function()
+            while clone.Parent do
+                for hue = 0, 1, 0.02 do
+                    for _, part in ipairs(clone:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.Color = Color3.fromHSV(hue, 1, 1)
+                            part.Material = Enum.Material.Neon
+                        end
+                    end
+                    task.wait(0.03)
+                end
+            end
+        end)
+    elseif clone.Name:lower():find("neon") then
+        print("[PetSpawner] Neon detected! Applying neon material ✓")
+        for _, part in ipairs(clone:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.Material = Enum.Material.Neon
+            end
+        end
+    end
+
+    print("[PetSpawner] Pet spawned successfully! ✓")
 end)
 
 -------------------------------------------------------------
