@@ -1,5 +1,8 @@
+-- Full Pet Spawner UI with top-bar-only draggable (PC + Mobile)
 local player = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "PetSpawnerUI"
@@ -15,48 +18,7 @@ frame.BorderSizePixel = 0
 frame.Parent = gui
 Instance.new("UICorner", frame)
 
--- ===== DRAGGABLE SUPPORT (PC + MOBILE) =====
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-
-local dragging = false
-local dragStart
-local startPos
-
-local function update(input)
-    local delta = input.Position - dragStart
-    frame.Position = UDim2.new(
-        startPos.X.Scale,
-        startPos.X.Offset + delta.X,
-        startPos.Y.Scale,
-        startPos.Y.Offset + delta.Y
-    )
-end
-
-top.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-    or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = frame.Position
-    end
-end)
-
-top.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-    or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
-    or input.UserInputType == Enum.UserInputType.Touch) then
-        update(input)
-    end
-end)
-
--- Top Bar
+-- Top Bar (drag area + title + controls live here)
 local top = Instance.new("Frame")
 top.Size = UDim2.new(1, 0, 0, 40)
 top.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
@@ -65,7 +27,7 @@ top.Parent = frame
 Instance.new("UICorner", top)
 
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -80, 1, 0)
+title.Size = UDim2.new(1, -100, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
@@ -77,7 +39,7 @@ title.Parent = top
 -- Minimize Button
 local minimize = Instance.new("TextButton")
 minimize.Size = UDim2.new(0, 30, 0, 30)
-minimize.Position = UDim2.new(1, -65, 0, 5)
+minimize.Position = UDim2.new(1, -70, 0, 5)
 minimize.Text = "-"
 minimize.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 minimize.TextScaled = true
@@ -89,7 +51,7 @@ Instance.new("UICorner", minimize)
 -- Expand Button
 local expand = Instance.new("TextButton")
 expand.Size = UDim2.new(0, 30, 0, 30)
-expand.Position = UDim2.new(1, -65, 0, 5)
+expand.Position = UDim2.new(1, -70, 0, 5)
 expand.Text = "+"
 expand.Visible = false
 expand.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
@@ -180,15 +142,12 @@ spawnBtn.MouseButton1Click:Connect(function()
 end)
 
 -------------------------------------------------------------
--- ⭐ FULLY WORKING MINIMIZE SYSTEM (FIXED)
+-- Minimize system (robust)
 -------------------------------------------------------------
-
--- Save old visibility
 local savedVisibility = {}
 
 local function hideAllContent()
     savedVisibility = {}
-
     for _, obj in ipairs(frame:GetDescendants()) do
         if obj:IsA("GuiObject") and obj ~= top and not obj:IsDescendantOf(top) then
             savedVisibility[obj] = obj.Visible
@@ -203,6 +162,7 @@ local function restoreAllContent()
             obj.Visible = state
         end
     end
+    savedVisibility = {}
 end
 
 local fullSize = UDim2.new(0, 350, 0, 270)
@@ -221,3 +181,97 @@ expand.MouseButton1Click:Connect(function()
     expand.Visible = false
     restoreAllContent()
 end)
+
+-------------------------------------------------------------
+-- Top-bar DRAGGING (PC + Mobile) with screen bounds
+-- Only when dragging the top bar (so buttons stay clickable)
+-------------------------------------------------------------
+local dragging = false
+local dragInput = nil
+local dragStart = Vector2.new()
+local startPos = UDim2.new()
+
+-- Helper to get viewport size (works in LocalScript)
+local function getViewport()
+    local cam = workspace.CurrentCamera
+    if cam then
+        return cam.ViewportSize
+    else
+        return Vector2.new(800, 600)
+    end
+end
+
+local function clampPosition(xOffset, yOffset)
+    local viewport = getViewport()
+    local absSize = frame.AbsoluteSize
+
+    local minX = 0
+    local minY = 0
+    local maxX = math.max(0, viewport.X - absSize.X)
+    local maxY = math.max(0, viewport.Y - absSize.Y)
+
+    local clampedX = math.clamp(xOffset, minX, maxX)
+    local clampedY = math.clamp(yOffset, minY, maxY)
+    return clampedX, clampedY
+end
+
+local function update(input)
+    if not dragging then return end
+    local delta = input.Position - dragStart
+    local newX = startPos.X.Offset + delta.X
+    local newY = startPos.Y.Offset + delta.Y
+
+    local clampedX, clampedY = clampPosition(newX, newY)
+    frame.Position = UDim2.new(startPos.X.Scale, clampedX, startPos.Y.Scale, clampedY)
+end
+
+top.InputBegan:Connect(function(input)
+    -- begin drag only on left mouse button or touch
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or
+       input.UserInputType == Enum.UserInputType.Touch then
+
+        -- don't start dragging if the user clicked the minimize/expand buttons
+        if input.Target and (input.Target == minimize or input.Target == expand) then
+            return
+        end
+
+        dragging = true
+        dragInput = input
+        dragStart = input.Position
+        startPos = frame.Position
+
+        -- stop dragging when the input ends
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+-- For mouse movement and touch movement
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        update(input)
+    end
+end)
+
+-- Ensure frame.AbsoluteSize is valid before dragging (in case UI hasn't fully rendered)
+frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() end)
+
+-- Also stop dragging if the gui is hidden/minimized
+minimize.Changed:Connect(function()
+    if not minimize.Visible then
+        dragging = false
+    end
+end)
+expand.Changed:Connect(function()
+    if not expand.Visible then
+        -- nothing
+    end
+end)
+
+-- Optional: keep it from going under the top bar (snap if needed) - not required
+-------------------------------------------------------------
+
+-- End of script
