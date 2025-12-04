@@ -79,6 +79,17 @@ moveBtn.TextColor3 = Color3.new(1,1,1)
 moveBtn.Parent = top
 Instance.new("UICorner", moveBtn)
 
+-- Invisible huge drag zone (fixes Android teleporting)
+local dragZone = Instance.new("TextButton")
+dragZone.Size = UDim2.new(1, 0, 1, 0)
+dragZone.Position = UDim2.new(0, 0, 0, 0)
+dragZone.BackgroundTransparency = 1
+dragZone.ZIndex = 1
+dragZone.Text = ""
+dragZone.Parent = top
+dragZone.AutoButtonColor = false
+
+
 -- PET NAME BOX
 local petName = Instance.new("TextBox")
 petName.Size = UDim2.new(1, -20, 0, 40)
@@ -200,39 +211,35 @@ expand.MouseButton1Click:Connect(function()
     restoreAllContent()
 end)
 -------------------------------------------------------------
--- PERFECT DRAGGING (PC + MOBILE) — NO TELEPORT / NO LIMITS
+-- ANDROID + PC DRAGGING (Using big invisible drag zone)
 -------------------------------------------------------------
-
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
-frame.Position = UDim2.new(0.5, 0, 0.3, 0)
+frame.AnchorPoint = Vector2.new(0, 0)
 
 local dragging = false
-local dragStart = Vector2.zero
-local frameStart = Vector2.zero
-local activeTouch = nil
+local dragStart
+local startPos
+local activeTouch
 
-local function updateDrag(pos)
-    local delta = pos - dragStart
-    local newPos = frameStart + delta
-
-    frame.Position = UDim2.fromOffset(newPos.X, newPos.Y)
+local function updateDrag(inputPos)
+    local delta = inputPos - dragStart
+    frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 end
 
-moveBtn.InputBegan:Connect(function(input)
+dragZone.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
-        dragStart = UserInputService:GetMouseLocation()
-        frameStart = Vector2.new(frame.Position.X.Offset, frame.Position.Y.Offset)
+        dragStart = Vector2.new(input.Position.X, input.Position.Y)
+        startPos = frame.Position
 
     elseif input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         activeTouch = input
         dragStart = input.Position
-        frameStart = Vector2.new(frame.Position.X.Offset, frame.Position.Y.Offset)
+        startPos = frame.Position
     end
 end)
 
-moveBtn.InputEnded:Connect(function(input)
+dragZone.InputEnded:Connect(function(input)
     if input == activeTouch or input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = false
         activeTouch = nil
@@ -250,4 +257,3 @@ UserInputService.TouchMoved:Connect(function(touch)
         updateDrag(touch.Position)
     end
 end)
-
