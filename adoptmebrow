@@ -52,6 +52,18 @@ minimize.TextColor3 = Color3.new(1,1,1)
 minimize.Parent = top
 Instance.new("UICorner", minimize)
 
+-- Move Button (↕)
+local moveBtn = Instance.new("TextButton")
+moveBtn.Size = UDim2.new(0, 30, 0, 30)
+moveBtn.Position = UDim2.new(1, -100, 0, 5)
+moveBtn.Text = "↕"
+moveBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+moveBtn.TextScaled = true
+moveBtn.Font = Enum.Font.GothamBold
+moveBtn.TextColor3 = Color3.new(1,1,1)
+moveBtn.Parent = top
+Instance.new("UICorner", moveBtn)
+
 -- Expand Button
 local expand = Instance.new("TextButton")
 expand.Size = UDim2.new(0, 30, 0, 30)
@@ -252,6 +264,48 @@ top.InputBegan:Connect(function(input)
         end)
     end
 end)
+
+-- DRAG USING MOVE BUTTON ONLY
+local dragging = false
+local dragStart
+local startPos
+
+local userInput = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
+
+local function update(input)
+    local delta = input.Position - dragStart
+    frame.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
+end
+
+moveBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+    end
+end)
+
+moveBtn.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+runService.RenderStepped:Connect(function()
+    if dragging then
+        local input = userInput:GetMouseLocation()
+        update({Position = input})
+    end
+end)
+
 
 -- For mouse movement and touch movement
 UserInputService.InputChanged:Connect(function(input)
