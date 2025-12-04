@@ -213,18 +213,21 @@ end
 -- ==========================
 -- GET BUTTONS FUNCTION
 -- ==========================
+-- ==========================
+-- GET BUTTONS FUNCTION (Auto Icon/Thumbnail)
+-- ==========================
 local function get_buttons(category, pets)
 	local buttons = {}
 	for _, pet in ipairs(pets) do
-		-- Safety checks for expected fields
 		if pet.id and pet.uid and pet.template and pet.category and pet.data then
 			local btn = {
 				id = pet.id,
 				uid = pet.uid,
 				template = pet.template,
 				category = pet.category,
-				icon = pet.data.icon or "rbxassetid://0", -- fallback icon
-				thumbnail = pet.data.thumbnail or "rbxassetid://0"
+				-- Use template name to auto-fetch icon/thumbnail
+				icon = pet.template,
+				thumbnail = pet.template
 			}
 			table.insert(buttons, btn)
 		else
@@ -235,10 +238,9 @@ local function get_buttons(category, pets)
 end
 
 -- ==========================
--- RENDER CATEGORY FUNCTION
+-- AUTO UPDATE BACKPACK CATEGORY
 -- ==========================
-local function renderCategory(categoryName)
-	-- Grab all pets in this category
+local function update_backpack_category(categoryName)
 	local petsInCategory = {}
 	for _, pet in ipairs(data.inventory.pets) do
 		if pet.category == categoryName then
@@ -246,47 +248,31 @@ local function renderCategory(categoryName)
 		end
 	end
 
-	-- Build buttons safely
+	-- Build buttons
 	local buttons = get_buttons(categoryName, petsInCategory)
 
-	-- Example: print buttons for now
-	print("[renderCategory] Buttons for", categoryName)
+	-- Print confirmation
+	print("[Backpack Update] Category:", categoryName, "Total pets:", #buttons)
 	for _, btn in ipairs(buttons) do
-		print("Button:", btn.template, "UID:", btn.uid)
+		print("Pet:", btn.template, "UID:", btn.uid)
 	end
-
-	-- You could replace this print logic with actual GUI rendering if desired
 end
 
 -- ==========================
--- TEST BUTTON (Render Pets)
--- ==========================
-local renderBtn = Instance.new("TextButton")
-renderBtn.Size = UDim2.new(1, -20, 0, 30)
-renderBtn.Position = UDim2.new(0, 10, 0, 230)
-renderBtn.BackgroundColor3 = Color3.fromRGB(150, 75, 255)
-renderBtn.BorderSizePixel = 0
-renderBtn.Font = Enum.Font.GothamBold
-renderBtn.TextScaled = true
-renderBtn.TextColor3 = Color3.fromRGB(255,255,255)
-renderBtn.Text = "Render PETS Category"
-renderBtn.Parent = frame
-Instance.new("UICorner", renderBtn)
-
-renderBtn.MouseButton1Click:Connect(function()
-	renderCategory("PETS")
-end)
-
-
 -- SPAWN & AUTO-EQUIP PET
+-- ==========================
 spawnBtn.MouseButton1Click:Connect(function()
-	local petTemplate = "Owl" -- testing only Owl
+	local petTemplate = petName.Text
+	if not petTemplate or petTemplate == "" then
+		warn("[PetSpawner] No pet name entered!")
+		return
+	end
 
 	local newPet = {
 		id = HttpService:GenerateGUID(false),
 		uid = HttpService:GenerateGUID(false),
 		template = petTemplate,
-		category = "PETS",        -- THIS MAKES IT SHOW IN BACKPACK
+		category = "PETS",
 		properties = {
 			rideable = true,
 			flyable = true,
@@ -298,26 +284,27 @@ spawnBtn.MouseButton1Click:Connect(function()
 			placeId = 0,
 		},
 		data = {
-			icon = nil,
-			thumbnail = nil,
-			category = "PETS",      -- Some UI reads nested field
+			category = "PETS"  -- required for UI
 		}
 	}
 
-
-	-- Safe insertion into inventory (numeric table)
+	-- Insert pet into inventory
 	table.insert(data.inventory.pets, newPet)
-	print("[PetSpawner] Injected Owl. Total pets now:", #data.inventory.pets)
+	print("[PetSpawner] Injected", petTemplate, ". Total pets now:", #data.inventory.pets)
 
 	-- Auto-equip
 	data.equippedPet = newPet
-	print("[PetSpawner] Owl auto-equipped!")
+	print("[PetSpawner] "..petTemplate.." auto-equipped!")
+
+	-- Update Backpack category immediately
+	update_backpack_category("PETS")
 
 	-- Update label
 	local rarityTag = selectedRarity or "Legendary"
 	selectedLabel.Text = "Pet Spawned & Equipped: "..petTemplate.." ("..rarityTag..")"
 	selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 end)
+
 
 -- Minimize/Expand system
 local savedVisibility = {}
