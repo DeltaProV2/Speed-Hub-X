@@ -218,12 +218,13 @@ spawnBtn.MouseButton1Click:Connect(function()
 		id = HttpService:GenerateGUID(false),
 		uid = HttpService:GenerateGUID(false),
 		template = petTemplate,
+		category = "Pets",        -- THIS MAKES IT SHOW IN BACKPACK
 		properties = {
 			rideable = true,
 			flyable = true,
 			neon = false,
 			mega = false,
-			age = 0,  -- Newborn
+			age = 0,
 			level = 1,
 			unique = false,
 			placeId = 0,
@@ -231,8 +232,10 @@ spawnBtn.MouseButton1Click:Connect(function()
 		data = {
 			icon = nil,
 			thumbnail = nil,
+			category = "Pets",      -- Some UI reads nested field
 		}
 	}
+
 
 	-- Safe insertion into inventory (numeric table)
 	table.insert(data.inventory.pets, newPet)
