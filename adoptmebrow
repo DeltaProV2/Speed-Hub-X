@@ -4,6 +4,14 @@ local Mouse = Player:GetMouse()
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local petModel = ReplicatedStorage:FindFirstChild("Pets"):FindFirstChild(petName)
+if petModel then
+    local clone = petModel:Clone()
+    clone.Parent = workspace  -- Put in workspace to see it
+    clone:SetPrimaryPartCFrame(Player.Character.PrimaryPart.CFrame * CFrame.new(0, 3, 0))
+    print("Pet spawned locally in workspace:", clone.Name)
+end
+
 -- Create ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PetSpawnerGui"
