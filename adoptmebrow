@@ -33,30 +33,39 @@ title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Text = "Pet Spawner By Shxdrag"
 title.Parent = top
 
--- Minimize Button (-)
-local minimize = Instance.new("TextButton")
-minimize.Size = UDim2.new(0, 30, 0, 30)
-minimize.Position = UDim2.new(1, -40, 0.5, -15)
-minimize.Text = "-"
-minimize.Font = Enum.Font.GothamBold
-minimize.TextScaled = true
-minimize.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimize.Parent = top
-Instance.new("UICorner", minimize)
+local fullSize = UDim2.new(0, 350, 0, 270)
+local minimizedSize = UDim2.new(0, 350, 0, 40)
 
--- Expand Button (+) (Hidden at first)
-local expand = Instance.new("TextButton")
-expand.Size = UDim2.new(0, 30, 0, 30)
-expand.Position = UDim2.new(1, -40, 0.5, -15)
-expand.Text = "+"
-expand.Font = Enum.Font.GothamBold
-expand.TextScaled = true
-expand.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-expand.TextColor3 = Color3.fromRGB(255, 255, 255)
-expand.Visible = false
-expand.Parent = top
-Instance.new("UICorner", expand)
+-- Get all content EXCEPT the title bar
+local content = {}
+for _, v in ipairs(frame:GetChildren()) do
+    if v ~= top then
+        table.insert(content, v)
+    end
+end
+
+minimize.MouseButton1Click:Connect(function()
+    TweenService:Create(frame, TweenInfo.new(0.3), {Size = minimizedSize}):Play()
+    minimize.Visible = false
+    expand.Visible = true
+
+    -- Hide all content properly
+    for _, v in ipairs(content) do
+        v.Visible = false
+    end
+end)
+
+expand.MouseButton1Click:Connect(function()
+    TweenService:Create(frame, TweenInfo.new(0.3), {Size = fullSize}):Play()
+    minimize.Visible = true
+    expand.Visible = false
+
+    -- Restore all content properly
+    for _, v in ipairs(content) do
+        v.Visible = true
+    end
+end)
+
 
 -- PET NAME BOX
 local petName = Instance.new("TextBox")
