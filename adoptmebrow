@@ -281,31 +281,33 @@ spawnBtn.MouseButton1Click:Connect(function()
 		return copy
 	end
 
-	local newPet = deepCopy(templateToClone)
+	local newPet = {
+		id = "Injected_" .. tostring(os.clock()),  -- unique ID
 
-	-- Set template and properties explicitly (use logic you requested)
-	newPet.template = petTemplate
-	newPet.properties = newPet.properties or {}
-	newPet.properties.rideable = true
-	newPet.properties.flyable = true
+		template = petTemplate,
 
-	local lname = petTemplate:lower()
-	newPet.properties.neon = lname:find("neon") and true or false
-	newPet.properties.mega = lname:find("mega") and true or false
+		properties = {
+			rideable = true,
+			flyable = true,
 
-	-------------------------------------------------------------
-	-- 🔥 BACKPACK FIX — WITHOUT THIS, PET LIST DISAPPEARS 🔥
-	-------------------------------------------------------------
-	newPet.icon = "rbxassetid://152207377"
-	newPet.thumbnail = "rbxassetid://152207377"
+			neon = false,
+			mega = false,
 
-	newPet.data = newPet.data or {}
-	newPet.data.icon = "rbxassetid://152207377"
-	newPet.data.thumbnail = "rbxassetid://152207377"
-	-------------------------------------------------------------
+			age = 0,
+			level = 1,
+			unique = false,
+			placeId = 0,
+		},
 
-	-------------------------------------------------------------
+		-- These MUST exist or UI crashes (and hides all pets)
+		icon = "rbxassetid://152207377",
+		thumbnail = "rbxassetid://152207377",
 
+		data = {
+			icon = "rbxassetid://152207377",
+			thumbnail = "rbxassetid://152207377",
+		},
+	}
 
 
 	-- Ensure the new pet has a unique id / uid fields the UI might expect
