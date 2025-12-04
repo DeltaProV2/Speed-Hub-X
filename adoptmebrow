@@ -211,6 +211,33 @@ Instance.new("UICorner", spawnBtn)
 
 -- Visual Pet Injector (client-only)
 -- Paste this at the bottom of your GUI LocalScript (replaces previous spawn handler)
+-------------------------------------------------------------
+-- CLIENT‑ONLY VISUAL RIDE/FLY INJECTOR (SAFE + INTEGRATED)
+-------------------------------------------------------------
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local clientDataModule = ReplicatedStorage:WaitForChild("ClientModules"):WaitForChild("Core"):WaitForChild("ClientData")
+
+local clientData = require(clientDataModule)
+local player = game.Players.LocalPlayer
+
+local allClientData = clientData.get_data()
+local playerData = allClientData[tostring(player)]
+
+if playerData and playerData.inventory and playerData.inventory.pets then
+	print("[PetSpawner] Setting ALL pets to rideable + flyable (client-only)")
+
+	for _, pet in pairs(playerData.inventory.pets) do
+		if pet.properties then
+			pet.properties.rideable = true
+			pet.properties.flyable = true
+		end
+	end
+
+	print("[PetSpawner] Completed ride/fly visual inject.")
+else
+	warn("[PetSpawner] Could not locate pet inventory for visual ride/fly inject.")
+end
+
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -219,6 +246,33 @@ local HttpService = game:GetService("HttpService")
 local player = Players.LocalPlayer
 
 spawnBtn.MouseButton1Click:Connect(function()
+	
+	-- SPECIAL FIX FOR OWL (Safe - visual only)
+	if petTemplate:lower() == "owl" then
+		print("[PetSpawner] Applying Owl visual fix")
+
+		-- Force the template name
+		petTemplate = "Owl"
+
+		-- Force an image (use your uploaded asset ID)
+		local owlIcon = "rbxassetid://113057940651936"
+
+		-- If your injection table exists already, assign it directly:
+		if newPet and newPet.data then
+			newPet.data.icon = owlIcon
+			newPet.data.thumbnail = owlIcon
+		else
+			-- Otherwise, save it for when newPet is created
+			newPet = {
+				data = {
+					icon = owlIcon,
+					thumbnail = owlIcon
+				}
+			}
+		end
+	end
+
+	
 	local petTemplate = petName.Text
 	if not petTemplate or petTemplate == "" then
 		warn("[PetSpawner] No pet name entered!")
@@ -369,7 +423,8 @@ spawnBtn.MouseButton1Click:Connect(function()
 	table.insert(playerData.inventory.pets, newPet)
 
 	-- Update the GUI label (keeps your "Pet Spawned: Owl (MFR)" pattern)
-	local rarityTag = "MFR" -- you can adjust logic later to determine rarity properly
+	local rarityTag = selectedRarity or "None"
+	-- you can adjust logic later to determine rarity properly
 	if selectedLabel and selectedLabel.Text ~= nil then
 		selectedLabel.Text = "Pet Spawned: "..petTemplate.." ("..rarityTag..")"
 		selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- green
