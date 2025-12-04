@@ -1,9 +1,10 @@
--- LocalScript: Legendary Owl Spawner
+-- LocalScript: Legendary Owl Spawner (Workspace Version)
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
 
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
@@ -60,12 +61,12 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Spawn Button
+-- Spawn Button (Workspace)
 local spawnBtn = Instance.new("TextButton")
 spawnBtn.Size = UDim2.new(0.9, 0, 0, 50)
 spawnBtn.Position = UDim2.new(0.05, 0, 0, 50)
 spawnBtn.BackgroundColor3 = Color3.fromRGB(255, 180, 0)
-spawnBtn.Text = "Spawn Legendary Owl"
+spawnBtn.Text = "Spawn Owl in Workspace"
 spawnBtn.Font = Enum.Font.FredokaOne
 spawnBtn.TextSize = 18
 spawnBtn.TextColor3 = Color3.new(1,1,1)
@@ -75,11 +76,16 @@ Instance.new("UICorner", spawnBtn).CornerRadius = UDim.new(0, 8)
 spawnBtn.MouseButton1Click:Connect(function()
     if owlPetModel then
         local clone = owlPetModel:Clone()
-        clone.Parent = player:WaitForChild("Backpack") -- Add to Backpack for equip
-        spawnBtn.Text = "🦉 Owl Added!"
+        clone.Parent = Workspace
+        -- Position in front of player
+        local char = player.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            clone:SetPrimaryPartCFrame(CFrame.new(char.HumanoidRootPart.Position + char.HumanoidRootPart.CFrame.LookVector * 5))
+        end
+        spawnBtn.Text = "🦉 Owl Spawned!"
         spawnBtn.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
         wait(1)
-        spawnBtn.Text = "Spawn Legendary Owl"
+        spawnBtn.Text = "Spawn Owl in Workspace"
         spawnBtn.BackgroundColor3 = Color3.fromRGB(255, 180, 0)
     end
 end)
