@@ -199,7 +199,7 @@ Instance.new("UICorner", spawnBtn)
 local clientData = require(ReplicatedStorage.ClientModules.Core.ClientData)
 local data = clientData.get_data()[tostring(player)]
 
--- Client-only: Make all pets rideable/flyable
+-- Make all existing pets rideable/flyable (client-only)
 if data and data.inventory and data.inventory.pets then
     for _, pet in pairs(data.inventory.pets) do
         if pet.properties then
@@ -209,7 +209,7 @@ if data and data.inventory and data.inventory.pets then
     end
 end
 
--- Client-only spawn handler
+-- Safe Client-only Pet Injection
 spawnBtn.MouseButton1Click:Connect(function()
 	local petTemplate = petName.Text
 	if not petTemplate or petTemplate == "" then
@@ -217,52 +217,37 @@ spawnBtn.MouseButton1Click:Connect(function()
 		return
 	end
 
-	-- Check for Owl template
+	-- Fix case for Owl
 	if petTemplate:lower() == "owl" then
 		petTemplate = "Owl"
 	end
 
-	local newPet = {
-		id = "Injected_" .. tostring(os.clock()),
-		template = petTemplate,
-		properties = {
-			rideable = true,
-			flyable = true,
-			neon = false,
-			mega = false,
-		},
-		data = {} -- Adopt Me client will populate thumbnail/icon automatically
-	}
+	-- Safe pet injection
+	pcall(function()
+		local newPet = {
+			id = "Injected_" .. tostring(os.clock()),
+			template = petTemplate,
+			properties = {
+				rideable = true,
+				flyable = true,
+				neon = false,
+				mega = false,
+				age = 0,  -- Newborn
+				level = 1
+			},
+			data = {} -- Client-only: Adopt Me will populate thumbnail/icon
+		}
 
-	-- Insert into client inventory
-	data.inventory.pets[newPet.id] = newPet
+		data.inventory.pets[newPet.id] = newPet
+	end)
 
 	-- Update GUI label
 	local rarityTag = selectedRarity or "None"
 	selectedLabel.Text = "Pet Spawned: "..petTemplate.." ("..rarityTag..")"
 	selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 
-	print("[PetSpawner] Injected pet into client inventory (visual only):", petTemplate)
+	print("[PetSpawner] Injected pet safely into client inventory:", petTemplate)
 end)
-
-data.inventory.pets[newPet.id] = newPet  -- <<< KEEP THIS
-
--- Place the refresh **immediately below** this line:
-local function tryRefreshBackpack()
-    local success, BackpackApp = pcall(function()
-        return require(ReplicatedStorage.ClientModules.Core.UIManager.Apps.BackpackApp)
-    end)
-    if success and BackpackApp then
-        if type(BackpackApp.refresh_inventory) == "function" then
-            pcall(BackpackApp.refresh_inventory)
-        end
-        if BackpackApp.BackpackCategoryButtons and type(BackpackApp.BackpackCategoryButtons.render_category) == "function" then
-            pcall(BackpackApp.BackpackCategoryButtons.render_category)
-        end
-    end
-end
-
-pcall(tryRefreshBackpack)  -- <<< THIS RUNS THE REFRESH
 
 -- Minimize/Expand system
 local savedVisibility = {}
