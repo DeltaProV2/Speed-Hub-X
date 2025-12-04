@@ -149,31 +149,4 @@ SpawnBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PetModels = ReplicatedStorage:WaitForChild("PetModels")
 
-SpawnBtn.MouseButton1Click:Connect(function()
-	local petName = PetNameBox.Text
-	if petName == "" then return end
-
-	-- Find model EXACTLY like "Bat Dragon", "Shadow Dragon", etc.
-	local petModel = PetModels:FindFirstChild(petName)
-	if not petModel then
-		warn("Pet model not found:", petName)
-		return
-	end
-
-	-- Clone locally
-	local clone = petModel:Clone()
-	clone.Parent = workspace
-
-	-- Spawn in front of the player
-	local char = game.Players.LocalPlayer.Character
-	if char and char:FindFirstChild("HumanoidRootPart") then
-		local hrp = char.HumanoidRootPart
-		local spawnCFrame = hrp.CFrame * CFrame.new(0, 0, -5)
-		clone:PivotTo(spawnCFrame)
-	end
-
-	print("Spawned pet:", petName, "(" .. selectedRarity .. ")")
-end)
