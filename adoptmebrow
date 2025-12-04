@@ -194,8 +194,8 @@ SpawnBtn.MouseButton1Click:Connect(function()
 
     -- Allowed pets
     local allowedPets = {
-        ["Bat Dragon"]=true,
-        ["Shadow Dragon"]=true,
+        ["Bat Dragon"]= true,
+        ["Shadow Dragon"]= true,
         ["Owl"]=true
     }
 
