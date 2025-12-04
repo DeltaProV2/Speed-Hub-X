@@ -3,7 +3,6 @@ local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
 local petModel = ReplicatedStorage:FindFirstChild("Pets"):FindFirstChild(petName)
 if petModel then
     local clone = petModel:Clone()
