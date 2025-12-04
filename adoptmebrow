@@ -3,32 +3,39 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 
+--// Pet search function (search Workspace first, then ReplicatedStorage)
 local function findPetAnywhere(petName)
-    print("DEBUG: Searching entire Workspace for:", petName)
-    local found = nil
-
-    -- Recursive search function
-    local function search(parent)
+    print("DEBUG: Searching Workspace for:", petName)
+    
+    local function recursiveSearch(parent)
         for _, child in ipairs(parent:GetChildren()) do
             if child.Name == petName and child:IsA("Model") then
-                found = child
-                return
+                return child
             else
-                search(child)
-                if found then return end
+                local found = recursiveSearch(child)
+                if found then return found end
             end
         end
     end
 
-    search(workspace)
-
+    -- Try Workspace first
+    local found = recursiveSearch(workspace)
     if found then
-        print("DEBUG: Pet found at:", found:GetFullName())
-    else
-        print("DEBUG: Pet NOT found anywhere in Workspace")
+        print("DEBUG: Pet found in Workspace at:", found:GetFullName())
+        return found
     end
 
-    return found
+    print("DEBUG: Not found in Workspace. Searching ReplicatedStorage...")
+
+    -- Try ReplicatedStorage
+    found = recursiveSearch(ReplicatedStorage)
+    if found then
+        print("DEBUG: Pet found in ReplicatedStorage at:", found:GetFullName())
+        return found
+    end
+
+    print("DEBUG: Pet NOT found anywhere.")
+    return nil
 end
 
 -- Example usage
@@ -139,7 +146,7 @@ SpawnBtn.MouseButton1Click:Connect(function()
     local petTemplate = findPetAnywhere(petName)
 
     if not petTemplate then
-        warn("Pet not found:", petName)
+        warn("Pet not found anywhere:", petName)
         return
     end
 
@@ -147,7 +154,7 @@ SpawnBtn.MouseButton1Click:Connect(function()
     local hrp = char:WaitForChild("HumanoidRootPart")
 
     local petClone = petTemplate:Clone()
-    petClone.Parent = workspace -- or PetFolder if you want local folder
+    petClone.Parent = workspace -- or PetFolder if you want
     if petClone.PrimaryPart then
         petClone:SetPrimaryPartCFrame(hrp.CFrame * CFrame.new(3, 0, 0))
     end
@@ -155,4 +162,5 @@ SpawnBtn.MouseButton1Click:Connect(function()
     table.insert(LocalInventory, {Name = petName, Rarity = selectedRarity, Model = petClone})
     print("DEBUG: Pet spawned successfully!")
 end)
+
 
