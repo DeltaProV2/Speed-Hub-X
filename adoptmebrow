@@ -138,15 +138,32 @@ spawnBtn.MouseButton1Click:Connect(function()
     selectedLabel.Text = "Pet Spawned: " .. name .. " (" .. rarity .. ")"
 end)
 
--- ⭐ COLLECT CONTENT AFTER EVERYTHING IS CREATED
-local content = {}
-for _, v in ipairs(frame:GetChildren()) do
-    if v ~= top then
-        table.insert(content, v)
+-------------------------------------------------------------
+-- ⭐ FULLY WORKING MINIMIZE SYSTEM (FIXED)
+-------------------------------------------------------------
+
+-- Save old visibility
+local savedVisibility = {}
+
+local function hideAllContent()
+    savedVisibility = {}
+
+    for _, obj in ipairs(frame:GetDescendants()) do
+        if obj:IsA("GuiObject") and obj ~= top and not obj:IsDescendantOf(top) then
+            savedVisibility[obj] = obj.Visible
+            obj.Visible = false
+        end
     end
 end
 
--- ⭐ Minimize / Expand
+local function restoreAllContent()
+    for obj, state in pairs(savedVisibility) do
+        if obj and obj.Parent then
+            obj.Visible = state
+        end
+    end
+end
+
 local fullSize = UDim2.new(0, 350, 0, 270)
 local minimizedSize = UDim2.new(0, 350, 0, 40)
 
@@ -154,18 +171,12 @@ minimize.MouseButton1Click:Connect(function()
     TweenService:Create(frame, TweenInfo.new(0.3), {Size = minimizedSize}):Play()
     minimize.Visible = false
     expand.Visible = true
-
-    for _, v in ipairs(content) do
-        v.Visible = false
-    end
+    hideAllContent()
 end)
 
 expand.MouseButton1Click:Connect(function()
     TweenService:Create(frame, TweenInfo.new(0.3), {Size = fullSize}):Play()
     minimize.Visible = true
     expand.Visible = false
-
-    for _, v in ipairs(content) do
-        v.Visible = true
-    end
+    restoreAllContent()
 end)
