@@ -3,6 +3,7 @@ local player = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
 
 -- GUI Setup
 local gui = Instance.new("ScreenGui")
@@ -201,52 +202,50 @@ local data = clientData.get_data()[tostring(player)]
 
 -- Make all existing pets rideable/flyable (client-only)
 if data and data.inventory and data.inventory.pets then
-    for _, pet in pairs(data.inventory.pets) do
-        if pet.properties then
-            pet.properties.rideable = true
-            pet.properties.flyable = true
-        end
-    end
+	for _, pet in pairs(data.inventory.pets) do
+		if pet.properties then
+			pet.properties.rideable = true
+			pet.properties.flyable = true
+		end
+	end
 end
 
--- Safe Client-only Pet Injection
+-- SPAWN & AUTO-EQUIP PET
 spawnBtn.MouseButton1Click:Connect(function()
-	local petTemplate = petName.Text
-	if not petTemplate or petTemplate == "" then
-		warn("[PetSpawner] No pet name entered!")
-		return
-	end
+	local petTemplate = "Owl" -- testing only Owl
 
-	-- Fix case for Owl
-	if petTemplate:lower() == "owl" then
-		petTemplate = "Owl"
-	end
-
-	-- Safe pet injection
-	pcall(function()
-		local newPet = {
-			id = "Injected_" .. tostring(os.clock()),
-			template = petTemplate,
-			properties = {
-				rideable = true,
-				flyable = true,
-				neon = false,
-				mega = false,
-				age = 0,  -- Newborn
-				level = 1
-			},
-			data = {} -- Client-only: Adopt Me will populate thumbnail/icon
+	local newPet = {
+		id = HttpService:GenerateGUID(false),
+		uid = HttpService:GenerateGUID(false),
+		template = petTemplate,
+		properties = {
+			rideable = true,
+			flyable = true,
+			neon = false,
+			mega = false,
+			age = 0,  -- Newborn
+			level = 1,
+			unique = false,
+			placeId = 0,
+		},
+		data = {
+			icon = nil,
+			thumbnail = nil,
 		}
+	}
 
-		data.inventory.pets[newPet.id] = newPet
-	end)
+	-- Safe insertion into inventory (numeric table)
+	table.insert(data.inventory.pets, newPet)
+	print("[PetSpawner] Injected Owl. Total pets now:", #data.inventory.pets)
 
-	-- Update GUI label
-	local rarityTag = selectedRarity or "None"
-	selectedLabel.Text = "Pet Spawned: "..petTemplate.." ("..rarityTag..")"
+	-- Auto-equip
+	data.equippedPet = newPet
+	print("[PetSpawner] Owl auto-equipped!")
+
+	-- Update label
+	local rarityTag = selectedRarity or "Legendary"
+	selectedLabel.Text = "Pet Spawned & Equipped: "..petTemplate.." ("..rarityTag..")"
 	selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-
-	print("[PetSpawner] Injected pet safely into client inventory:", petTemplate)
 end)
 
 -- Minimize/Expand system
