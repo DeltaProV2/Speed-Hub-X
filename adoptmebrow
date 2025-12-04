@@ -2,7 +2,6 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 local TweenService = game:GetService("TweenService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Create ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
@@ -21,8 +20,8 @@ MainFrame.Parent = ScreenGui
 -- Gradient Background
 local UIGradient = Instance.new("UIGradient")
 UIGradient.Color = ColorSequence.new({
-	ColorSequenceKeypoint.new(0, Color3.new(1, 0.705, 0.862)),
-	ColorSequenceKeypoint.new(1, Color3.new(1, 0.549, 0.823))
+    ColorSequenceKeypoint.new(0, Color3.new(1, 0.705, 0.862)),
+    ColorSequenceKeypoint.new(1, Color3.new(1, 0.549, 0.823))
 })
 UIGradient.Rotation = 90
 UIGradient.Parent = MainFrame
@@ -60,12 +59,20 @@ local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 10)
 UICorner.Parent = MainFrame
 
--- Title Frame
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "amina pets nyo"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 20
+-- Title Frame (darker see-through black background)
 local TitleFrame = Instance.new("Frame")
 TitleFrame.Size = UDim2.new(1, -20, 0, 35)
 TitleFrame.Position = UDim2.new(0, 10, 0, 5)
 TitleFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-TitleFrame.BackgroundTransparency = 0.1
+TitleFrame.BackgroundTransparency = 0.1 -- darker (0 = solid black, 1 = invisible)
 TitleFrame.BorderSizePixel = 0
 TitleFrame.Parent = MainFrame
 
@@ -73,6 +80,7 @@ local TitleFrameCorner = Instance.new("UICorner")
 TitleFrameCorner.CornerRadius = UDim.new(0, 8)
 TitleFrameCorner.Parent = TitleFrame
 
+-- Title Text
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
@@ -87,11 +95,12 @@ local PetNameBox = Instance.new("TextBox")
 PetNameBox.Size = UDim2.new(0.9, 0, 0, 30)
 PetNameBox.Position = UDim2.new(0.05, 0, 0, 50)
 PetNameBox.PlaceholderText = "Enter Pet Name"
+PetNameBox.Text = ""
+PetNameBox.ClearTextOnFocus = false
 PetNameBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 PetNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 PetNameBox.Font = Enum.Font.SourceSans
 PetNameBox.TextSize = 18
-PetNameBox.ClearTextOnFocus = false
 PetNameBox.Parent = MainFrame
 
 local BoxCorner = Instance.new("UICorner")
@@ -120,18 +129,6 @@ local MFRBtn = CreateButton("MFR", Color3.fromRGB(255, 100, 100), 0.05)
 local NFRBtn = CreateButton("NFR", Color3.fromRGB(100, 255, 100), 0.375)
 local FRBtn = CreateButton("FR", Color3.fromRGB(100, 100, 255), 0.7)
 
-local selectedRarity = "MFR"
-local function selectRarity(rarity)
-	selectedRarity = rarity
-	MFRBtn.BackgroundColor3 = (rarity == "MFR" and Color3.fromRGB(255,100,100)) or Color3.fromRGB(60,60,60)
-	NFRBtn.BackgroundColor3 = (rarity == "NFR" and Color3.fromRGB(100,255,100)) or Color3.fromRGB(60,60,60)
-	FRBtn.BackgroundColor3 = (rarity == "FR" and Color3.fromRGB(100,100,255)) or Color3.fromRGB(60,60,60)
-end
-
-MFRBtn.MouseButton1Click:Connect(function() selectRarity("MFR") end)
-NFRBtn.MouseButton1Click:Connect(function() selectRarity("NFR") end)
-FRBtn.MouseButton1Click:Connect(function() selectRarity("FR") end)
-
 -- Spawn Pet Button
 local SpawnBtn = Instance.new("TextButton")
 SpawnBtn.Size = UDim2.new(0.9, 0, 0, 40)
@@ -147,8 +144,12 @@ local SpawnCorner = Instance.new("UICorner")
 SpawnCorner.CornerRadius = UDim.new(0,5)
 SpawnCorner.Parent = SpawnBtn
 
--- Draggable GUI (Title only)
+-- Movable GUI logic
+-- Draggable GUI logic
+-- Draggable GUI logic (drag only using the Title)
+-- Draggable GUI (Title only) + Hide mouse while dragging
 local UserInputService = game:GetService("UserInputService")
+
 local dragging = false
 local dragStart
 local startPos
@@ -167,11 +168,15 @@ Title.InputBegan:Connect(function(input)
 		dragging = true
 		dragStart = input.Position
 		startPos = Vector2.new(MainFrame.AbsolutePosition.X, MainFrame.AbsolutePosition.Y)
+
+		-- Hide mouse
 		UserInputService.MouseIconEnabled = false
+
+		-- Stop dragging when mouse released
 		input.Changed:Connect(function()
 			if input.UserInputState == Enum.UserInputState.End then
 				dragging = false
-				UserInputService.MouseIconEnabled = true
+				UserInputService.MouseIconEnabled = true -- show mouse again
 			end
 		end)
 	end
@@ -189,35 +194,41 @@ UserInputService.InputChanged:Connect(function(input)
 	end
 end)
 
--- Allowed Pets
-local AllowedPets = {
-	["Bat Dragon"] = true,
-	["Shadow Dragon"] = true
-}
+-- Rarity selection logic
+local selectedRarity = "MFR"
 
--- Spawn Pet Function (local, client-side)
-local function spawnPet(petName)
-	if not AllowedPets[petName] then
+local function selectRarity(rarity)
+	selectedRarity = rarity
+	MFRBtn.BackgroundColor3 = (rarity == "MFR" and Color3.fromRGB(255,100,100)) or Color3.fromRGB(60,60,60)
+	NFRBtn.BackgroundColor3 = (rarity == "NFR" and Color3.fromRGB(100,255,100)) or Color3.fromRGB(60,60,60)
+	FRBtn.BackgroundColor3 = (rarity == "FR" and Color3.fromRGB(100,100,255)) or Color3.fromRGB(60,60,60)
+end
+
+MFRBtn.MouseButton1Click:Connect(function() selectRarity("MFR") end)
+NFRBtn.MouseButton1Click:Connect(function() selectRarity("NFR") end)
+FRBtn.MouseButton1Click:Connect(function() selectRarity("FR") end)
+
+-- Spawn pet logic (replace with your own spawning code)
+-- Local temporary inventory (client-side only)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PetSpawnEvent = ReplicatedStorage:WaitForChild("PetSpawnEvent")
+
+SpawnBtn.MouseButton1Click:Connect(function()
+	local petName = PetNameBox.Text
+	if petName == "" then return end
+
+	-- Only allow these pets
+	local allowedPets = {
+		["Bat Dragon"] = true,
+		["Shadow Dragon"] = true
+	}
+
+	if not allowedPets[petName] then
 		warn("Invalid pet:", petName)
 		return
 	end
 
-	local petModel = ReplicatedStorage:FindFirstChild("Pets"):FindFirstChild(petName)
-	if not petModel then
-		warn("Pet model not found:", petName)
-		return
-	end
-
-	local clone = petModel:Clone()
-	clone.Name = petName .. " - " .. selectedRarity
-	clone.Parent = Player:WaitForChild("Backpack")
-
-	print("Spawned pet locally:", clone.Name)
-end
-
--- Connect Spawn Button
-SpawnBtn.MouseButton1Click:Connect(function()
-	local petName = PetNameBox.Text
-	if petName == "" then return end
-	spawnPet(petName)
+	-- Fire server event to give pet
+	PetSpawnEvent:FireServer(petName, selectedRarity)
+	print("Requested pet from server:", petName, selectedRarity)
 end)
