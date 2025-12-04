@@ -245,6 +245,25 @@ spawnBtn.MouseButton1Click:Connect(function()
 	print("[PetSpawner] Injected pet into client inventory (visual only):", petTemplate)
 end)
 
+data.inventory.pets[newPet.id] = newPet  -- <<< KEEP THIS
+
+-- Place the refresh **immediately below** this line:
+local function tryRefreshBackpack()
+    local success, BackpackApp = pcall(function()
+        return require(ReplicatedStorage.ClientModules.Core.UIManager.Apps.BackpackApp)
+    end)
+    if success and BackpackApp then
+        if type(BackpackApp.refresh_inventory) == "function" then
+            pcall(BackpackApp.refresh_inventory)
+        end
+        if BackpackApp.BackpackCategoryButtons and type(BackpackApp.BackpackCategoryButtons.render_category) == "function" then
+            pcall(BackpackApp.BackpackCategoryButtons.render_category)
+        end
+    end
+end
+
+pcall(tryRefreshBackpack)  -- <<< THIS RUNS THE REFRESH
+
 -- Minimize/Expand system
 local savedVisibility = {}
 local function hideAllContent()
