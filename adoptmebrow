@@ -211,14 +211,9 @@ local function getViewport()
 end
 
 local function clampPosition(x, y)
-    local vp = getViewport()
-    local size = frame.AbsoluteSize
-
-    local maxX = math.max(0, vp.X - size.X)
-    local maxY = math.max(0, vp.Y - size.Y)
-
-    return math.clamp(x, 0, maxX), math.clamp(y, 0, maxY)
+    return x, y -- no locking, free movement
 end
+
 
 local function updateDrag(pos)
     local delta = pos - dragStart
