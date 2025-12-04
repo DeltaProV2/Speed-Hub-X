@@ -94,39 +94,39 @@ local dragStart
 local startPos
 
 local function updateDrag(input)
-    local delta = input.Position - dragStart
-    frame.Position = UDim2.new(
-        startPos.X.Scale,
-        startPos.X.Offset + delta.X,
-        startPos.Y.Scale,
-        startPos.Y.Offset + delta.Y
-    )
+	local delta = input.Position - dragStart
+	frame.Position = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
 end
 
 moveBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch then
-        
-        dragging = true
-        dragStart = input.Position
-        startPos = frame.Position
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
 
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-    if dragging then
-        if input.UserInputType == Enum.UserInputType.MouseMovement
-            or input.UserInputType == Enum.UserInputType.Touch then
-            
-            updateDrag(input)
-        end
-    end
+	if dragging then
+		if input.UserInputType == Enum.UserInputType.MouseMovement
+			or input.UserInputType == Enum.UserInputType.Touch then
+
+			updateDrag(input)
+		end
+	end
 end)
 
 -------------------------------------------------------------
@@ -173,21 +173,21 @@ selectedLabel.Text = "Selected: None"
 selectedLabel.Parent = frame
 
 local function createRarityButton(name, color)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 90, 1, -5)
-    button.BackgroundColor3 = color
-    button.BorderSizePixel = 0
-    button.TextColor3 = Color3.fromRGB(255,255,255)
-    button.Font = Enum.Font.GothamBold
-    button.TextScaled = true
-    button.Text = name
-    button.Parent = rarityFrame
-    Instance.new("UICorner", button)
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(0, 90, 1, -5)
+	button.BackgroundColor3 = color
+	button.BorderSizePixel = 0
+	button.TextColor3 = Color3.fromRGB(255,255,255)
+	button.Font = Enum.Font.GothamBold
+	button.TextScaled = true
+	button.Text = name
+	button.Parent = rarityFrame
+	Instance.new("UICorner", button)
 
-    button.MouseButton1Click:Connect(function()
-        selectedRarity = name
-        selectedLabel.Text = "Selected: " .. name
-    end)
+	button.MouseButton1Click:Connect(function()
+		selectedRarity = name
+		selectedLabel.Text = "Selected: " .. name
+	end)
 end
 
 createRarityButton("MFR", Color3.fromRGB(255, 100, 100))
@@ -219,166 +219,181 @@ local HttpService = game:GetService("HttpService")
 local player = Players.LocalPlayer
 
 spawnBtn.MouseButton1Click:Connect(function()
-    local petTemplate = petName.Text
-    if not petTemplate or petTemplate == "" then
-        warn("[PetSpawner] No pet name entered!")
-        return
-    end
+	local petTemplate = petName.Text
+	if not petTemplate or petTemplate == "" then
+		warn("[PetSpawner] No pet name entered!")
+		return
+	end
 
-    -- require ClientData safely
-    local ok, clientData = pcall(function()
-        return require(ReplicatedStorage.ClientModules.Core.ClientData)
-    end)
-    if not ok or not clientData then
-        warn("[PetSpawner] ERROR: Could not require ClientData!")
-        return
-    end
+	-- require ClientData safely
+	local ok, clientData = pcall(function()
+		return require(ReplicatedStorage.ClientModules.Core.ClientData)
+	end)
+	if not ok or not clientData then
+		warn("[PetSpawner] ERROR: Could not require ClientData!")
+		return
+	end
 
-    local allData = clientData.get_data()
-    if not allData then
-        warn("[PetSpawner] ERROR: clientData.get_data() returned nil")
-        return
-    end
+	local allData = clientData.get_data()
+	if not allData then
+		warn("[PetSpawner] ERROR: clientData.get_data() returned nil")
+		return
+	end
 
-    local playerData = allData[tostring(player)]
-    if not playerData or not playerData.inventory or not playerData.inventory.pets then
-        warn("[PetSpawner] ERROR: playerData.inventory.pets not found!")
-        return
-    end
+	local playerData = allData[tostring(player)]
+	if not playerData or not playerData.inventory or not playerData.inventory.pets then
+		warn("[PetSpawner] ERROR: playerData.inventory.pets not found!")
+		return
+	end
 
-    -- Find an existing pet to clone (so we don't miss required fields for the UI)
-    local templateToClone = nil
-    for i, pet in ipairs(playerData.inventory.pets) do
-        templateToClone = pet
-        break
-    end
+	-- Find an existing pet to clone (so we don't miss required fields for the UI)
+	local templateToClone = nil
+	for i, pet in ipairs(playerData.inventory.pets) do
+		templateToClone = pet
+		break
+	end
 
-    -- Fallback: if player has no pets, try to create a minimal valid structure
-    if not templateToClone then
-        warn("[PetSpawner] No existing pet to clone. Creating a minimal entry (may be risky).")
-        templateToClone = {
-            template = petTemplate,
-            properties = {
-                rideable = true,
-                flyable = true,
-                neon = false,
-                mega = false
-            }
-        }
-    end
+	-- Fallback: if player has no pets, try to create a minimal valid structure
+	if not templateToClone then
+		warn("[PetSpawner] No existing pet to clone. Creating a minimal entry (may be risky).")
+		templateToClone = {
+			template = petTemplate,
+			properties = {
+				rideable = true,
+				flyable = true,
+				neon = false,
+				mega = false
+			}
+		}
+	end
 
-    -- Deep copy function (keeps nested tables)
-    local function deepCopy(t)
-        if type(t) ~= "table" then return t end
-        local copy = {}
-        for k, v in pairs(t) do
-            if type(v) == "table" then
-                copy[k] = deepCopy(v)
-            else
-                copy[k] = v
-            end
-        end
-        return copy
-    end
+	-- Deep copy function (keeps nested tables)
+	local function deepCopy(t)
+		if type(t) ~= "table" then return t end
+		local copy = {}
+		for k, v in pairs(t) do
+			if type(v) == "table" then
+				copy[k] = deepCopy(v)
+			else
+				copy[k] = v
+			end
+		end
+		return copy
+	end
 
-    local newPet = deepCopy(templateToClone)
+	local newPet = deepCopy(templateToClone)
 
-    -- Set template and properties explicitly (use logic you requested)
-    newPet.template = petTemplate
-    newPet.properties = newPet.properties or {}
-    newPet.properties.rideable = true
-    newPet.properties.flyable = true
-    -- If name contains "neon" or "mega", set those flags accordingly
-    local lname = petTemplate:lower()
-    newPet.properties.neon = lname:find("neon") and true or false
-    newPet.properties.mega = lname:find("mega") and true or false
+	-- Set template and properties explicitly (use logic you requested)
+	newPet.template = petTemplate
+	newPet.properties = newPet.properties or {}
+	newPet.properties.rideable = true
+	newPet.properties.flyable = true
 
-    -- Ensure the new pet has a unique id / uid fields the UI might expect
-    -- We'll attempt to set common id keys if they exist in the cloned template
-    local generatedId = HttpService:GenerateGUID(false)
+	local lname = petTemplate:lower()
+	newPet.properties.neon = lname:find("neon") and true or false
+	newPet.properties.mega = lname:find("mega") and true or false
 
-    -- helper to set common id-like fields
-    local function assignIdLikeFields(petTable, idStr)
-        local possibleKeys = {"id", "uid", "instance_id", "template_id", "unique_id"}
-        for _, key in ipairs(possibleKeys) do
-            if petTable[key] ~= nil then
-                petTable[key] = idStr
-            end
-        end
-        -- some games put nested ids under "data" or "meta"
-        if petTable.data and type(petTable.data) == "table" then
-            for _, key in ipairs(possibleKeys) do
-                if petTable.data[key] ~= nil then
-                    petTable.data[key] = idStr
-                end
-            end
-        end
-    end
+	-------------------------------------------------------------
+	-- 🔥 BACKPACK FIX — WITHOUT THIS, PET LIST DISAPPEARS 🔥
+	-------------------------------------------------------------
+	newPet.icon = "rbxassetid://152207377"
+	newPet.thumbnail = "rbxassetid://152207377"
 
-    assignIdLikeFields(newPet, generatedId)
-    -- also set a couple of safe fields directly
-    newPet.id = newPet.id or generatedId
-    newPet.uid = newPet.uid or generatedId
+	newPet.data = newPet.data or {}
+	newPet.data.icon = "rbxassetid://152207377"
+	newPet.data.thumbnail = "rbxassetid://152207377"
+	-------------------------------------------------------------
 
-    -- Insert into inventory
-    table.insert(playerData.inventory.pets, newPet)
+	-------------------------------------------------------------
 
-    -- Update the GUI label (keeps your "Pet Spawned: Owl (MFR)" pattern)
-    local rarityTag = "MFR" -- you can adjust logic later to determine rarity properly
-    if selectedLabel and selectedLabel.Text ~= nil then
-        selectedLabel.Text = "Pet Spawned: "..petTemplate.." ("..rarityTag..")"
-        selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- green
-    end
 
-    print("--------------------------------------------------")
-    print("[PetSpawner] Injected visual pet into inventory (client-only).")
-    print("Template:", newPet.template)
-    print("ID:", newPet.id)
-    print("Flyable:", tostring(newPet.properties.flyable))
-    print("Rideable:", tostring(newPet.properties.rideable))
-    print("Neon:", tostring(newPet.properties.neon))
-    print("Mega:", tostring(newPet.properties.mega))
-    print("Total pets now:", #playerData.inventory.pets)
 
-    -- Attempt to call backpack UI refresh safely (wrapped in pcall)
-    local function tryRefreshBackpack()
-        -- Common place for the backpack UI module (try multiple common names)
-        local tryModules = {
-            "ClientModules.Core.UIManager.Apps.BackpackApp",
-            "ClientModules.Gui.BackpackGui",
-            "ClientModules.Core.UIManager.Apps.BackpackApp.BackpackCategoryButtons"
-        }
-        for _, path in ipairs(tryModules) do
-            local success, mod = pcall(function() return require(ReplicatedStorage:WaitForChild(unpack(string.split(path, ".")))) end)
-            if success and mod then
-                -- try common refresh functions
-                local refreshFns = {"refresh_inventory", "refresh", "update", "rebuild"}
-                for _, fnName in ipairs(refreshFns) do
-                    if type(mod[fnName]) == "function" then
-                        pcall(mod[fnName])
-                        print("[PetSpawner] Called backpack UI function:", path.."."..fnName)
-                        return true
-                    end
-                end
-            end
-        end
-        -- As a last resort, try UIManager global (very safe pcall)
-        local ok2, uiManager = pcall(function()
-            return ReplicatedStorage.ClientModules and ReplicatedStorage.ClientModules.Core and ReplicatedStorage.ClientModules.Core.UIManager
-        end)
-        if ok2 and uiManager then
-            -- sometimes the UI listens to signals; we can't safely emit them without knowing structure
-            -- so we just return false here quietly
-            return false
-        end
-        return false
-    end
+	-- Ensure the new pet has a unique id / uid fields the UI might expect
+	-- We'll attempt to set common id keys if they exist in the cloned template
+	local generatedId = HttpService:GenerateGUID(false)
 
-    local refreshed = pcall(tryRefreshBackpack)
-    if not refreshed then
-        -- not critical; we injected the data and the GUI should be stable because we cloned a real entry
-        print("[PetSpawner] Backpack UI refresh not available or failed (this is okay).")
-    end
+	-- helper to set common id-like fields
+	local function assignIdLikeFields(petTable, idStr)
+		local possibleKeys = {"id", "uid", "instance_id", "template_id", "unique_id"}
+		for _, key in ipairs(possibleKeys) do
+			if petTable[key] ~= nil then
+				petTable[key] = idStr
+			end
+		end
+		-- some games put nested ids under "data" or "meta"
+		if petTable.data and type(petTable.data) == "table" then
+			for _, key in ipairs(possibleKeys) do
+				if petTable.data[key] ~= nil then
+					petTable.data[key] = idStr
+				end
+			end
+		end
+	end
+
+	assignIdLikeFields(newPet, generatedId)
+	-- also set a couple of safe fields directly
+	newPet.id = newPet.id or generatedId
+	newPet.uid = newPet.uid or generatedId
+
+	-- Insert into inventory
+	table.insert(playerData.inventory.pets, newPet)
+
+	-- Update the GUI label (keeps your "Pet Spawned: Owl (MFR)" pattern)
+	local rarityTag = "MFR" -- you can adjust logic later to determine rarity properly
+	if selectedLabel and selectedLabel.Text ~= nil then
+		selectedLabel.Text = "Pet Spawned: "..petTemplate.." ("..rarityTag..")"
+		selectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- green
+	end
+
+	print("--------------------------------------------------")
+	print("[PetSpawner] Injected visual pet into inventory (client-only).")
+	print("Template:", newPet.template)
+	print("ID:", newPet.id)
+	print("Flyable:", tostring(newPet.properties.flyable))
+	print("Rideable:", tostring(newPet.properties.rideable))
+	print("Neon:", tostring(newPet.properties.neon))
+	print("Mega:", tostring(newPet.properties.mega))
+	print("Total pets now:", #playerData.inventory.pets)
+
+	-- Attempt to call backpack UI refresh safely (wrapped in pcall)
+	local function tryRefreshBackpack()
+		-- Common place for the backpack UI module (try multiple common names)
+		local tryModules = {
+			"ClientModules.Core.UIManager.Apps.BackpackApp",
+			"ClientModules.Gui.BackpackGui",
+			"ClientModules.Core.UIManager.Apps.BackpackApp.BackpackCategoryButtons"
+		}
+		for _, path in ipairs(tryModules) do
+			local success, mod = pcall(function() return require(ReplicatedStorage:WaitForChild(unpack(string.split(path, ".")))) end)
+			if success and mod then
+				-- try common refresh functions
+				local refreshFns = {"refresh_inventory", "refresh", "update", "rebuild"}
+				for _, fnName in ipairs(refreshFns) do
+					if type(mod[fnName]) == "function" then
+						pcall(mod[fnName])
+						print("[PetSpawner] Called backpack UI function:", path.."."..fnName)
+						return true
+					end
+				end
+			end
+		end
+		-- As a last resort, try UIManager global (very safe pcall)
+		local ok2, uiManager = pcall(function()
+			return ReplicatedStorage.ClientModules and ReplicatedStorage.ClientModules.Core and ReplicatedStorage.ClientModules.Core.UIManager
+		end)
+		if ok2 and uiManager then
+			-- sometimes the UI listens to signals; we can't safely emit them without knowing structure
+			-- so we just return false here quietly
+			return false
+		end
+		return false
+	end
+
+	local refreshed = pcall(tryRefreshBackpack)
+	if not refreshed then
+		-- not critical; we injected the data and the GUI should be stable because we cloned a real entry
+		print("[PetSpawner] Backpack UI refresh not available or failed (this is okay).")
+	end
 end)
 
 -------------------------------------------------------------
@@ -387,39 +402,39 @@ end)
 local savedVisibility = {}
 
 local function hideAllContent()
-    savedVisibility = {}
-    for _, obj in ipairs(frame:GetDescendants()) do
-        if obj:IsA("GuiObject") and obj ~= top and not obj:IsDescendantOf(top) then
-            savedVisibility[obj] = obj.Visible
-            obj.Visible = false
-        end
-    end
+	savedVisibility = {}
+	for _, obj in ipairs(frame:GetDescendants()) do
+		if obj:IsA("GuiObject") and obj ~= top and not obj:IsDescendantOf(top) then
+			savedVisibility[obj] = obj.Visible
+			obj.Visible = false
+		end
+	end
 end
 
 local function restoreAllContent()
-    for obj, state in pairs(savedVisibility) do
-        if obj and obj.Parent then
-            obj.Visible = state
-        end
-    end
-    savedVisibility = {}
+	for obj, state in pairs(savedVisibility) do
+		if obj and obj.Parent then
+			obj.Visible = state
+		end
+	end
+	savedVisibility = {}
 end
 
 local fullSize = UDim2.new(0, 350, 0, 270)
 local minimizedSize = UDim2.new(0, 350, 0, 40)
 
 minimize.MouseButton1Click:Connect(function()
-    TweenService:Create(frame, TweenInfo.new(0.3), {Size = minimizedSize}):Play()
-    minimize.Visible = false
-    expand.Visible = true
-    hideAllContent()
+	TweenService:Create(frame, TweenInfo.new(0.3), {Size = minimizedSize}):Play()
+	minimize.Visible = false
+	expand.Visible = true
+	hideAllContent()
 end)
 
 expand.MouseButton1Click:Connect(function()
-    TweenService:Create(frame, TweenInfo.new(0.3), {Size = fullSize}):Play()
-    minimize.Visible = true
-    expand.Visible = false
-    restoreAllContent()
+	TweenService:Create(frame, TweenInfo.new(0.3), {Size = fullSize}):Play()
+	minimize.Visible = true
+	expand.Visible = false
+	restoreAllContent()
 end)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -430,15 +445,15 @@ local data = clientData.get_data()[tostring(player)]
 
 print("===== INVENTORY PET DATA DUMP =====")
 for i,v in pairs(data.inventory.pets) do
-    print("PET #"..i)
-    for k2,v2 in pairs(v) do
-        print("   ", k2, v2)
-        if typeof(v2) == "table" then
-            for k3,v3 in pairs(v2) do
-                print("      ", k3, v3)
-            end
-        end
-    end
+	print("PET #"..i)
+	for k2,v2 in pairs(v) do
+		print("   ", k2, v2)
+		if typeof(v2) == "table" then
+			for k3,v3 in pairs(v2) do
+				print("      ", k3, v3)
+			end
+		end
+	end
 end
 print("====================================")
 
