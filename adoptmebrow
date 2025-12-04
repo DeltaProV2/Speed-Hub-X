@@ -3,13 +3,6 @@ local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local petModel = ReplicatedStorage:FindFirstChild("Pets"):FindFirstChild(petName)
-if petModel then
-    local clone = petModel:Clone()
-    clone.Parent = workspace  -- Put in workspace to see it
-    clone:SetPrimaryPartCFrame(Player.Character.PrimaryPart.CFrame * CFrame.new(0, 3, 0))
-    print("Pet spawned locally in workspace:", clone.Name)
-end
 
 -- Create ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
@@ -232,27 +225,35 @@ SpawnBtn.MouseButton1Click:Connect(function()
 		["Bat Dragon"] = true,
 		["Shadow Dragon"] = true
 	}
+
 	if not allowedPets[petName] then
 		warn("Invalid pet:", petName)
 		return
 	end
 
+	-- Check for Pets folder in ReplicatedStorage
 	local petsFolder = ReplicatedStorage:FindFirstChild("Pets")
 	if not petsFolder then
 		warn("Pets folder not found in ReplicatedStorage!")
 		return
 	end
 
+	-- Find the pet model
 	local petModel = petsFolder:FindFirstChild(petName)
 	if not petModel then
 		warn("Pet model not found:", petName)
 		return
 	end
 
-	-- Clone the pet and put it in the player's Backpack
+	-- Clone and spawn in Workspace
 	local clone = petModel:Clone()
 	clone.Name = petName .. " - " .. selectedRarity
-	clone.Parent = Player:WaitForChild("Backpack")
+	clone.Parent = workspace
 
-	print("Spawned pet locally:", clone.Name)
+	-- Position it above the player
+	if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+		clone:SetPrimaryPartCFrame(Player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0))
+	end
+
+	print("Pet spawned locally in Workspace:", clone.Name)
 end)
