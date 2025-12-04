@@ -2,7 +2,6 @@
 print("[PetSpawnerUI] Script started")
 
 local player = game.Players.LocalPlayer
-local HttpService = game:GetService("HttpService")
 
 -- GUI Setup
 local gui = Instance.new("ScreenGui")
@@ -13,7 +12,7 @@ gui.Parent = player:WaitForChild("PlayerGui")
 
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 400, 0, 400)
+frame.Size = UDim2.new(0, 400, 0, 450) -- increased height
 frame.Position = UDim2.new(0.5, -200, 0.2, 0)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
@@ -83,7 +82,7 @@ createRarityButton("FR", Color3.fromRGB(100, 100, 255))
 
 -- Scrollable container for spawned pets
 local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Size = UDim2.new(1, -20, 0, 200)
+scrollFrame.Size = UDim2.new(1, -20, 0, 220)
 scrollFrame.Position = UDim2.new(0, 10, 0, 160)
 scrollFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 scrollFrame.BorderSizePixel = 0
@@ -97,10 +96,23 @@ listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 listLayout.Padding = UDim.new(0, 5)
 listLayout.Parent = scrollFrame
 
+-- Spawn Button
+local spawnBtn = Instance.new("TextButton")
+spawnBtn.Size = UDim2.new(1, -20, 0, 40)
+spawnBtn.Position = UDim2.new(0, 10, 0, 390) -- below scroll frame
+spawnBtn.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
+spawnBtn.BorderSizePixel = 0
+spawnBtn.Font = Enum.Font.GothamBold
+spawnBtn.TextScaled = true
+spawnBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+spawnBtn.Text = "Spawn Pet"
+spawnBtn.Parent = frame
+Instance.new("UICorner", spawnBtn)
+
 -- Status Label
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Size = UDim2.new(1, -20, 0, 30)
-statusLabel.Position = UDim2.new(0, 10, 0, 370)
+statusLabel.Position = UDim2.new(0, 10, 0, 420)
 statusLabel.BackgroundTransparency = 1
 statusLabel.Font = Enum.Font.GothamBold
 statusLabel.TextScaled = true
@@ -108,7 +120,7 @@ statusLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
 statusLabel.Text = "No pet spawned yet"
 statusLabel.Parent = frame
 
--- Function to create a pet frame (no image, just colored frame)
+-- Function to create a pet frame
 local function createPetFrame(petNameText, rarity)
 	local petFrame = Instance.new("Frame")
 	petFrame.Size = UDim2.new(1, -10, 0, 50)
@@ -137,22 +149,8 @@ local function createPetFrame(petNameText, rarity)
 	rarityLabel.TextScaled = true
 	rarityLabel.Parent = petFrame
 
-	-- Update scrollCanvas size
 	scrollFrame.CanvasSize = UDim2.new(0, 0, 0, #scrollFrame:GetChildren() * 55)
 end
-
--- Spawn Button
-local spawnBtn = Instance.new("TextButton")
-spawnBtn.Size = UDim2.new(1, -20, 0, 40)
-spawnBtn.Position = UDim2.new(0, 10, 0, 320)
-spawnBtn.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
-spawnBtn.BorderSizePixel = 0
-spawnBtn.Font = Enum.Font.GothamBold
-spawnBtn.TextScaled = true
-spawnBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-spawnBtn.Text = "Spawn Pet"
-spawnBtn.Parent = frame
-Instance.new("UICorner", spawnBtn)
 
 -- Spawn logic
 spawnBtn.MouseButton1Click:Connect(function()
