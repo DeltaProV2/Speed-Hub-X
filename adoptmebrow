@@ -1,19 +1,8 @@
--- Full Pet Spawner UI + Client-only Owl spawning
+-- Full Pet Spawner UI with Move button dragging (PC + Mobile)
 local player = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local RS = game:GetService("ReplicatedStorage")
 
--------------------------------------------------------------
--- PET DATABASE (ONLY pets you want to allow)
--------------------------------------------------------------
-local Pets = {
-	["Owl"] = RS:WaitForChild("Pets"):WaitForChild("Legendary"):WaitForChild("Owl")
-}
-
--------------------------------------------------------------
--- GUI SETUP
--------------------------------------------------------------
 local gui = Instance.new("ScreenGui")
 gui.Name = "PetSpawnerUI"
 gui.ResetOnSpawn = false
@@ -27,14 +16,18 @@ frame.Position = UDim2.new(0.5, -175, 0.25, 0)
 frame.Active = true
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
+frame.ClipsDescendants = false
 frame.Parent = gui
 Instance.new("UICorner", frame)
 
 -- Top Bar
 local top = Instance.new("Frame")
 top.Size = UDim2.new(1, 0, 0, 40)
+top.Position = UDim2.new(0, 0, 0, 0)
+top.Active = true
 top.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 top.BorderSizePixel = 0
+top.ClipsDescendants = false
 top.Parent = frame
 Instance.new("UICorner", top)
 
@@ -44,65 +37,19 @@ title.Position = UDim2.new(0, 10, 0, 0)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
 title.TextScaled = true
-title.TextColor3 = Color3.new(1,1,1)
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Text = "Pet Spawner By Shxdrag"
 title.Parent = top
 
--- Drag Button
-local moveBtn = Instance.new("TextButton")
-moveBtn.Size = UDim2.new(0, 30, 0, 30)
-moveBtn.Position = UDim2.new(1, -80, 0, 5)
-moveBtn.Text = "↕"
-moveBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-moveBtn.TextScaled = true
-moveBtn.Font = Enum.Font.GothamBold
-moveBtn.TextColor3 = Color3.new(1,1,1)
-moveBtn.Parent = top
-Instance.new("UICorner", moveBtn)
+-- Drag bar (used for dragging)
+local DragBar = Instance.new("Frame")
+DragBar.Name = "DragBar"
+DragBar.Size = UDim2.new(1, -140, 1, 0) -- only the left area drags
+DragBar.Position = UDim2.new(0, 0, 0, 0)
+DragBar.BackgroundTransparency = 1
+DragBar.Parent = top
 
--------------------------------------------------------------
--- DRAGGING (PC + Mobile)
--------------------------------------------------------------
-local dragging = false
-local dragStart
-local startPos
-
-local function updateDrag(input)
-	local delta = input.Position - dragStart
-	frame.Position = UDim2.new(
-		startPos.X.Scale,
-		startPos.X.Offset + delta.X,
-		startPos.Y.Scale,
-		startPos.Y.Offset + delta.Y
-	)
-end
-
-moveBtn.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 
-	or input.UserInputType == Enum.UserInputType.Touch then
-		
-		dragging = true
-		dragStart = input.Position
-		startPos = frame.Position
-		
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement 
-	or input.UserInputType == Enum.UserInputType.Touch) then
-		updateDrag(input)
-	end
-end)
-
--------------------------------------------------------------
--- MINIMIZE SYSTEM
--------------------------------------------------------------
+-- Minimize Button
 local minimize = Instance.new("TextButton")
 minimize.Size = UDim2.new(0, 30, 0, 30)
 minimize.Position = UDim2.new(1, -120, 0, 5)
@@ -114,6 +61,7 @@ minimize.TextColor3 = Color3.new(1,1,1)
 minimize.Parent = top
 Instance.new("UICorner", minimize)
 
+-- Expand Button (hidden by default)
 local expand = Instance.new("TextButton")
 expand.Size = UDim2.new(0, 30, 0, 30)
 expand.Position = UDim2.new(1, -120, 0, 5)
@@ -126,53 +74,80 @@ expand.TextColor3 = Color3.new(1,1,1)
 expand.Parent = top
 Instance.new("UICorner", expand)
 
-local savedVisibility = {}
+-- Move Button
+local moveBtn = Instance.new("TextButton")
+moveBtn.Size = UDim2.new(0, 30, 0, 30)
+moveBtn.Position = UDim2.new(1, -80, 0, 5)
+moveBtn.Text = "↕"
+moveBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+moveBtn.TextScaled = true
+moveBtn.Font = Enum.Font.GothamBold
+moveBtn.TextColor3 = Color3.new(1,1,1)
+moveBtn.Parent = top
+Instance.new("UICorner", moveBtn)
 
-local function hideAllContent()
-	savedVisibility = {}
-	for _, obj in ipairs(frame:GetDescendants()) do
-		if obj:IsA("GuiObject") and obj ~= top and not obj:IsDescendantOf(top) then
-			savedVisibility[obj] = obj.Visible
-			obj.Visible = false
-		end
-	end
+-------------------------------------------------------------
+-- SINGLE DRAG SYSTEM (fixed for PC + Android)
+-------------------------------------------------------------
+local dragging = false
+local dragStart
+local startPos
+
+local function updateDrag(input)
+    local delta = input.Position - dragStart
+    frame.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
 end
 
-local function restoreAllContent()
-	for obj, v in pairs(savedVisibility) do
-		obj.Visible = v
-	end
-end
+moveBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+        
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
 
-minimize.MouseButton1Click:Connect(function()
-	TweenService:Create(frame, TweenInfo.new(0.25), {Size = UDim2.new(0,350,0,40)}):Play()
-	minimize.Visible = false
-	expand.Visible = true
-	hideAllContent()
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
 end)
 
-expand.MouseButton1Click:Connect(function()
-	TweenService:Create(frame, TweenInfo.new(0.25), {Size = UDim2.new(0,350,0,270)}):Play()
-	expand.Visible = false
-	minimize.Visible = true
-	restoreAllContent()
+UserInputService.InputChanged:Connect(function(input)
+    if dragging then
+        if input.UserInputType == Enum.UserInputType.MouseMovement
+            or input.UserInputType == Enum.UserInputType.Touch then
+            
+            updateDrag(input)
+        end
+    end
 end)
 
 -------------------------------------------------------------
--- UI CONTENT
+-- PET NAME BOX
 -------------------------------------------------------------
 local petName = Instance.new("TextBox")
 petName.Size = UDim2.new(1, -20, 0, 40)
 petName.Position = UDim2.new(0, 10, 0, 60)
-petName.BackgroundColor3 = Color3.fromRGB(45,45,45)
+petName.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 petName.BorderSizePixel = 0
 petName.Font = Enum.Font.GothamBold
 petName.TextScaled = true
-petName.TextColor3 = Color3.new(1,1,1)
-petName.PlaceholderText = "Pet Name (Example: Owl)"
+petName.TextColor3 = Color3.fromRGB(255, 255, 255)
+petName.PlaceholderText = "Put Pet Name!"
+petName.ClearTextOnFocus = false
 petName.Parent = frame
 Instance.new("UICorner", petName)
 
+-------------------------------------------------------------
+-- RARITY BUTTONS
+-------------------------------------------------------------
 local rarityFrame = Instance.new("Frame")
 rarityFrame.Size = UDim2.new(1, 0, 0, 60)
 rarityFrame.Position = UDim2.new(0, 0, 0, 110)
@@ -187,85 +162,96 @@ uiList.Parent = rarityFrame
 
 local selectedRarity = nil
 
-local rarities = {
-	"MFR", "NFR", "FR"
-}
-
-local colors = {
-	["MFR"] = Color3.fromRGB(255,100,100),
-	["NFR"] = Color3.fromRGB(100,255,100),
-	["FR"] = Color3.fromRGB(100,100,255)
-}
-
-for _, r in ipairs(rarities) do
-	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(0, 90, 1, -5)
-	b.BackgroundColor3 = colors[r]
-	b.Text = r
-	b.Font = Enum.Font.GothamBold
-	b.TextScaled = true
-	b.TextColor3 = Color3.new(1,1,1)
-	b.Parent = rarityFrame
-	Instance.new("UICorner", b)
-
-	b.MouseButton1Click:Connect(function()
-		selectedRarity = r
-	end)
-end
-
 local selectedLabel = Instance.new("TextLabel")
 selectedLabel.Size = UDim2.new(1, -20, 0, 30)
 selectedLabel.Position = UDim2.new(0, 10, 0, 225)
 selectedLabel.BackgroundTransparency = 1
-selectedLabel.TextScaled = true
 selectedLabel.Font = Enum.Font.GothamSemibold
-selectedLabel.TextColor3 = Color3.fromRGB(255,255,0)
+selectedLabel.TextScaled = true
+selectedLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
 selectedLabel.Text = "Selected: None"
 selectedLabel.Parent = frame
 
--------------------------------------------------------------
--- CLIENT-ONLY PET SPAWNING
--------------------------------------------------------------
-local currentPet = nil
+local function createRarityButton(name, color)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 90, 1, -5)
+    button.BackgroundColor3 = color
+    button.BorderSizePixel = 0
+    button.TextColor3 = Color3.fromRGB(255,255,255)
+    button.Font = Enum.Font.GothamBold
+    button.TextScaled = true
+    button.Text = name
+    button.Parent = rarityFrame
+    Instance.new("UICorner", button)
 
+    button.MouseButton1Click:Connect(function()
+        selectedRarity = name
+        selectedLabel.Text = "Selected: " .. name
+    end)
+end
+
+createRarityButton("MFR", Color3.fromRGB(255, 100, 100))
+createRarityButton("NFR", Color3.fromRGB(100, 255, 100))
+createRarityButton("FR", Color3.fromRGB(100, 100, 255))
+
+-------------------------------------------------------------
+-- SPAWN BUTTON
+-------------------------------------------------------------
 local spawnBtn = Instance.new("TextButton")
 spawnBtn.Size = UDim2.new(1, -20, 0, 45)
 spawnBtn.Position = UDim2.new(0, 10, 0, 175)
-spawnBtn.BackgroundColor3 = Color3.fromRGB(70,120,255)
-spawnBtn.Text = "Spawn Pet"
+spawnBtn.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
+spawnBtn.BorderSizePixel = 0
 spawnBtn.Font = Enum.Font.GothamBold
 spawnBtn.TextScaled = true
-spawnBtn.TextColor3 = Color3.new(1,1,1)
+spawnBtn.TextColor3 = Color3.fromRGB(255,255,255)
+spawnBtn.Text = "Spawn Pet"
 spawnBtn.Parent = frame
 Instance.new("UICorner", spawnBtn)
 
 spawnBtn.MouseButton1Click:Connect(function()
-	local pet = petName.Text
+    local name = petName.Text ~= "" and petName.Text or "Unknown Pet"
+    local rarity = selectedRarity or "None"
+    selectedLabel.Text = "Pet Spawned: " .. name .. " (" .. rarity .. ")"
+end)
 
-	if Pets[pet] == nil then
-		selectedLabel.Text = "❌ Pet not found!"
-		return
-	end
+-------------------------------------------------------------
+-- MINIMIZE SYSTEM (fixed)
+-------------------------------------------------------------
+local savedVisibility = {}
 
-	-- delete old pet
-	if currentPet then
-		currentPet:Destroy()
-	end
+local function hideAllContent()
+    savedVisibility = {}
+    for _, obj in ipairs(frame:GetDescendants()) do
+        if obj:IsA("GuiObject") and obj ~= top and not obj:IsDescendantOf(top) then
+            savedVisibility[obj] = obj.Visible
+            obj.Visible = false
+        end
+    end
+end
 
-	local clone = Pets[pet]:Clone()
-	clone.Parent = workspace
-	currentPet = clone
+local function restoreAllContent()
+    for obj, state in pairs(savedVisibility) do
+        if obj and obj.Parent then
+            obj.Visible = state
+        end
+    end
+    savedVisibility = {}
+end
 
-	-- Make it visible ONLY for this player
-	for _, d in ipairs(clone:GetDescendants()) do
-		if d:IsA("BasePart") then
-			d.LocalTransparencyModifier = 0
-		end
-	end
+local fullSize = UDim2.new(0, 350, 0, 270)
+local minimizedSize = UDim2.new(0, 350, 0, 40)
 
-	-- place in front of player's camera
-	local cam = workspace.CurrentCamera
-	clone:PivotTo(cam.CFrame * CFrame.new(0, -1, -5))
+minimize.MouseButton1Click:Connect(function()
+    TweenService:Create(frame, TweenInfo.new(0.3), {Size = minimizedSize}):Play()
+    minimize.Visible = false
+    expand.Visible = true
+    hideAllContent()
+end)
 
-	selectedLabel.Text = "Spawned: " .. pet .. " (" .. (selectedRarity or "None") .. ")"
+expand.MouseButton1Click:Connect(function()
+    TweenService:Create(frame, TweenInfo.new(0.3), {Size = fullSize}):Play()
+    minimize.Visible = true
+    expand.Visible = false
+    restoreAllContent()
 end)
