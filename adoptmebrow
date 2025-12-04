@@ -15,7 +15,7 @@ frame.BorderSizePixel = 0
 frame.Parent = gui
 Instance.new("UICorner", frame)
 
--- Top Bar (for minimize)
+-- Top Bar
 local top = Instance.new("Frame")
 top.Size = UDim2.new(1, 0, 0, 40)
 top.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
@@ -24,7 +24,7 @@ top.Parent = frame
 Instance.new("UICorner", top)
 
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -60, 1, 0)
+title.Size = UDim2.new(1, -80, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
@@ -33,39 +33,30 @@ title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Text = "Pet Spawner By Shxdrag"
 title.Parent = top
 
-local fullSize = UDim2.new(0, 350, 0, 270)
-local minimizedSize = UDim2.new(0, 350, 0, 40)
+-- Minimize Button
+local minimize = Instance.new("TextButton")
+minimize.Size = UDim2.new(0, 30, 0, 30)
+minimize.Position = UDim2.new(1, -65, 0, 5)
+minimize.Text = "-"
+minimize.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+minimize.TextScaled = true
+minimize.Font = Enum.Font.GothamBold
+minimize.TextColor3 = Color3.new(1,1,1)
+minimize.Parent = top
+Instance.new("UICorner", minimize)
 
--- Get all content EXCEPT the title bar
-local content = {}
-for _, v in ipairs(frame:GetChildren()) do
-    if v ~= top then
-        table.insert(content, v)
-    end
-end
-
-minimize.MouseButton1Click:Connect(function()
-    TweenService:Create(frame, TweenInfo.new(0.3), {Size = minimizedSize}):Play()
-    minimize.Visible = false
-    expand.Visible = true
-
-    -- Hide all content properly
-    for _, v in ipairs(content) do
-        v.Visible = false
-    end
-end)
-
-expand.MouseButton1Click:Connect(function()
-    TweenService:Create(frame, TweenInfo.new(0.3), {Size = fullSize}):Play()
-    minimize.Visible = true
-    expand.Visible = false
-
-    -- Restore all content properly
-    for _, v in ipairs(content) do
-        v.Visible = true
-    end
-end)
-
+-- Expand Button
+local expand = Instance.new("TextButton")
+expand.Size = UDim2.new(0, 30, 0, 30)
+expand.Position = UDim2.new(1, -65, 0, 5)
+expand.Text = "+"
+expand.Visible = false
+expand.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+expand.TextScaled = true
+expand.Font = Enum.Font.GothamBold
+expand.TextColor3 = Color3.new(1,1,1)
+expand.Parent = top
+Instance.new("UICorner", expand)
 
 -- PET NAME BOX
 local petName = Instance.new("TextBox")
@@ -96,6 +87,16 @@ uiList.Parent = rarityFrame
 
 local selectedRarity = nil
 
+local selectedLabel = Instance.new("TextLabel")
+selectedLabel.Size = UDim2.new(1, -20, 0, 30)
+selectedLabel.Position = UDim2.new(0, 10, 0, 225)
+selectedLabel.BackgroundTransparency = 1
+selectedLabel.Font = Enum.Font.GothamSemibold
+selectedLabel.TextScaled = true
+selectedLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+selectedLabel.Text = "Selected: None"
+selectedLabel.Parent = frame
+
 local function createRarityButton(name, color)
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(0, 90, 1, -5)
@@ -114,7 +115,6 @@ local function createRarityButton(name, color)
     end)
 end
 
--- Create MFR / NFR / FR
 createRarityButton("MFR", Color3.fromRGB(255, 100, 100))
 createRarityButton("NFR", Color3.fromRGB(100, 255, 100))
 createRarityButton("FR", Color3.fromRGB(100, 100, 255))
@@ -132,26 +132,21 @@ spawnBtn.Text = "Spawn Pet"
 spawnBtn.Parent = frame
 Instance.new("UICorner", spawnBtn)
 
--- Selected Display
-selectedLabel = Instance.new("TextLabel")
-selectedLabel.Size = UDim2.new(1, -20, 0, 30)
-selectedLabel.Position = UDim2.new(0, 10, 0, 225)
-selectedLabel.BackgroundTransparency = 1
-selectedLabel.Font = Enum.Font.GothamSemibold
-selectedLabel.TextScaled = true
-selectedLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-selectedLabel.Text = "Selected: None"
-selectedLabel.Parent = frame
-
--- Spawn Pet Logic
 spawnBtn.MouseButton1Click:Connect(function()
     local name = petName.Text ~= "" and petName.Text or "Unknown Pet"
     local rarity = selectedRarity or "None"
-
     selectedLabel.Text = "Pet Spawned: " .. name .. " (" .. rarity .. ")"
 end)
 
--- Minimize / Expand Logic
+-- ⭐ COLLECT CONTENT AFTER EVERYTHING IS CREATED
+local content = {}
+for _, v in ipairs(frame:GetChildren()) do
+    if v ~= top then
+        table.insert(content, v)
+    end
+end
+
+-- ⭐ Minimize / Expand
 local fullSize = UDim2.new(0, 350, 0, 270)
 local minimizedSize = UDim2.new(0, 350, 0, 40)
 
@@ -160,9 +155,8 @@ minimize.MouseButton1Click:Connect(function()
     minimize.Visible = false
     expand.Visible = true
 
-    -- hide all content except title
-    for _, v in ipairs(frame:GetChildren()) do
-        if v ~= top then v.Visible = false end
+    for _, v in ipairs(content) do
+        v.Visible = false
     end
 end)
 
@@ -171,7 +165,7 @@ expand.MouseButton1Click:Connect(function()
     minimize.Visible = true
     expand.Visible = false
 
-    for _, v in ipairs(frame:GetChildren()) do
+    for _, v in ipairs(content) do
         v.Visible = true
     end
 end)
