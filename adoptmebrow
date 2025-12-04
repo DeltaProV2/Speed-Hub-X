@@ -1,17 +1,25 @@
---// Pet Spawner LocalScript
+--// Services
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
+local Mouse = Player:GetMouse()
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
--- Wait for PlayerGui
-local PlayerGui = Player:WaitForChild("PlayerGui")
+--// Temporary local inventory
+local LocalInventory = {}
 
--- GUI setup
+--// Folder to store pets in workspace
+local PetFolder = Workspace:FindFirstChild("LocalPets") or Instance.new("Folder")
+PetFolder.Name = "LocalPets"
+PetFolder.Parent = Workspace
+
+--// GUI Setup
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PetSpawnerGui"
-ScreenGui.Parent = PlayerGui
+ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 300, 0, 180)
@@ -21,14 +29,16 @@ MainFrame.BorderSizePixel = 0
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Parent = ScreenGui
 
+-- Gradient
 local UIGradient = Instance.new("UIGradient")
 UIGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,180,220)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255,140,210))
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 180, 220)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 140, 210))
 })
 UIGradient.Rotation = 90
 UIGradient.Parent = MainFrame
 
+-- Neon border
 local Stroke = Instance.new("UIStroke")
 Stroke.Thickness = 3
 Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -36,25 +46,24 @@ Stroke.Color = Color3.fromRGB(255, 0, 200)
 Stroke.Parent = MainFrame
 
 local neonColors = {
-    Color3.fromRGB(255, 0, 200),
-    Color3.fromRGB(0, 220, 255),
-    Color3.fromRGB(180, 0, 255),
-    Color3.fromRGB(255, 120, 0),
+	Color3.fromRGB(255, 0, 200),
+	Color3.fromRGB(0, 220, 255),
+	Color3.fromRGB(180, 0, 255),
+	Color3.fromRGB(255, 120, 0),
 }
 
 task.spawn(function()
-    while true do
-        for _, color in ipairs(neonColors) do
-            local tween = TweenService:Create(Stroke, TweenInfo.new(1.5, Enum.EasingStyle.Linear), {Color = color})
-            tween:Play()
-            tween.Completed:Wait()
-        end
-    end
+	while true do
+		for _, neonColor in ipairs(neonColors) do
+			local tween = TweenService:Create(Stroke, TweenInfo.new(1.5, Enum.EasingStyle.Linear), {Color = neonColor})
+			tween:Play()
+			tween.Completed:Wait()
+		end
+	end
 end)
 
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0,10)
-UICorner.Parent = MainFrame
+-- UICorner
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 
 -- Title Frame
 local TitleFrame = Instance.new("Frame")
@@ -64,10 +73,7 @@ TitleFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
 TitleFrame.BackgroundTransparency = 0.1
 TitleFrame.BorderSizePixel = 0
 TitleFrame.Parent = MainFrame
-
-local TitleFrameCorner = Instance.new("UICorner")
-TitleFrameCorner.CornerRadius = UDim.new(0,8)
-TitleFrameCorner.Parent = TitleFrame
+Instance.new("UICorner", TitleFrame).CornerRadius = UDim.new(0,8)
 
 -- Title Text
 local Title = Instance.new("TextLabel")
@@ -79,7 +85,7 @@ Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 20
 Title.Parent = TitleFrame
 
--- Pet Name TextBox
+-- PetNameBox
 local PetNameBox = Instance.new("TextBox")
 PetNameBox.Size = UDim2.new(0.9,0,0,30)
 PetNameBox.Position = UDim2.new(0.05,0,0,50)
@@ -90,32 +96,39 @@ PetNameBox.Font = Enum.Font.SourceSans
 PetNameBox.TextSize = 18
 PetNameBox.ClearTextOnFocus = false
 PetNameBox.Parent = MainFrame
+Instance.new("UICorner", PetNameBox).CornerRadius = UDim.new(0,5)
 
-local BoxCorner = Instance.new("UICorner")
-BoxCorner.CornerRadius = UDim.new(0,5)
-BoxCorner.Parent = PetNameBox
-
--- Helper to create rarity buttons
-local function CreateButton(name, color, posX)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.25,0,0,30)
-    btn.Position = UDim2.new(posX,0,0,90)
-    btn.BackgroundColor3 = color
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255,255,255)
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 18
-    btn.Parent = MainFrame
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0,5)
-    corner.Parent = btn
-    return btn
+-- Button helper
+local function CreateButton(name,color,posX)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0.25,0,0,30)
+	btn.Position = UDim2.new(posX,0,0,90)
+	btn.BackgroundColor3 = color
+	btn.Text = name
+	btn.TextColor3 = Color3.fromRGB(255,255,255)
+	btn.Font = Enum.Font.SourceSansBold
+	btn.TextSize = 18
+	btn.Parent = MainFrame
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0,5)
+	return btn
 end
 
--- Rarity Buttons
+-- Rarity buttons
 local MFRBtn = CreateButton("MFR", Color3.fromRGB(255,100,100), 0.05)
 local NFRBtn = CreateButton("NFR", Color3.fromRGB(100,255,100), 0.375)
 local FRBtn = CreateButton("FR", Color3.fromRGB(100,100,255), 0.7)
+local selectedRarity = "MFR"
+
+local function selectRarity(rarity)
+	selectedRarity = rarity
+	MFRBtn.BackgroundColor3 = (rarity=="MFR" and Color3.fromRGB(255,100,100)) or Color3.fromRGB(60,60,60)
+	NFRBtn.BackgroundColor3 = (rarity=="NFR" and Color3.fromRGB(100,255,100)) or Color3.fromRGB(60,60,60)
+	FRBtn.BackgroundColor3 = (rarity=="FR" and Color3.fromRGB(100,100,255)) or Color3.fromRGB(60,60,60)
+end
+
+MFRBtn.MouseButton1Click:Connect(function() selectRarity("MFR") end)
+NFRBtn.MouseButton1Click:Connect(function() selectRarity("NFR") end)
+FRBtn.MouseButton1Click:Connect(function() selectRarity("FR") end)
 
 -- Spawn Button
 local SpawnBtn = Instance.new("TextButton")
@@ -127,84 +140,79 @@ SpawnBtn.TextColor3 = Color3.fromRGB(255,255,255)
 SpawnBtn.Font = Enum.Font.SourceSansBold
 SpawnBtn.TextSize = 20
 SpawnBtn.Parent = MainFrame
+Instance.new("UICorner", SpawnBtn).CornerRadius = UDim.new(0,5)
 
-local SpawnCorner = Instance.new("UICorner")
-SpawnCorner.CornerRadius = UDim.new(0,5)
-SpawnCorner.Parent = SpawnBtn
-
--- Draggable GUI
-local dragging = false
+--// GUI Dragging (Title only)
+local dragging=false
 local dragStart
 local startPos
 local dragInput
-
 local function update(input)
-    local delta = input.Position - dragStart
-    MainFrame.Position = UDim2.new(0, startPos.X + delta.X, 0, startPos.Y + delta.Y)
+	local delta = input.Position - dragStart
+	MainFrame.Position = UDim2.new(0,startPos.X+delta.X,0,startPos.Y+delta.Y)
 end
 
 Title.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = Vector2.new(MainFrame.AbsolutePosition.X, MainFrame.AbsolutePosition.Y)
-        UserInputService.MouseIconEnabled = false
-
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-                UserInputService.MouseIconEnabled = true
-            end
-        end)
-    end
+	if input.UserInputType==Enum.UserInputType.MouseButton1 then
+		dragging=true
+		dragStart=input.Position
+		startPos=Vector2.new(MainFrame.AbsolutePosition.X,MainFrame.AbsolutePosition.Y)
+		UserInputService.MouseIconEnabled=false
+		input.Changed:Connect(function()
+			if input.UserInputState==Enum.UserInputState.End then
+				dragging=false
+				UserInputService.MouseIconEnabled=true
+			end
+		end)
+	end
 end)
 
 Title.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInput = input
-    end
+	if input.UserInputType==Enum.UserInputType.MouseMovement then
+		dragInput=input
+	end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-    if dragging and input == dragInput then
-        update(input)
-    end
+	if dragging and input==dragInput then update(input) end
 end)
 
--- Rarity selection
-local selectedRarity = "MFR"
-
-local function selectRarity(rarity)
-    selectedRarity = rarity
-    MFRBtn.BackgroundColor3 = (rarity=="MFR" and Color3.fromRGB(255,100,100)) or Color3.fromRGB(60,60,60)
-    NFRBtn.BackgroundColor3 = (rarity=="NFR" and Color3.fromRGB(100,255,100)) or Color3.fromRGB(60,60,60)
-    FRBtn.BackgroundColor3 = (rarity=="FR" and Color3.fromRGB(100,100,255)) or Color3.fromRGB(60,60,60)
-end
-
-MFRBtn.MouseButton1Click:Connect(function() selectRarity("MFR") end)
-NFRBtn.MouseButton1Click:Connect(function() selectRarity("NFR") end)
-FRBtn.MouseButton1Click:Connect(function() selectRarity("FR") end)
-
--- Spawn logic
-local PetSpawnEvent = ReplicatedStorage:WaitForChild("PetSpawnEvent")
-
+--// Pet spawning logic
 SpawnBtn.MouseButton1Click:Connect(function()
-    local petName = PetNameBox.Text
-    if petName == "" then return end
+	local petName = PetNameBox.Text
+	if petName=="" then return end
 
-    -- Allowed pets
-    local allowedPets = {
-        ["Bat Dragon"]= true,
-        ["Shadow Dragon"]= true,
-        ["Owl"]=true
-    }
+	local petTemplate = ReplicatedStorage:FindFirstChild(petName)
+	if not petTemplate then
+		warn("Pet not found in ReplicatedStorage:",petName)
+		return
+	end
 
-    if not allowedPets[petName] then
-        warn("Invalid pet:", petName)
-        return
-    end
+	local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+	if not root then return end
 
-    -- Fire server to spawn pet
-    PetSpawnEvent:FireServer(petName, selectedRarity)
-    print("Requested pet:", petName, selectedRarity)
+	-- Clone pet and set parent
+	local petClone = petTemplate:Clone()
+	petClone.Parent = PetFolder
+
+	if petClone.PrimaryPart then
+		petClone:SetPrimaryPartCFrame(root.CFrame * CFrame.new(3,0,0))
+	end
+
+	-- Store in local inventory
+	table.insert(LocalInventory,{Name=petName,Rarity=selectedRarity,Model=petClone})
+end)
+
+--// RunService loop: pets follow player
+RunService.RenderStepped:Connect(function()
+	local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+	if not root then return end
+	for _,pet in ipairs(LocalInventory) do
+		if pet.Model and pet.Model.PrimaryPart then
+			local targetPos = root.Position + Vector3.new(3,0,0)
+			local petPos = pet.Model.PrimaryPart.Position
+			local newPos = petPos:Lerp(targetPos,0.1)
+			pet.Model:SetPrimaryPartCFrame(CFrame.new(newPos))
+		end
+	end
 end)
