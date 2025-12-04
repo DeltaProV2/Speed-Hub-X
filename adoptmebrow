@@ -1,4 +1,4 @@
--- Full Pet Spawner UI with top-bar-only draggable (PC + Mobile)
+-- Full Pet Spawner UI with Move button dragging (PC + Mobile)
 local player = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -13,7 +13,7 @@ gui.Parent = player:WaitForChild("PlayerGui")
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 350, 0, 270)
 frame.Position = UDim2.new(0.5, -175, 0.25, 0)
-frame.Active = true -- REQUIRED FOR DRAGGING
+frame.Active = true -- required for mobile input
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
 frame.Parent = gui
@@ -23,15 +23,14 @@ Instance.new("UICorner", frame)
 local top = Instance.new("Frame")
 top.Size = UDim2.new(1, 0, 0, 40)
 top.Position = UDim2.new(0, 0, 0, 0)
-top.Active = true -- REQUIRED FOR DRAGGING
+top.Active = true -- required for mobile input
 top.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 top.BorderSizePixel = 0
 top.Parent = frame
 Instance.new("UICorner", top)
 
-
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -100, 1, 0)
+title.Size = UDim2.new(1, -140, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
@@ -43,7 +42,7 @@ title.Parent = top
 -- Minimize Button
 local minimize = Instance.new("TextButton")
 minimize.Size = UDim2.new(0, 30, 0, 30)
-minimize.Position = UDim2.new(1, -70, 0, 5)
+minimize.Position = UDim2.new(1, -120, 0, 5)
 minimize.Text = "-"
 minimize.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 minimize.TextScaled = true
@@ -52,22 +51,10 @@ minimize.TextColor3 = Color3.new(1,1,1)
 minimize.Parent = top
 Instance.new("UICorner", minimize)
 
--- Move Button (↕)
-local moveBtn = Instance.new("TextButton")
-moveBtn.Size = UDim2.new(0, 30, 0, 30)
-moveBtn.Position = UDim2.new(1, -100, 0, 5)
-moveBtn.Text = "↕"
-moveBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-moveBtn.TextScaled = true
-moveBtn.Font = Enum.Font.GothamBold
-moveBtn.TextColor3 = Color3.new(1,1,1)
-moveBtn.Parent = top
-Instance.new("UICorner", moveBtn)
-
 -- Expand Button
 local expand = Instance.new("TextButton")
 expand.Size = UDim2.new(0, 30, 0, 30)
-expand.Position = UDim2.new(1, -70, 0, 5)
+expand.Position = UDim2.new(1, -120, 0, 5)
 expand.Text = "+"
 expand.Visible = false
 expand.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
@@ -76,6 +63,18 @@ expand.Font = Enum.Font.GothamBold
 expand.TextColor3 = Color3.new(1,1,1)
 expand.Parent = top
 Instance.new("UICorner", expand)
+
+-- Move Button (↕) - placed next to minimize/expand
+local moveBtn = Instance.new("TextButton")
+moveBtn.Size = UDim2.new(0, 30, 0, 30)
+moveBtn.Position = UDim2.new(1, -80, 0, 5) -- sits between title and minimize
+moveBtn.Text = "↕"
+moveBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+moveBtn.TextScaled = true
+moveBtn.Font = Enum.Font.GothamBold
+moveBtn.TextColor3 = Color3.new(1,1,1)
+moveBtn.Parent = top
+Instance.new("UICorner", moveBtn)
 
 -- PET NAME BOX
 local petName = Instance.new("TextBox")
@@ -199,137 +198,82 @@ expand.MouseButton1Click:Connect(function()
 end)
 
 -------------------------------------------------------------
--- Top-bar DRAGGING (PC + Mobile) with screen bounds
--- Only when dragging the top bar (so buttons stay clickable)
+-- Move Button Dragging (moveBtn) - works on PC + Mobile
 -------------------------------------------------------------
 local dragging = false
 local dragInput = nil
 local dragStart = Vector2.new()
 local startPos = UDim2.new()
 
--- Helper to get viewport size (works in LocalScript)
+-- Helper: viewport and clamp so window stays on screen
 local function getViewport()
     local cam = workspace.CurrentCamera
-    if cam then
-        return cam.ViewportSize
-    else
-        return Vector2.new(800, 600)
-    end
+    if cam then return cam.ViewportSize end
+    return Vector2.new(800,600)
 end
 
 local function clampPosition(xOffset, yOffset)
     local viewport = getViewport()
     local absSize = frame.AbsoluteSize
-
-    local minX = 0
-    local minY = 0
+    local minX, minY = 0, 0
     local maxX = math.max(0, viewport.X - absSize.X)
     local maxY = math.max(0, viewport.Y - absSize.Y)
-
     local clampedX = math.clamp(xOffset, minX, maxX)
     local clampedY = math.clamp(yOffset, minY, maxY)
     return clampedX, clampedY
 end
 
-local function update(input)
-    if not dragging then return end
-    local delta = input.Position - dragStart
+local function updateFromPosition(pos)
+    local delta = pos - dragStart
     local newX = startPos.X.Offset + delta.X
     local newY = startPos.Y.Offset + delta.Y
-
     local clampedX, clampedY = clampPosition(newX, newY)
     frame.Position = UDim2.new(startPos.X.Scale, clampedX, startPos.Y.Scale, clampedY)
 end
 
-top.InputBegan:Connect(function(input)
-    -- begin drag only on left mouse button or touch
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or
-       input.UserInputType == Enum.UserInputType.Touch then
-
-        -- don't start dragging if the user clicked the minimize/expand buttons
-        if input.Target and (input.Target == minimize or input.Target == expand) then
-            return
-        end
-
+-- Start dragging when touching/clicking moveBtn
+moveBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         dragInput = input
         dragStart = input.Position
         startPos = frame.Position
 
-        -- stop dragging when the input ends
+        -- Stop dragging when that input ends
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
                 dragging = false
+                dragInput = nil
             end
         end)
     end
 end)
 
--- DRAG USING MOVE BUTTON ONLY
-local dragging = false
-local dragStart
-local startPos
-
-local userInput = game:GetService("UserInputService")
-local runService = game:GetService("RunService")
-
-local function update(input)
-    local delta = input.Position - dragStart
-    frame.Position = UDim2.new(
-        startPos.X.Scale,
-        startPos.X.Offset + delta.X,
-        startPos.Y.Scale,
-        startPos.Y.Offset + delta.Y
-    )
-end
-
-moveBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-    or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = frame.Position
-    end
-end)
-
-moveBtn.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-    or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
-end)
-
-runService.RenderStepped:Connect(function()
-    if dragging then
-        local input = userInput:GetMouseLocation()
-        update({Position = input})
-    end
-end)
-
-
--- For mouse movement and touch movement
+-- Update during movement. Use InputChanged for touch/mouse movement.
 UserInputService.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        update(input)
+    if dragging and input == dragInput then
+        -- use the raw input.Position
+        updateFromPosition(input.Position)
     end
 end)
 
--- Ensure frame.AbsoluteSize is valid before dragging (in case UI hasn't fully rendered)
-frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() end)
+-- Also handle RenderStepped fallback for devices where GetMouseLocation is helpful (smoothness)
+RunService.RenderStepped:Connect(function()
+    if dragging and dragInput then
+        -- sometimes InputChanged events aren't fired consistently on some devices,
+        -- so using GetMouseLocation as backup keeps movement smooth.
+        local loc = UserInputService:GetMouseLocation()
+        updateFromPosition(loc)
+    end
+end)
 
--- Also stop dragging if the gui is hidden/minimized
+-- Prevent dragging while minimized
 minimize.Changed:Connect(function()
     if not minimize.Visible then
         dragging = false
+        dragInput = nil
     end
 end)
-expand.Changed:Connect(function()
-    if not expand.Visible then
-        -- nothing
-    end
-end)
-
--- Optional: keep it from going under the top bar (snap if needed) - not required
--------------------------------------------------------------
 
 -- End of script
