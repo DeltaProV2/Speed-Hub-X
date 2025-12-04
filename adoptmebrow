@@ -210,11 +210,69 @@ spawnBtn.Parent = frame
 Instance.new("UICorner", spawnBtn)
 
 spawnBtn.MouseButton1Click:Connect(function()
-	local name = petName.Text ~= "" and petName.Text or "Unknown Pet"
-	local rarity = selectedRarity or "None"
-	selectedLabel.Text = "Pet Spawned: " .. name .. " (" .. rarity .. ")"
+	local pet = petName.Text
+	if PETS[pet] then
+		selectedLabel.Text = "Pet Spawned: " .. pet .. " (" .. selectedRarity .. ")"
+		spawnLocalPet(pet)
+	else
+		selectedLabel.Text = "Pet not allowed."
+	end
 end)
 
+------------------------------------------------------------------
+-- STRICT PET SYSTEM (Non-dynamic, only pets listed here work)
+------------------------------------------------------------------
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PetsFolder = ReplicatedStorage:WaitForChild("Pets")
+local currentPet = nil
+
+local PETS = {
+	Owl = {Rarity = "Legendary"} -- you can add more later
+}
+
+local function spawnLocalPet(petName)
+	if not PETS[petName] then
+		warn("Pet not allowed:", petName)
+		return
+	end
+
+	if currentPet then
+		currentPet:Destroy()
+		currentPet = nil
+	end
+
+	local rarityFolder = PetsFolder:FindFirstChild(PETS[petName].Rarity)
+	if not rarityFolder then return end
+
+	local petModel = rarityFolder:FindFirstChild(petName)
+	if not petModel then return end
+
+	local pet = petModel:Clone()
+	pet.Parent = workspace
+	currentPet = pet
+
+	local char = player.Character or player.CharacterAdded:Wait()
+	local root = char:WaitForChild("HumanoidRootPart")
+
+	pet:SetPrimaryPartCFrame(root.CFrame * CFrame.new(2,0,-3))
+
+	-- follow loop
+	task.spawn(function()
+		while pet and pet.Parent do
+			task.wait(.1)
+			local char = player.Character
+			if not char then continue end
+			local root = char:FindFirstChild("HumanoidRootPart")
+			if not root then continue end
+
+			local targetPos = root.Position - root.CFrame.LookVector * 3 + Vector3.new(0,2,0)
+			pet:SetPrimaryPartCFrame(pet.PrimaryPart.CFrame:Lerp(
+				CFrame.new(targetPos, root.Position),
+				0.1
+				))
+		end
+	end)
+end
 -------------------------------------------------------------
 -- MINIMIZE SYSTEM (fixed)
 -------------------------------------------------------------
