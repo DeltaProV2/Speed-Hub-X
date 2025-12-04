@@ -1,22 +1,32 @@
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Workspace = game:GetService("Workspace")
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
+--// Pet Spawner LocalScript
 
+local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
 
--- Create ScreenGui
+-- RemoteEvent (make sure this exists in ReplicatedStorage)
+local PetSpawnEvent = ReplicatedStorage:WaitForChild("PetSpawnEvent")
+
+-- Allowed pets
+local allowedPets = {
+	["Bat Dragon"] = true,
+	["Shadow Dragon"] = true,
+	["Owl"] = true
+}
+
+-- === GUI Setup ===
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PetSpawnerGui"
 ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 
--- Create Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 300, 0, 180)
 MainFrame.Position = UDim2.new(0.5, -150, 0.5, -90)
-MainFrame.BackgroundColor3 = Color3.fromRGB(255, 150, 200) -- light pink
+MainFrame.BackgroundColor3 = Color3.fromRGB(255, 150, 200)
 MainFrame.BorderSizePixel = 0
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Parent = ScreenGui
@@ -24,8 +34,8 @@ MainFrame.Parent = ScreenGui
 -- Gradient Background
 local UIGradient = Instance.new("UIGradient")
 UIGradient.Color = ColorSequence.new({
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 180, 220)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 140, 210))
+	ColorSequenceKeypoint.new(0, Color3.new(1, 0.705, 0.862)),
+	ColorSequenceKeypoint.new(1, Color3.new(1, 0.549, 0.823))
 })
 UIGradient.Rotation = 90
 UIGradient.Parent = MainFrame
@@ -38,20 +48,16 @@ Stroke.Color = Color3.fromRGB(255, 0, 200)
 Stroke.Parent = MainFrame
 
 local neonColors = {
-	Color3.fromRGB(255, 0, 200),   -- Pink
-	Color3.fromRGB(0, 220, 255),   -- Cyan
-	Color3.fromRGB(180, 0, 255),   -- Purple
-	Color3.fromRGB(255, 120, 0),   -- Orange
+	Color3.fromRGB(255, 0, 200),
+	Color3.fromRGB(0, 220, 255),
+	Color3.fromRGB(180, 0, 255),
+	Color3.fromRGB(255, 120, 0),
 }
 
 task.spawn(function()
 	while true do
 		for _, neonColor in ipairs(neonColors) do
-			local tween = TweenService:Create(
-				Stroke,
-				TweenInfo.new(1.5, Enum.EasingStyle.Linear),
-				{ Color = neonColor }
-			)
+			local tween = TweenService:Create(Stroke, TweenInfo.new(1.5, Enum.EasingStyle.Linear), {Color = neonColor})
 			tween:Play()
 			tween.Completed:Wait()
 		end
@@ -64,19 +70,11 @@ UICorner.CornerRadius = UDim.new(0, 10)
 UICorner.Parent = MainFrame
 
 -- Title
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.BackgroundTransparency = 1
-Title.Text = "amina pets nyo"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 20
--- Title Frame (darker see-through black background)
 local TitleFrame = Instance.new("Frame")
 TitleFrame.Size = UDim2.new(1, -20, 0, 35)
 TitleFrame.Position = UDim2.new(0, 10, 0, 5)
 TitleFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-TitleFrame.BackgroundTransparency = 0.1 -- darker (0 = solid black, 1 = invisible)
+TitleFrame.BackgroundTransparency = 0.1
 TitleFrame.BorderSizePixel = 0
 TitleFrame.Parent = MainFrame
 
@@ -84,7 +82,6 @@ local TitleFrameCorner = Instance.new("UICorner")
 TitleFrameCorner.CornerRadius = UDim.new(0, 8)
 TitleFrameCorner.Parent = TitleFrame
 
--- Title Text
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
@@ -148,12 +145,7 @@ local SpawnCorner = Instance.new("UICorner")
 SpawnCorner.CornerRadius = UDim.new(0,5)
 SpawnCorner.Parent = SpawnBtn
 
--- Movable GUI logic
--- Draggable GUI logic
--- Draggable GUI logic (drag only using the Title)
--- Draggable GUI (Title only) + Hide mouse while dragging
-local UserInputService = game:GetService("UserInputService")
-
+-- === Movable GUI (Drag using Title) ===
 local dragging = false
 local dragStart
 local startPos
@@ -172,15 +164,11 @@ Title.InputBegan:Connect(function(input)
 		dragging = true
 		dragStart = input.Position
 		startPos = Vector2.new(MainFrame.AbsolutePosition.X, MainFrame.AbsolutePosition.Y)
-
-		-- Hide mouse
 		UserInputService.MouseIconEnabled = false
-
-		-- Stop dragging when mouse released
 		input.Changed:Connect(function()
 			if input.UserInputState == Enum.UserInputState.End then
 				dragging = false
-				UserInputService.MouseIconEnabled = true -- show mouse again
+				UserInputService.MouseIconEnabled = true
 			end
 		end)
 	end
@@ -198,7 +186,7 @@ UserInputService.InputChanged:Connect(function(input)
 	end
 end)
 
--- === Rarity selection logic (your existing code) ===
+-- === Rarity Selection Logic ===
 local selectedRarity = "MFR"
 local function selectRarity(rarity)
 	selectedRarity = rarity
@@ -211,62 +199,32 @@ MFRBtn.MouseButton1Click:Connect(function() selectRarity("MFR") end)
 NFRBtn.MouseButton1Click:Connect(function() selectRarity("NFR") end)
 FRBtn.MouseButton1Click:Connect(function() selectRarity("FR") end)
 
--- === Allowed pets table ===
-local allowedPets = {
-	["Bat Dragon"] = true,
-	["Shadow Dragon"] = true,
-}
-
--- === Function to spawn pet visually in Workspace ===
+-- === Spawn Pet Functionality ===
 local function spawnPet(petName, rarity)
 	local petTemplate = ReplicatedStorage:FindFirstChild(petName)
 	if not petTemplate then
-		warn("Pet template not found:", petName)
+		warn("Pet not found in ReplicatedStorage:", petName)
 		return
 	end
 
-	local petClone = petTemplate:Clone()
-	petClone.Parent = Workspace
-
-	-- Position the pet above the player's character
+	local clone = petTemplate:Clone()
+	clone.Parent = Workspace
+	-- Position in front of player
 	local character = Player.Character
-	if character and character:FindFirstChild("HumanoidRootPart") and petClone.PrimaryPart then
-		petClone:SetPrimaryPartCFrame(character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0))
+	if character and character:FindFirstChild("HumanoidRootPart") then
+		clone:SetPrimaryPartCFrame(character.HumanoidRootPart.CFrame * CFrame.new(0,0,5))
 	end
-
-	-- Add BillboardGui to display name + rarity
-	local billboard = Instance.new("BillboardGui")
-	billboard.Adornee = petClone.PrimaryPart
-	billboard.Size = UDim2.new(0, 200, 0, 50)
-	billboard.StudsOffset = Vector3.new(0, 3, 0)
-	billboard.AlwaysOnTop = true
-	billboard.Parent = petClone
-
-	local label = Instance.new("TextLabel")
-	label.Size = UDim2.new(1, 0, 1, 0)
-	label.BackgroundTransparency = 1
-	label.Text = petName .. " [" .. rarity .. "]"
-	label.TextColor3 = Color3.fromRGB(255, 255, 0)
-	label.TextScaled = true
-	label.Font = Enum.Font.FredokaOne
-	label.Parent = billboard
-
-	return petClone
+	print("Spawned pet:", petName, "Rarity:", rarity)
 end
 
--- === Connect Spawn Button ===
+-- Spawn Button Click
 SpawnBtn.MouseButton1Click:Connect(function()
 	local petName = PetNameBox.Text
-	if petName == "" then return end
 	if not allowedPets[petName] then
-		warn("Invalid pet:", petName)
+		warn("Invalid pet name:", petName)
 		return
 	end
-
-	-- Spawn the pet visually
 	spawnPet(petName, selectedRarity)
-
-	-- Optionally, fire your server event if you want real pet
-	-- PetSpawnEvent:FireServer(petName, selectedRarity)
-	print("Spawned pet:", petName, "with rarity:", selectedRarity)
+	-- Optional: fire RemoteEvent to server if needed
+	PetSpawnEvent:FireServer(petName, selectedRarity)
 end)
