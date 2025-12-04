@@ -210,27 +210,29 @@ FRBtn.MouseButton1Click:Connect(function() selectRarity("FR") end)
 
 -- Spawn pet logic (replace with your own spawning code)
 -- Local temporary inventory (client-side only)
-local LocalInventory = {}
+-- Spawn pet logic (local script only, no server)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PetsFolder = ReplicatedStorage:WaitForChild("Pets")  -- your pet models
 
 SpawnBtn.MouseButton1Click:Connect(function()
 	local petName = PetNameBox.Text
 	if petName == "" then return end
 
-	-- Create pet data
-	local petData = {
-		Name = petName,
-		Rarity = selectedRarity,
-		UID = math.random(100000, 999999) -- unique ID like Adopt Me
-	}
+	-- find model
+	local petModel = PetsFolder:FindFirstChild(petName)
+	if not petModel then
+		warn("Pet not found:", petName)
+		return
+	end
 
-	-- Store it in the local inventory
-	table.insert(LocalInventory, petData)
+	-- clone pet
+	local clone = petModel:Clone()
+	clone.Name = petName .. " - " .. selectedRarity
 
-	print("Pet given locally:")
-	print("Name:", petData.Name)
-	print("Rarity:", petData.Rarity)
-	print("UID:", petData.UID)
-
-	-- (Optional visual debug)
-	print("Current Local Inventory:", LocalInventory)
+	-- spawn in workspace near player
+	local char = Player.Character
+	if char then
+		clone.Parent = workspace
+		clone:SetPrimaryPartCFrame(char.HumanoidRootPart.CFrame * CFrame.new(3, 0, 3))
+	end
 end)
