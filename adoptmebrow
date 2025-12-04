@@ -218,7 +218,7 @@ spawnBtn.MouseButton1Click:Connect(function()
 		id = HttpService:GenerateGUID(false),
 		uid = HttpService:GenerateGUID(false),
 		template = petTemplate,
-		category = "Pets",        -- THIS MAKES IT SHOW IN BACKPACK
+		category = "PETS",        -- THIS MAKES IT SHOW IN BACKPACK
 		properties = {
 			rideable = true,
 			flyable = true,
@@ -232,7 +232,7 @@ spawnBtn.MouseButton1Click:Connect(function()
 		data = {
 			icon = nil,
 			thumbnail = nil,
-			category = "Pets",      -- Some UI reads nested field
+			category = "PETS",      -- Some UI reads nested field
 		}
 	}
 
