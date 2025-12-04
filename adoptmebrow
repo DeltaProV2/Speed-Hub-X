@@ -198,82 +198,81 @@ expand.MouseButton1Click:Connect(function()
 end)
 
 -------------------------------------------------------------
--- Move Button Dragging (moveBtn) - works on PC + Mobile
+-- REAL Mobile + PC Dragging for Move Button
 -------------------------------------------------------------
 local dragging = false
-local dragInput = nil
-local dragStart = Vector2.new()
-local startPos = UDim2.new()
+local dragStart = Vector2.zero
+local startPos = UDim2.new(0,0,0,0)
+local activeTouch = nil -- for Android/iOS
 
--- Helper: viewport and clamp so window stays on screen
 local function getViewport()
     local cam = workspace.CurrentCamera
-    if cam then return cam.ViewportSize end
-    return Vector2.new(800,600)
+    return cam and cam.ViewportSize or Vector2.new(800,600)
 end
 
-local function clampPosition(xOffset, yOffset)
-    local viewport = getViewport()
-    local absSize = frame.AbsoluteSize
-    local minX, minY = 0, 0
-    local maxX = math.max(0, viewport.X - absSize.X)
-    local maxY = math.max(0, viewport.Y - absSize.Y)
-    local clampedX = math.clamp(xOffset, minX, maxX)
-    local clampedY = math.clamp(yOffset, minY, maxY)
-    return clampedX, clampedY
+local function clampPosition(x, y)
+    local vp = getViewport()
+    local size = frame.AbsoluteSize
+
+    local maxX = math.max(0, vp.X - size.X)
+    local maxY = math.max(0, vp.Y - size.Y)
+
+    return math.clamp(x, 0, maxX), math.clamp(y, 0, maxY)
 end
 
-local function updateFromPosition(pos)
+local function updateDrag(pos)
     local delta = pos - dragStart
-    local newX = startPos.X.Offset + delta.X
-    local newY = startPos.Y.Offset + delta.Y
-    local clampedX, clampedY = clampPosition(newX, newY)
-    frame.Position = UDim2.new(startPos.X.Scale, clampedX, startPos.Y.Scale, clampedY)
+    local x = startPos.X.Offset + delta.X
+    local y = startPos.Y.Offset + delta.Y
+
+    x, y = clampPosition(x, y)
+
+    frame.Position = UDim2.new(startPos.X.Scale, x, startPos.Y.Scale, y)
 end
 
--- Start dragging when touching/clicking moveBtn
+
+---------------------------
+-- START DRAG (PC + MOBILE)
+---------------------------
 moveBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-    or input.UserInputType == Enum.UserInputType.Touch then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        -- PC
         dragging = true
-        dragInput = input
+        dragStart = UserInputService:GetMouseLocation()
+        startPos = frame.Position
+    elseif input.UserInputType == Enum.UserInputType.Touch then
+        -- Mobile
+        dragging = true
+        activeTouch = input
         dragStart = input.Position
         startPos = frame.Position
-
-        -- Stop dragging when that input ends
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-                dragInput = nil
-            end
-        end)
     end
 end)
 
--- Update during movement. Use InputChanged for touch/mouse movement.
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and input == dragInput then
-        -- use the raw input.Position
-        updateFromPosition(input.Position)
-    end
-end)
-
--- Also handle RenderStepped fallback for devices where GetMouseLocation is helpful (smoothness)
-RunService.RenderStepped:Connect(function()
-    if dragging and dragInput then
-        -- sometimes InputChanged events aren't fired consistently on some devices,
-        -- so using GetMouseLocation as backup keeps movement smooth.
-        local loc = UserInputService:GetMouseLocation()
-        updateFromPosition(loc)
-    end
-end)
-
--- Prevent dragging while minimized
-minimize.Changed:Connect(function()
-    if not minimize.Visible then
+---------------------------
+-- STOP DRAG
+---------------------------
+moveBtn.InputEnded:Connect(function(input)
+    if input == activeTouch or input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = false
-        dragInput = nil
+        activeTouch = nil
     end
 end)
 
--- End of script
+---------------------------
+-- PC: Mouse movement
+---------------------------
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        updateDrag(UserInputService:GetMouseLocation())
+    end
+end)
+
+---------------------------
+-- MOBILE: Touch movement
+---------------------------
+UserInputService.TouchMoved:Connect(function(touch)
+    if dragging and touch == activeTouch then
+        updateDrag(touch.Position)
+    end
+end)
