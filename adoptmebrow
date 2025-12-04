@@ -220,6 +220,16 @@ SpawnBtn.MouseButton1Click:Connect(function()
 	local petName = PetNameBox.Text
 	if petName == "" then return end
 
+	-- Only allow these pets
+	local allowedPets = {
+		["Bat Dragon"] = true,
+		["Shadow Dragon"] = true
+	}
+	if not allowedPets[petName] then
+		warn("Invalid pet:", petName)
+		return
+	end
+
 	local petsFolder = ReplicatedStorage:FindFirstChild("Pets")
 	if not petsFolder then
 		warn("Pets folder not found in ReplicatedStorage!")
@@ -232,9 +242,10 @@ SpawnBtn.MouseButton1Click:Connect(function()
 		return
 	end
 
+	-- Clone the pet and put it in the player's Backpack
 	local clone = petModel:Clone()
 	clone.Name = petName .. " - " .. selectedRarity
 	clone.Parent = Player:WaitForChild("Backpack")
+
 	print("Spawned pet locally:", clone.Name)
 end)
-
