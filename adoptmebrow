@@ -1,91 +1,112 @@
--- LocalScript: Legendary Owl Spawner (Workspace Version)
+--// Create ScreenGui
+local gui = Instance.new("ScreenGui")
+gui.Name = "PetSpawnerUI"
+gui.ResetOnSpawn = false
+gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local Workspace = game:GetService("Workspace")
-
-local player = Players.LocalPlayer
-local mouse = player:GetMouse()
-
--- Path to Legendary Pets
-local legendaryFolder = ReplicatedStorage:WaitForChild("Pets"):WaitForChild("Legendary")
-local owlPetModel = legendaryFolder:WaitForChild("Owl") -- Make sure the model is named "Owl"
-
--- Create GUI
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "LegendaryOwlSpawner"
-screenGui.Parent = player:WaitForChild("PlayerGui")
-
+--// Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 250, 0, 150)
-frame.Position = UDim2.new(0, 50, 0, 100)
-frame.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+frame.Size = UDim2.new(0, 350, 0, 240)
+frame.Position = UDim2.new(0.5, -175, 0.5, -120)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
-frame.Parent = screenGui
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+frame.Parent = gui
 
--- Title
+--// UI corner
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 12)
+
+--// Title
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 30)
-title.Position = UDim2.new(0, 0, 0, 0)
+title.Size = UDim2.new(1, 0, 0, 40)
 title.BackgroundTransparency = 1
-title.Text = "🦉 Legendary Owl Spawner"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Font = Enum.Font.FredokaOne
-title.TextSize = 20
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.Text = "Pet Spawner By Shxdrag"
 title.Parent = frame
 
--- Dragging
-local drag = Instance.new("TextButton")
-drag.Size = UDim2.new(1, 0, 1, 0)
-drag.Position = UDim2.new(0,0,0,0)
-drag.Text = ""
-drag.BackgroundTransparency = 1
-drag.Parent = title
+--// Pet name label
+local petName = Instance.new("TextLabel")
+petName.Position = UDim2.new(0, 0, 0, 50)
+petName.Size = UDim2.new(1, 0, 0, 30)
+petName.BackgroundTransparency = 1
+petName.Font = Enum.Font.GothamSemibold
+petName.TextScaled = true
+petName.TextColor3 = Color3.fromRGB(255,255,255)
+petName.Text = "Owl"
+petName.Parent = frame
 
-local dragging, offset
-drag.MouseButton1Down:Connect(function()
-    dragging = true
-    offset = Vector2.new(mouse.X - frame.Position.X.Offset, mouse.Y - frame.Position.Y.Offset)
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-RunService.RenderStepped:Connect(function()
-    if dragging then
-        frame.Position = UDim2.new(0, mouse.X - offset.X, 0, mouse.Y - offset.Y)
-    end
-end)
+--// Buttons container
+local buttonHolder = Instance.new("Frame")
+buttonHolder.Size = UDim2.new(1, 0, 0, 50)
+buttonHolder.Position = UDim2.new(0, 0, 0, 90)
+buttonHolder.BackgroundTransparency = 1
+buttonHolder.Parent = frame
 
--- Spawn Button (Workspace)
+local uiList = Instance.new("UIListLayout", buttonHolder)
+uiList.FillDirection = Enum.FillDirection.Horizontal
+uiList.Padding = UDim.new(0, 10)
+uiList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- Button data
+local options = {
+    {name = "MFR", color = Color3.fromRGB(255, 100, 100)},
+    {name = "NFR", color = Color3.fromRGB(120, 255, 120)},
+    {name = "FR",  color = Color3.fromRGB(120, 120, 255)}
+}
+
+local selected = nil
+local rarityLabel = nil
+
+--// Create rarity display label
+rarityLabel = Instance.new("TextLabel")
+rarityLabel.Position = UDim2.new(0, 0, 0, 200)
+rarityLabel.Size = UDim2.new(1, 0, 0, 25)
+rarityLabel.BackgroundTransparency = 1
+rarityLabel.Font = Enum.Font.GothamSemibold
+rarityLabel.TextScaled = true
+rarityLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+rarityLabel.Text = "Selected: None"
+rarityLabel.Parent = frame
+
+--// Create MFR / NFR / FR buttons
+for _, data in ipairs(options) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 90, 1, 0)
+    btn.BackgroundColor3 = data.color
+    btn.Font = Enum.Font.GothamBold
+    btn.TextScaled = true
+    btn.TextColor3 = Color3.fromRGB(255,255,255)
+    btn.Text = data.name
+    btn.AutoButtonColor = false
+    btn.Parent = buttonHolder
+
+    Instance.new("UICorner", btn)
+
+    btn.MouseButton1Click:Connect(function()
+        selected = data.name
+        rarityLabel.Text = "Selected: " .. selected
+    end)
+end
+
+--// Spawn button
 local spawnBtn = Instance.new("TextButton")
-spawnBtn.Size = UDim2.new(0.9, 0, 0, 50)
-spawnBtn.Position = UDim2.new(0.05, 0, 0, 50)
-spawnBtn.BackgroundColor3 = Color3.fromRGB(255, 180, 0)
-spawnBtn.Text = "Spawn Owl in Workspace"
-spawnBtn.Font = Enum.Font.FredokaOne
-spawnBtn.TextSize = 18
-spawnBtn.TextColor3 = Color3.new(1,1,1)
+spawnBtn.Size = UDim2.new(1, -20, 0, 45)
+spawnBtn.Position = UDim2.new(0, 10, 0, 150)
+spawnBtn.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
+spawnBtn.Font = Enum.Font.GothamBold
+spawnBtn.TextScaled = true
+spawnBtn.TextColor3 = Color3.fromRGB(255,255,255)
+spawnBtn.Text = "Spawn Pet"
 spawnBtn.Parent = frame
-Instance.new("UICorner", spawnBtn).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", spawnBtn)
 
 spawnBtn.MouseButton1Click:Connect(function()
-    if owlPetModel then
-        local clone = owlPetModel:Clone()
-        clone.Parent = Workspace
-        -- Position in front of player
-        local char = player.Character
-        if char and char:FindFirstChild("HumanoidRootPart") then
-            clone:SetPrimaryPartCFrame(CFrame.new(char.HumanoidRootPart.Position + char.HumanoidRootPart.CFrame.LookVector * 5))
-        end
-        spawnBtn.Text = "🦉 Owl Spawned!"
-        spawnBtn.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
-        wait(1)
-        spawnBtn.Text = "Spawn Owl in Workspace"
-        spawnBtn.BackgroundColor3 = Color3.fromRGB(255, 180, 0)
+    if selected == nil then
+        rarityLabel.Text = "Please select a rarity!"
+        return
     end
+
+    rarityLabel.Text = "Pet Spawned: Owl ("..selected..")"
 end)
