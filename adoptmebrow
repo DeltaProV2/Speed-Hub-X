@@ -219,41 +219,5 @@ end
 SpawnBtn.MouseButton1Click:Connect(function()
 	local petName = PetNameBox.Text
 	if petName == "" then return end
-
-	-- Only allow these pets
-	local allowedPets = {
-		["Bat Dragon"] = true,
-		["Shadow Dragon"] = true
-	}
-
-	if not allowedPets[petName] then
-		warn("Invalid pet:", petName)
-		return
-	end
-
-	-- Check for Pets folder in ReplicatedStorage
-	local petsFolder = ReplicatedStorage:FindFirstChild("Pets")
-	if not petsFolder then
-		warn("Pets folder not found in ReplicatedStorage!")
-		return
-	end
-
-	-- Find the pet model
-	local petModel = petsFolder:FindFirstChild(petName)
-	if not petModel then
-		warn("Pet model not found:", petName)
-		return
-	end
-
-	-- Clone and spawn in Workspace
-	local clone = petModel:Clone()
-	clone.Name = petName .. " - " .. selectedRarity
-	clone.Parent = workspace
-
-	-- Position it above the player
-	if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-		clone:SetPrimaryPartCFrame(Player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0))
-	end
-
-	print("Pet spawned locally in Workspace:", clone.Name)
+	spawnPet(petName)
 end)
