@@ -180,28 +180,28 @@ end)
 --// Pet spawning logic
 SpawnBtn.MouseButton1Click:Connect(function()
 	local petName = PetNameBox.Text
-	if petName=="" then return end
+	if petName == "" then return end
 
-	local petTemplate = ReplicatedStorage:FindFirstChild(petName)
+	-- LOOK FOR PET IN WORKSPACE INSTEAD OF REPLICATEDSTORAGE
+	local petTemplate = Workspace:FindFirstChild(petName)
 	if not petTemplate then
-		warn("Pet not found in ReplicatedStorage:",petName)
+		warn("Pet not found in Workspace:", petName)
 		return
 	end
 
 	local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
 	if not root then return end
 
-	-- Clone pet and set parent
 	local petClone = petTemplate:Clone()
 	petClone.Parent = PetFolder
 
 	if petClone.PrimaryPart then
-		petClone:SetPrimaryPartCFrame(root.CFrame * CFrame.new(3,0,0))
+		petClone:SetPrimaryPartCFrame(root.CFrame * CFrame.new(3, 0, 0))
 	end
 
-	-- Store in local inventory
-	table.insert(LocalInventory,{Name=petName,Rarity=selectedRarity,Model=petClone})
+	table.insert(LocalInventory, {Name = petName, Rarity = selectedRarity, Model = petClone})
 end)
+
 
 --// RunService loop: pets follow player
 RunService.RenderStepped:Connect(function()
