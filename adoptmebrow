@@ -1,5 +1,3 @@
--- Pet Spawner LocalScript
-
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
@@ -217,22 +215,4 @@ local LocalInventory = {}
 SpawnBtn.MouseButton1Click:Connect(function()
 	local petName = PetNameBox.Text
 	if petName == "" then return end
-
-	-- Create pet data
-	local petData = {
-		Name = petName,
-		Rarity = selectedRarity,
-		UID = math.random(100000, 999999) -- unique ID like Adopt Me
-	}
-
-	-- Store it in the local inventory
-	table.insert(LocalInventory, petData)
-
-	print("Pet given locally:")
-	print("Name:", petData.Name)
-	print("Rarity:", petData.Rarity)
-	print("UID:", petData.UID)
-
-	-- (Optional visual debug)
-	print("Current Local Inventory:", LocalInventory)
 end)
