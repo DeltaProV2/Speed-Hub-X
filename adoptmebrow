@@ -213,54 +213,14 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-spawnBtn.MouseButton1Click:Connect(function()
-    local petNameText = petName.Text
-    if petNameText == "" then
-        warn("[PetSpawner] No pet name entered!")
-        return
-    end
-
-    print("--------------------------------------------------")
-    print("[PetSpawner] Attempting to spawn pet:", petNameText)
-
-    -- Look for Pets folder in ReplicatedStorage
-    local petsFolder = ReplicatedStorage:FindFirstChild("Pets")
-    if not petsFolder then
-        warn("[PetSpawner] ERROR: Pets folder not found in ReplicatedStorage!")
-        return
-    end
-
-    local petModel = petsFolder:FindFirstChild(petNameText)
-    if not petModel then
-        warn("[PetSpawner] ERROR: Pet '"..petNameText.."' does NOT exist in ReplicatedStorage > Pets!")
-        return
-    end
-
-    -- Create a Tool for Backpack
-    local tool = Instance.new("Tool")
-    tool.Name = petNameText
-    tool.RequiresHandle = false
-    tool.CanBeDropped = false
-
-    -- Clone pet into the Tool
-    local clone = petModel:Clone()
-    clone.Parent = tool
-
-    -- Attach PrimaryPart if missing
-    if not clone.PrimaryPart then
-        local firstPart = clone:FindFirstChildWhichIsA("BasePart")
-        if firstPart then
-            clone.PrimaryPart = firstPart
-        end
-    end
-
-    -- Apply Neon / Mega Neon effects
-    if clone.Name:lower():find("mega") then
+-- Function to apply Neon/Mega Neon effects
+local function applyNeonEffects(model)
+    if model.Name:lower():find("mega") then
         print("[PetSpawner] Mega Neon detected! Cycling colors ✓")
         task.spawn(function()
-            while tool.Parent do
-                for hue = 0, 1, 0.02 do
-                    for _, part in ipairs(clone:GetDescendants()) do
+            while model.Parent do
+                for hue = 0,1,0.02 do
+                    for _, part in ipairs(model:GetDescendants()) do
                         if part:IsA("BasePart") then
                             part.Color = Color3.fromHSV(hue,1,1)
                             part.Material = Enum.Material.Neon
@@ -270,41 +230,89 @@ spawnBtn.MouseButton1Click:Connect(function()
                 end
             end
         end)
-    elseif clone.Name:lower():find("neon") then
+    elseif model.Name:lower():find("neon") then
         print("[PetSpawner] Neon detected! Applying neon material ✓")
-        for _, part in ipairs(clone:GetDescendants()) do
+        for _, part in ipairs(model:GetDescendants()) do
             if part:IsA("BasePart") then
                 part.Material = Enum.Material.Neon
             end
         end
     end
+end
 
-    -- Simulate Fly Potion
-    if clone:FindFirstChild("FlyPotion") then
-        print("[PetSpawner] Fly Potion detected! Pet can now fly ✓")
-        -- Add BodyVelocity for testing flying
-        local bv = Instance.new("BodyVelocity")
-        bv.Velocity = Vector3.new(0,5,0)
-        bv.MaxForce = Vector3.new(0,5000,0)
-        bv.Parent = clone.PrimaryPart
-        task.delay(2, function() bv:Destroy() end)
+-- Function to spawn pet in Workspace when Tool is clicked
+local function setupTool(tool)
+    tool.Activated:Connect(function()
+        local petClone = tool:FindFirstChildWhichIsA("Model"):Clone()
+        petClone.Parent = workspace
+        petClone:SetPrimaryPartCFrame(player.Character.HumanoidRootPart.CFrame + Vector3.new(0,5,0))
+        print("[PetSpawner] Spawned pet:", petClone.Name)
+
+        -- Fly Potion simulation
+        if petClone:FindFirstChild("FlyPotion") and petClone.PrimaryPart then
+            print("[PetSpawner] Fly Potion active!")
+            local bv = Instance.new("BodyVelocity")
+            bv.Velocity = Vector3.new(0,5,0)
+            bv.MaxForce = Vector3.new(0,5000,0)
+            bv.Parent = petClone.PrimaryPart
+            task.delay(2, function() bv:Destroy() end)
+        end
+
+        -- Ride Potion simulation
+        if petClone:FindFirstChild("RidePotion") and petClone.PrimaryPart then
+            print("[PetSpawner] Ride Potion active!")
+            local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = petClone.PrimaryPart.CFrame + Vector3.new(0,2,0)
+            end
+        end
+
+        applyNeonEffects(petClone)
+    end)
+end
+
+-- Spawn Button Logic
+spawnBtn.MouseButton1Click:Connect(function()
+    local petNameText = petName.Text
+    if petNameText == "" then
+        warn("[PetSpawner] No pet name entered!")
+        return
     end
 
-    -- Simulate Ride Potion
-    if clone:FindFirstChild("RidePotion") then
-        print("[PetSpawner] Ride Potion detected! Player can ride pet ✓")
-        local character = player.Character
-        local hrp = character and character:FindFirstChild("HumanoidRootPart")
-        if hrp and clone.PrimaryPart then
-            hrp.CFrame = clone.PrimaryPart.CFrame + Vector3.new(0,2,0)
+    local petsFolder = ReplicatedStorage:FindFirstChild("Pets")
+    if not petsFolder then
+        warn("[PetSpawner] Pets folder not found in ReplicatedStorage!")
+        return
+    end
+
+    local petModel = petsFolder:FindFirstChild(petNameText)
+    if not petModel then
+        warn("[PetSpawner] Pet '"..petNameText.."' not found in Pets folder!")
+        return
+    end
+
+    -- Create Tool for Backpack
+    local tool = Instance.new("Tool")
+    tool.Name = petNameText
+    tool.RequiresHandle = false
+    tool.CanBeDropped = false
+
+    local clone = petModel:Clone()
+    clone.Parent = tool
+
+    -- Ensure PrimaryPart
+    if not clone.PrimaryPart then
+        local firstPart = clone:FindFirstChildWhichIsA("BasePart")
+        if firstPart then
+            clone.PrimaryPart = firstPart
         end
     end
 
-    -- Parent Tool to Backpack
     tool.Parent = player.Backpack
-    print("[PetSpawner] Pet added to Backpack successfully! ✓")
-end)
+    print("[PetSpawner] Tool added to Backpack:", tool.Name)
 
+    setupTool(tool)
+end)
 
 -------------------------------------------------------------
 -- MINIMIZE SYSTEM (fixed)
