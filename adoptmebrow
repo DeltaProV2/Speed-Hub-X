@@ -210,6 +210,74 @@ if data and data.inventory and data.inventory.pets then
 	end
 end
 
+-- ==========================
+-- GET BUTTONS FUNCTION
+-- ==========================
+local function get_buttons(category, pets)
+	local buttons = {}
+	for _, pet in ipairs(pets) do
+		-- Safety checks for expected fields
+		if pet.id and pet.uid and pet.template and pet.category and pet.data then
+			local btn = {
+				id = pet.id,
+				uid = pet.uid,
+				template = pet.template,
+				category = pet.category,
+				icon = pet.data.icon or "rbxassetid://0", -- fallback icon
+				thumbnail = pet.data.thumbnail or "rbxassetid://0"
+			}
+			table.insert(buttons, btn)
+		else
+			warn("[get_buttons] Pet missing required fields:", pet.template or "unknown")
+		end
+	end
+	return buttons
+end
+
+-- ==========================
+-- RENDER CATEGORY FUNCTION
+-- ==========================
+local function renderCategory(categoryName)
+	-- Grab all pets in this category
+	local petsInCategory = {}
+	for _, pet in ipairs(data.inventory.pets) do
+		if pet.category == categoryName then
+			table.insert(petsInCategory, pet)
+		end
+	end
+
+	-- Build buttons safely
+	local buttons = get_buttons(categoryName, petsInCategory)
+
+	-- Example: print buttons for now
+	print("[renderCategory] Buttons for", categoryName)
+	for _, btn in ipairs(buttons) do
+		print("Button:", btn.template, "UID:", btn.uid)
+	end
+
+	-- You could replace this print logic with actual GUI rendering if desired
+end
+
+-- ==========================
+-- TEST BUTTON (Render Pets)
+-- ==========================
+local renderBtn = Instance.new("TextButton")
+renderBtn.Size = UDim2.new(1, -20, 0, 30)
+renderBtn.Position = UDim2.new(0, 10, 0, 230)
+renderBtn.BackgroundColor3 = Color3.fromRGB(150, 75, 255)
+renderBtn.BorderSizePixel = 0
+renderBtn.Font = Enum.Font.GothamBold
+renderBtn.TextScaled = true
+renderBtn.TextColor3 = Color3.fromRGB(255,255,255)
+renderBtn.Text = "Render PETS Category"
+renderBtn.Parent = frame
+Instance.new("UICorner", renderBtn)
+
+renderBtn.MouseButton1Click:Connect(function()
+	renderCategory("PETS")
+end)
+
+
 -- SPAWN & AUTO-EQUIP PET
 spawnBtn.MouseButton1Click:Connect(function()
 	local petTemplate = "Owl" -- testing only Owl
