@@ -1,13 +1,3 @@
--- dito fake pets
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PetFolder = ReplicatedStorage:WaitForChild("Pet")
-
--- ONLY these pets are allowed (for testing)
-local AllowedPet = {
-	["Bat Dragon"] = true,
-	["Shadow Dragon"] = true
-}
-
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
@@ -30,8 +20,8 @@ MainFrame.Parent = ScreenGui
 -- Gradient Background
 local UIGradient = Instance.new("UIGradient")
 UIGradient.Color = ColorSequence.new({
-	ColorSequenceKeypoint.new(0, Color3.new(1, 0.705, 0.862)),
-	ColorSequenceKeypoint.new(1, Color3.new(1, 0.549, 0.823))
+    ColorSequenceKeypoint.new(0, Color3.new(1, 0.705, 0.862)),
+    ColorSequenceKeypoint.new(1, Color3.new(1, 0.549, 0.823))
 })
 UIGradient.Rotation = 90
 UIGradient.Parent = MainFrame
@@ -218,32 +208,27 @@ MFRBtn.MouseButton1Click:Connect(function() selectRarity("MFR") end)
 NFRBtn.MouseButton1Click:Connect(function() selectRarity("NFR") end)
 FRBtn.MouseButton1Click:Connect(function() selectRarity("FR") end)
 
--- Spawn pet logic (LOCAL ONLY – puts pet into Backpack)
-local Backpack = Player:WaitForChild("Backpack")
+-- Spawn pet logic (replace with your own spawning code)
+-- Local temporary inventory (client-side only)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PetSpawnEvent = ReplicatedStorage:WaitForChild("PetSpawnEvent")
 
 SpawnBtn.MouseButton1Click:Connect(function()
 	local petName = PetNameBox.Text
 	if petName == "" then return end
 
-	-- Only allow specific pets
-	if not AllowedPets[petName] then
+	-- Only allow these pets
+	local allowedPets = {
+		["Bat Dragon"] = true,
+		["Shadow Dragon"] = true
+	}
+
+	if not allowedPets[petName] then
 		warn("Invalid pet:", petName)
 		return
 	end
 
-	-- find the pet model
-	local petModel = PetsFolder:FindFirstChild(petName)
-	if not petModel then
-		warn("Pet model not found:", petName)
-		return
-	end
-
-	-- clone it
-	local clone = petModel:Clone()
-	clone.Name = petName .. " - " .. selectedRarity  -- Example: "Bat Dragon - MFR"
-
-	-- put into Backpack (local)
-	clone.Parent = Backpack
-
-	print("Spawned:", clone.Name)
+	-- Fire server event to give pet
+	PetSpawnEvent:FireServer(petName, selectedRarity)
+	print("Requested pet from server:", petName, selectedRarity)
 end)
