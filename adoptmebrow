@@ -8,6 +8,8 @@ local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
+print("DEBUG: LocalScript Loaded")
+
 --// Temporary local inventory
 local LocalInventory = {}
 
@@ -16,10 +18,14 @@ local PetFolder = Workspace:FindFirstChild("LocalPets") or Instance.new("Folder"
 PetFolder.Name = "LocalPets"
 PetFolder.Parent = Workspace
 
+print("DEBUG: PetFolder located at:", PetFolder:GetFullName())
+
 --// GUI Setup
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PetSpawnerGui"
 ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+
+print("DEBUG: GUI Initialized")
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 300, 0, 180)
@@ -120,6 +126,7 @@ local FRBtn = CreateButton("FR", Color3.fromRGB(100,100,255), 0.7)
 local selectedRarity = "MFR"
 
 local function selectRarity(rarity)
+	print("DEBUG: Selected rarity:", rarity)
 	selectedRarity = rarity
 	MFRBtn.BackgroundColor3 = (rarity=="MFR" and Color3.fromRGB(255,100,100)) or Color3.fromRGB(60,60,60)
 	NFRBtn.BackgroundColor3 = (rarity=="NFR" and Color3.fromRGB(100,255,100)) or Color3.fromRGB(60,60,60)
@@ -142,66 +149,57 @@ SpawnBtn.TextSize = 20
 SpawnBtn.Parent = MainFrame
 Instance.new("UICorner", SpawnBtn).CornerRadius = UDim.new(0,5)
 
---// GUI Dragging (Title only)
-local dragging=false
-local dragStart
-local startPos
-local dragInput
-local function update(input)
-	local delta = input.Position - dragStart
-	MainFrame.Position = UDim2.new(0,startPos.X+delta.X,0,startPos.Y+delta.Y)
-end
-
-Title.InputBegan:Connect(function(input)
-	if input.UserInputType==Enum.UserInputType.MouseButton1 then
-		dragging=true
-		dragStart=input.Position
-		startPos=Vector2.new(MainFrame.AbsolutePosition.X,MainFrame.AbsolutePosition.Y)
-		UserInputService.MouseIconEnabled=false
-		input.Changed:Connect(function()
-			if input.UserInputState==Enum.UserInputState.End then
-				dragging=false
-				UserInputService.MouseIconEnabled=true
-			end
-		end)
-	end
-end)
-
-Title.InputChanged:Connect(function(input)
-	if input.UserInputType==Enum.UserInputType.MouseMovement then
-		dragInput=input
-	end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-	if dragging and input==dragInput then update(input) end
-end)
-
 --// Pet spawning logic
 SpawnBtn.MouseButton1Click:Connect(function()
 	local petName = PetNameBox.Text
-	if petName == "" then return end
+	print("DEBUG: Spawn button pressed. User typed:", petName)
+
+	if petName == "" then
+		print("DEBUG: No pet name entered.")
+		return
+	end
+
+	print("DEBUG: Checking Workspace for pet:", petName)
 
 	-- LOOK FOR PET IN WORKSPACE INSTEAD OF REPLICATEDSTORAGE
 	local petTemplate = Workspace:FindFirstChild(petName)
-	if not petTemplate then
-		warn("Pet not found in Workspace:", petName)
+
+	if petTemplate then
+		print("DEBUG: PET FOUND in Workspace:", petTemplate:GetFullName())
+	else
+		print("DEBUG: NOT FOUND in Workspace. Checking ReplicatedStorage...")
+
+		local rsPet = ReplicatedStorage:FindFirstChild(petName)
+		if rsPet then
+			print("DEBUG: FOUND PET in ReplicatedStorage:", rsPet:GetFullName())
+		else
+			warn("FINAL RESULT: Pet not found in ANY location:", petName)
+		end
+
 		return
 	end
 
 	local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
-	if not root then return end
+	if not root then
+		print("DEBUG: Root part not found.")
+		return
+	end
 
 	local petClone = petTemplate:Clone()
 	petClone.Parent = PetFolder
 
+	print("DEBUG: Pet cloned and parented to:", PetFolder:GetFullName())
+
 	if petClone.PrimaryPart then
 		petClone:SetPrimaryPartCFrame(root.CFrame * CFrame.new(3, 0, 0))
+		print("DEBUG: Pet moved beside player.")
+	else
+		print("DEBUG WARNING: Pet has NO PrimaryPart!")
 	end
 
 	table.insert(LocalInventory, {Name = petName, Rarity = selectedRarity, Model = petClone})
+	print("DEBUG: Pet added to LocalInventory.")
 end)
-
 
 --// RunService loop: pets follow player
 RunService.RenderStepped:Connect(function()
