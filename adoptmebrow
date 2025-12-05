@@ -1,117 +1,254 @@
---// CLEAN PET SPAWN FUNCTIONS (EXTRACTED)
+--//========================================================
+--//  ADOPT ME MODDED - PET SPAWNER GUI + SPAWN SYSTEM
+--//========================================================
 
+--// SERVICES
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
+local UIS = game:GetService("UserInputService")
 
 local load = require(ReplicatedStorage:WaitForChild("Fsys")).load
 
-local clientData     = load("ClientData")
-local items          = load("KindDB")
-local downloader     = load("DownloadClient")
-local InventoryDB    = load("InventoryDB")
+--// GAME MODULES
+local clientData  = load("ClientData")
+local items       = load("KindDB")
+local downloader  = load("DownloadClient")
+local InventoryDB = load("InventoryDB")
 
+--// PET SYSTEM TABLES
 local petModels = {}
 local pets = {}
 
--- Generate unique ID
+----------------------------------------------------------------
+--//  CLEAN EXTRACTED FUNCTIONS (NO EXPLOIT NEEDED)
+----------------------------------------------------------------
+
 local function getUniqueId()
-    return HttpService:GenerateGUID(false)
+	return HttpService:GenerateGUID(false)
 end
 
--- Download + cache pet model
 local function getPetModel(kind)
-    if petModels[kind] then
-        return petModels[kind]
-    end
-    local streamed = downloader.promise_download_copy("Pets", kind):expect()
-    petModels[kind] = streamed
-    return streamed
+	if petModels[kind] then
+		return petModels[kind]
+	end
+	local streamed = downloader.promise_download_copy("Pets", kind):expect()
+	petModels[kind] = streamed
+	return streamed
 end
 
--- Update inventory state
 local function updateInventory(action)
-    local data = clientData.get("inventory")
-    local cloned = table.clone(data)
-    clientData.predict("inventory", action(cloned))
+	local data = clientData.get("inventory")
+	local cloned = table.clone(data)
+	clientData.predict("inventory", action(cloned))
 end
 
--- Create pet in player inventory
 function CreatePet(id, properties)
-    local uid = getUniqueId()
-    local newPet = nil
+	local uid = getUniqueId()
+	local newPet = nil
 
-    updateInventory(function(inv)
-        local newPets = table.clone(inv.pets)
-        local item = items[id]
+	updateInventory(function(inv)
+		local newPets = table.clone(inv.pets)
+		local item = items[id]
 
-        newPet = {
-            unique = uid,
-            category = "pets",
-            id = id,
-            kind = item.kind,
-            newness_order = 0,
-            properties = properties
-        }
+		newPet = {
+			unique = uid,
+			category = "pets",
+			id = id,
+			kind = item.kind,
+			newness_order = 0,
+			properties = properties
+		}
 
-        newPets[uid] = newPet
-        inv.pets = newPets
-        return inv
-    end)
+		newPets[uid] = newPet
+		inv.pets = newPets
+		return inv
+	end)
 
-    pets[uid] = {data = newPet, model = nil}
-    return newPet
+	pets[uid] = {data = newPet, model = nil}
+	return newPet
 end
 
--- Find pet ID by name
 function GetPetByName(name)
-    for _, v in pairs(InventoryDB.pets) do
-        if v.name:lower() == name:lower() then
-            return v.id
-        end
-    end
-    return false
+	for _, v in pairs(InventoryDB.pets) do
+		if v.name:lower() == name:lower() then
+			return v.id
+		end
+	end
+	return false
 end
 
--- MAIN SPAWN FUNCTION YOU WILL CALL
 function SpawnPet(petName, petType)
-    local petId = GetPetByName(petName)
-    if not petId then
-        warn("Pet not found:", petName)
-        return
-    end
+	local petId = GetPetByName(petName)
+	if not petId then
+		warn("Pet not found:", petName)
+		return false
+	end
 
-    if petType == "FR" then
-        CreatePet(petId, {
-            rideable = true,
-            flyable = true,
-            pet_trick_level = 0,
-            friendship_level = 0,
-            age = 1,
-            rp_name = ""
-        })
+	if petType == "FR" then
+		CreatePet(petId, {
+			rideable = true,
+			flyable = true,
+			pet_trick_level = 0,
+			friendship_level = 0,
+			age = 1,
+			rp_name = ""
+		})
 
-    elseif petType == "NFR" then
-        CreatePet(petId, {
-            neon = true,
-            rideable = true,
-            flyable = true,
-            pet_trick_level = 0,
-            friendship_level = 0,
-            age = 1,
-            rp_name = ""
-        })
+	elseif petType == "NFR" then
+		CreatePet(petId, {
+			neon = true,
+			rideable = true,
+			flyable = true,
+			pet_trick_level = 0,
+			friendship_level = 0,
+			age = 1,
+			rp_name = ""
+		})
 
-    elseif petType == "MFR" then
-        CreatePet(petId, {
-            mega_neon = true,
-            rideable = true,
-            flyable = true,
-            pet_trick_level = 0,
-            friendship_level = 0,
-            age = 1,
-            rp_name = ""
-        })
-    end
+	elseif petType == "MFR" then
+		CreatePet(petId, {
+			mega_neon = true,
+			rideable = true,
+			flyable = true,
+			pet_trick_level = 0,
+			friendship_level = 0,
+			age = 1,
+			rp_name = ""
+		})
+	end
 
-    print("Spawned:", petName, petType)
+	print("Spawned:", petName, petType)
+	return true
 end
+
+----------------------------------------------------------------
+--//  GUI CREATION
+----------------------------------------------------------------
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "PetSpawnerGui"
+gui.Parent = Player:WaitForChild("PlayerGui")
+gui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 330, 0, 200)
+frame.Position = UDim2.new(0.5, -165, 0.4, 0)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+frame.BorderSizePixel = 0
+frame.Parent = gui
+
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 30)
+topBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+topBar.BorderSizePixel = 0
+topBar.Parent = frame
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 1, 0)
+title.BackgroundTransparency = 1
+title.Text = "Pet Spawner"
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.Parent = topBar
+
+-- DRAGGING
+local dragging = false
+local dragStart, startPos
+
+topBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+	end
+end)
+
+topBar.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+			startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
+
+----------------------------------------------------------------
+--// INPUTS
+----------------------------------------------------------------
+
+local petBox = Instance.new("TextBox")
+petBox.Size = UDim2.new(1, -20, 0, 30)
+petBox.Position = UDim2.new(0, 10, 0, 50)
+petBox.PlaceholderText = "Enter pet name (ex: Owl)"
+petBox.BackgroundColor3 = Color3.fromRGB(60,60,60)
+petBox.TextColor3 = Color3.fromRGB(255,255,255)
+petBox.Font = Enum.Font.Gotham
+petBox.TextSize = 14
+petBox.Parent = frame
+
+local dropdown = Instance.new("TextButton")
+dropdown.Size = UDim2.new(1, -20, 0, 30)
+dropdown.Position = UDim2.new(0, 10, 0, 90)
+dropdown.Text = "FR"
+dropdown.BackgroundColor3 = Color3.fromRGB(60,60,60)
+dropdown.TextColor3 = Color3.fromRGB(255,255,255)
+dropdown.Font = Enum.Font.GothamBold
+dropdown.TextSize = 14
+dropdown.Parent = frame
+
+local types = {"FR", "NFR", "MFR"}
+local currentTypeIndex = 1
+
+dropdown.MouseButton1Click:Connect(function()
+	currentTypeIndex = currentTypeIndex + 1
+	if currentTypeIndex > #types then
+		currentTypeIndex = 1
+	end
+	dropdown.Text = types[currentTypeIndex]
+end)
+
+----------------------------------------------------------------
+--// SPAWN BUTTON
+----------------------------------------------------------------
+
+local spawnBtn = Instance.new("TextButton")
+spawnBtn.Size = UDim2.new(1, -20, 0, 40)
+spawnBtn.Position = UDim2.new(0, 10, 0, 140)
+spawnBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+spawnBtn.TextColor3 = Color3.fromRGB(255,255,255)
+spawnBtn.Font = Enum.Font.GothamBold
+spawnBtn.TextSize = 16
+spawnBtn.Text = "Spawn Pet"
+spawnBtn.Parent = frame
+
+spawnBtn.MouseButton1Click:Connect(function()
+	local petName = petBox.Text
+	local petType = dropdown.Text
+
+	if petName == "" then
+		warn("Enter a pet name!")
+		return
+	end
+
+	local success = SpawnPet(petName, petType)
+
+	if success then
+		spawnBtn.Text = "Spawned!"
+		task.delay(1, function()
+			spawnBtn.Text = "Spawn Pet"
+		end)
+	else
+		spawnBtn.Text = "Pet Not Found!"
+		task.delay(1, function()
+			spawnBtn.Text = "Spawn Pet"
+		end)
+	end
+end)
