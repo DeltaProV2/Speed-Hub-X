@@ -1,43 +1,44 @@
--- Pet Spawner Backend (GUI-free)
-local player = game.Players.LocalPlayer
-local load = require(game.ReplicatedStorage:WaitForChild("Fsys")).load
+--// Pet Spawner LocalScript (GUI + Spawn Logic)
 
--- Core Services
+local player = game.Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+
+-- Load Adopt Me modules
+local load = require(ReplicatedStorage:WaitForChild("Fsys")).load
 local clientData = load("ClientData")
 local items = load("KindDB")
-local router = load("RouterClient")
 local downloader = load("DownloadClient")
-local animationManager = load("AnimationManager")
 local petRigs = load("new:PetRigs")
+local animationManager = load("AnimationManager")
 
--- Pet Storage
+-- Pet storage
 local petModels = {}
 local pets = {}
-local equippedPet = nil
-local mountedPet = nil
-local currentMountTrack = nil
 
--- Utilities
-local HttpService = game:GetService("HttpService")
+-- Helper functions
 local function getUniqueId()
     return HttpService:GenerateGUID(false)
 end
 
 local function getPetModel(kind)
-    if petModels[kind] then return petModels[kind] end
+    if petModels[kind] then
+        return petModels[kind]
+    end
     local streamed = downloader.promise_download_copy("Pets", kind):expect()
     petModels[kind] = streamed
     return streamed
 end
 
--- Update client data helper
 local function updateData(key, action)
     local data = clientData.get(key)
     local clonedData = table.clone(data)
     clientData.predict(key, action(clonedData))
 end
 
--- Pet creation
+-- Create pet into inventory (unequipped)
 local function createPet(id, properties)
     local uniqueId = getUniqueId()
     local pet = nil
@@ -62,133 +63,8 @@ local function createPet(id, properties)
     return pet
 end
 
--- Apply neon/mega neon visuals
-local function neonify(model, entry)
-    local petModel = model:FindFirstChild("PetModel")
-    if not petModel then return end
-    for neonPart, configuration in pairs(entry.neon_parts or {}) do
-        local truePart = petRigs.get(petModel).get_geo_part(petModel, neonPart)
-        if truePart then
-            truePart.Material = configuration.Material
-            truePart.Color = configuration.Color
-        end
-    end
-end
-
--- Equip / Unequip
-local function addPetWrapper(wrapper)
-    updateData("pet_char_wrappers", function(petWrappers)
-        wrapper.unique = #petWrappers + 1
-        wrapper.index = #petWrappers + 1
-        petWrappers[#petWrappers + 1] = wrapper
-        return petWrappers
-    end)
-end
-
-local function addPetState(state)
-    updateData("pet_state_managers", function(petStates)
-        petStates[#petStates + 1] = state
-        return petStates
-    end)
-end
-
-local function removePetWrapper(uniqueId)
-    updateData("pet_char_wrappers", function(petWrappers)
-        for i, w in ipairs(petWrappers) do
-            if w.pet_unique == uniqueId then
-                table.remove(petWrappers, i)
-                break
-            end
-        end
-        for idx, w in ipairs(petWrappers) do
-            w.unique = idx
-            w.index = idx
-        end
-        return petWrappers
-    end)
-end
-
-local function clearPetState(uniqueId)
-    local pet = pets[uniqueId]
-    if not pet or not pet.model then return end
-    updateData("pet_state_managers", function(states)
-        for i, state in ipairs(states) do
-            if state.char == pet.model then
-                local clone = table.clone(states[i])
-                clone.states = {}
-                states[i] = clone
-                break
-            end
-        end
-        return states
-    end)
-end
-
-local function equip(item)
-    if equippedPet then
-        unequip(equippedPet)
-    end
-    local petModel = getPetModel(item.kind):Clone()
-    petModel.Parent = workspace
-    pets[item.unique].model = petModel
-
-    if item.properties.neon or item.properties.mega_neon then
-        neonify(petModel, items[item.kind])
-    end
-
-    equippedPet = item
-
-    addPetWrapper({
-        char = petModel,
-        mega_neon = item.properties.mega_neon,
-        neon = item.properties.neon,
-        player = player,
-        entity_controller = player,
-        controller = player,
-        rp_name = item.properties.rp_name or "",
-        pet_trick_level = item.properties.pet_trick_level,
-        pet_unique = item.unique,
-        pet_id = item.id,
-        location = {
-            full_destination_id = "housing",
-            destination_id = "housing",
-            house_owner = player
-        },
-        pet_progression = {
-            friendship_level = item.properties.friendship_level,
-            age = item.properties.age,
-            percentage = 0
-        },
-        are_colors_sealed = false,
-        is_pet = true
-    })
-
-    addPetState({
-        char = petModel,
-        player = player,
-        store_key = "pet_state_managers",
-        is_sitting = false,
-        chars_connected_to_me = {},
-        states = {}
-    })
-end
-
-local function unequip(item)
-    local pet = pets[item.unique]
-    if not pet or not pet.model then return end
-
-    removePetWrapper(item.unique)
-    clearPetState(item.unique)
-    pet.model:Destroy()
-    pet.model = nil
-    equippedPet = nil
-end
-
--- Pet lookup
-local Loads = require(game.ReplicatedStorage.Fsys).load
-local InventoryDB = Loads("InventoryDB")
-
 local function GetPetByName(name)
+    local InventoryDB = load("InventoryDB")
     for _, v in pairs(InventoryDB.pets) do
         if v.name:lower() == name:lower() then
             return v.id
@@ -197,11 +73,246 @@ local function GetPetByName(name)
     return false
 end
 
--- Expose backend functions for your own GUI
-return {
-    createPet = createPet,
-    equipPet = equip,
-    unequipPet = unequip,
-    getPetByName = GetPetByName,
-    pets = pets
-}
+-- =========================
+-- GUI SETUP (Your Original GUI)
+-- =========================
+local gui = Instance.new("ScreenGui")
+gui.Name = "PetSpawnerUI"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Main Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 350, 0, 270)
+frame.Position = UDim2.new(0.5, -175, 0.25, 0)
+frame.Active = true
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.ClipsDescendants = false
+frame.Parent = gui
+Instance.new("UICorner", frame)
+
+-- Top Bar
+local top = Instance.new("Frame")
+top.Size = UDim2.new(1, 0, 0, 40)
+top.Position = UDim2.new(0, 0, 0, 0)
+top.Active = true
+top.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+top.BorderSizePixel = 0
+top.ClipsDescendants = false
+top.Parent = frame
+Instance.new("UICorner", top)
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -140, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Text = "Pet Spawner By Shxdrag"
+title.Parent = top
+
+-- Drag bar (used for dragging)
+local DragBar = Instance.new("Frame")
+DragBar.Name = "DragBar"
+DragBar.Size = UDim2.new(1, -140, 1, 0)
+DragBar.Position = UDim2.new(0, 0, 0, 0)
+DragBar.BackgroundTransparency = 1
+DragBar.Parent = top
+
+-- Minimize / Expand / Move Buttons
+local function createTopButton(posX, text)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 30, 0, 30)
+    btn.Position = UDim2.new(1, posX, 0, 5)
+    btn.Text = text
+    btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    btn.TextScaled = true
+    btn.Font = Enum.Font.GothamBold
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Parent = top
+    Instance.new("UICorner", btn)
+    return btn
+end
+
+local minimize = createTopButton(-120, "-")
+local expand = createTopButton(-120, "+")
+expand.Visible = false
+local moveBtn = createTopButton(-80, "↕")
+
+-- Drag logic
+local dragging = false
+local dragStart
+local startPos
+local function updateDrag(input)
+    local delta = input.Position - dragStart
+    frame.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
+end
+
+moveBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+        
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging then
+        if input.UserInputType == Enum.UserInputType.MouseMovement
+            or input.UserInputType == Enum.UserInputType.Touch then
+            updateDrag(input)
+        end
+    end
+end)
+
+-- Pet Name Box
+local petNameBox = Instance.new("TextBox")
+petNameBox.Size = UDim2.new(1, -20, 0, 40)
+petNameBox.Position = UDim2.new(0, 10, 0, 60)
+petNameBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+petNameBox.BorderSizePixel = 0
+petNameBox.Font = Enum.Font.GothamBold
+petNameBox.TextScaled = true
+petNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+petNameBox.PlaceholderText = "Put Pet Name!"
+petNameBox.ClearTextOnFocus = false
+petNameBox.Parent = frame
+Instance.new("UICorner", petNameBox)
+
+-- Rarity buttons
+local rarityFrame = Instance.new("Frame")
+rarityFrame.Size = UDim2.new(1, 0, 0, 60)
+rarityFrame.Position = UDim2.new(0, 0, 0, 110)
+rarityFrame.BackgroundTransparency = 1
+rarityFrame.Parent = frame
+
+local uiList = Instance.new("UIListLayout")
+uiList.FillDirection = Enum.FillDirection.Horizontal
+uiList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uiList.Padding = UDim.new(0, 10)
+uiList.Parent = rarityFrame
+
+local selectedRarity = nil
+local selectedLabel = Instance.new("TextLabel")
+selectedLabel.Size = UDim2.new(1, -20, 0, 30)
+selectedLabel.Position = UDim2.new(0, 10, 0, 225)
+selectedLabel.BackgroundTransparency = 1
+selectedLabel.Font = Enum.Font.GothamSemibold
+selectedLabel.TextScaled = true
+selectedLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+selectedLabel.Text = "Selected: None"
+selectedLabel.Parent = frame
+
+local function createRarityButton(name, color)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 90, 1, -5)
+    button.BackgroundColor3 = color
+    button.BorderSizePixel = 0
+    button.TextColor3 = Color3.fromRGB(255,255,255)
+    button.Font = Enum.Font.GothamBold
+    button.TextScaled = true
+    button.Text = name
+    button.Parent = rarityFrame
+    Instance.new("UICorner", button)
+
+    button.MouseButton1Click:Connect(function()
+        selectedRarity = name
+        selectedLabel.Text = "Selected: " .. name
+    end)
+end
+
+createRarityButton("MFR", Color3.fromRGB(255, 100, 100))
+createRarityButton("NFR", Color3.fromRGB(100, 255, 100))
+createRarityButton("FR", Color3.fromRGB(100, 100, 255))
+
+-- Spawn Button
+local spawnBtn = Instance.new("TextButton")
+spawnBtn.Size = UDim2.new(1, -20, 0, 45)
+spawnBtn.Position = UDim2.new(0, 10, 0, 175)
+spawnBtn.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
+spawnBtn.BorderSizePixel = 0
+spawnBtn.Font = Enum.Font.GothamBold
+spawnBtn.TextScaled = true
+spawnBtn.TextColor3 = Color3.fromRGB(255,255,255)
+spawnBtn.Text = "Spawn Pet"
+spawnBtn.Parent = frame
+Instance.new("UICorner", spawnBtn)
+
+spawnBtn.MouseButton1Click:Connect(function()
+    local name = petNameBox.Text
+    if not name or name == "" then
+        selectedLabel.Text = "Please enter a pet name!"
+        return
+    end
+
+    local rarity = selectedRarity or "FR"
+    local petId = GetPetByName(name)
+    if not petId then
+        selectedLabel.Text = "Pet not found!"
+        return
+    end
+
+    local properties = {pet_trick_level = 0, rideable = true, flyable = true, friendship_level = 0, age = 1, ailments_completed = 0, rp_name = ""}
+    if rarity == "NFR" then
+        properties.neon = true
+    elseif rarity == "MFR" then
+        properties.mega_neon = true
+    end
+
+    createPet(petId, properties)
+    selectedLabel.Text = "Pet Spawned: " .. name .. " (" .. rarity .. ")"
+end)
+
+-- Minimize / Expand logic
+local fullSize = UDim2.new(0, 350, 0, 270)
+local minimizedSize = UDim2.new(0, 350, 0, 40)
+local savedVisibility = {}
+
+local function hideAllContent()
+    savedVisibility = {}
+    for _, obj in ipairs(frame:GetDescendants()) do
+        if obj:IsA("GuiObject") and obj ~= top and not obj:IsDescendantOf(top) then
+            savedVisibility[obj] = obj.Visible
+            obj.Visible = false
+        end
+    end
+end
+
+local function restoreAllContent()
+    for obj, state in pairs(savedVisibility) do
+        if obj and obj.Parent then
+            obj.Visible = state
+        end
+    end
+    savedVisibility = {}
+end
+
+minimize.MouseButton1Click:Connect(function()
+    TweenService:Create(frame, TweenInfo.new(0.3), {Size = minimizedSize}):Play()
+    minimize.Visible = false
+    expand.Visible = true
+    hideAllContent()
+end)
+
+expand.MouseButton1Click:Connect(function()
+    TweenService:Create(frame, TweenInfo.new(0.3), {Size = fullSize}):Play()
+    minimize.Visible = true
+    expand.Visible = false
+    restoreAllContent()
+end)
