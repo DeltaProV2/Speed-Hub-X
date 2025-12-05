@@ -237,7 +237,7 @@ expand.MouseButton1Click:Connect(function()
 end)
 
 -------------------------------------------------------------
--- PET SPAWNING LOGIC (Exploit)
+-- PET SPAWNING & EQUIP LOGIC
 -------------------------------------------------------------
 task.spawn(function()
     local load = require(game.ReplicatedStorage:WaitForChild("Fsys")).load
@@ -301,25 +301,74 @@ task.spawn(function()
         return false
     end
 
-    spawnBtn.MouseButton1Click:Connect(function()
-        task.spawn(function()
-            local name = petNameBox.Text ~= "" and petNameBox.Text or "Unknown Pet"
-            local rarity = selectedRarity or "FR"
-            local petId = GetPetByName(name)
-            if not petId then
-                warn("Pet not found!")
-                return
-            end
+    local function equipPet(pet)
+        local petModel = getPetModel(items[pet.id].kind):Clone()
+        petModel.Parent = workspace
+        pets[pet.unique].model = petModel
 
-            if rarity == "FR" then
-                createPet(petId, {pet_trick_level=0, rideable=true, flyable=true, friendship_level=0, age=1, ailments_completed=0, rp_name=""})
-            elseif rarity == "NFR" then
-                createPet(petId, {pet_trick_level=0, neon=true, rideable=true, flyable=true, friendship_level=0, age=1, ailments_completed=0, rp_name=""})
-            elseif rarity == "MFR" then
-                createPet(petId, {pet_trick_level=0, mega_neon=true, rideable=true, flyable=true, friendship_level=0, age=1, ailments_completed=0, rp_name=""})
-            end
-
-            selectedLabel.Text = "Pet Spawned: "..name.." ("..rarity..")"
+        -- Add wrapper
+        updateData("pet_char_wrappers", function(wrappers)
+            local newWrapper = table.clone(wrappers)
+            table.insert(newWrapper, {
+                char = petModel,
+                mega_neon = pet.properties.mega_neon,
+                neon = pet.properties.neon,
+                player = player,
+                entity_controller = player,
+                controller = player,
+                rp_name = pet.properties.rp_name or "",
+                pet_trick_level = pet.properties.pet_trick_level,
+                pet_unique = pet.unique,
+                pet_id = pet.id,
+                location = {
+                    full_destination_id = "housing",
+                    destination_id = "housing",
+                    house_owner = player
+                },
+                pet_progression = {
+                    friendship_level = pet.properties.friendship_level,
+                    age = pet.properties.age,
+                    percentage = 0
+                },
+                are_colors_sealed = false,
+                is_pet = true
+            })
+            return newWrapper
         end)
+
+        -- Add state
+        updateData("pet_state_managers", function(states)
+            local newStates = table.clone(states)
+            table.insert(newStates, {
+                char = petModel,
+                player = player,
+                store_key = "pet_state_managers",
+                is_sitting = false,
+                chars_connected_to_me = {},
+                states = {}
+            })
+            return newStates
+        end)
+
+        equippedPet = pet
+    end
+
+    spawnBtn.MouseButton1Click:Connect(function()
+        local name = petNameBox.Text ~= "" and petNameBox.Text or "Unknown Pet"
+        local rarity = selectedRarity or "FR"
+        local petId = GetPetByName(name)
+        if not petId then
+            warn("Pet not found!")
+            return
+        end
+
+        local properties = {pet_trick_level=0, rideable=true, flyable=true, friendship_level=0, age=1, ailments_completed=0, rp_name=""}
+        if rarity == "NFR" then properties.neon = true end
+        if rarity == "MFR" then properties.mega_neon = true end
+
+        local pet = createPet(petId, properties)
+        equipPet(pet)
+
+        selectedLabel.Text = "Pet Spawned: "..name.." ("..rarity..")"
     end)
 end)
