@@ -480,67 +480,81 @@ task.spawn(
 
 		--// LocalScript: Pet Spawner GUI
 
+		-- FUNCTIONS YOU MUST HAVE SOMEWHERE:
+		-- createPet(petId, data)
+		-- GetPetByName(petName)
+
+		----------------------------------------------------------
+		-- GUI CREATION
+		----------------------------------------------------------
+
+		--// SERVICES
+		local Players = game:GetService("Players")
+		local UIS = game:GetService("UserInputService")
+		local player = Players.LocalPlayer
+
 		--// GUI CREATION
-		local gui = Instance.new("ScreenGui")
-		gui.Name = "PetSpawnerUI"
-		gui.ResetOnSpawn = false
-		gui.IgnoreGuiInset = true
-		gui.Parent = player:WaitForChild("PlayerGui")
+		local ScreenGui = Instance.new("ScreenGui")
+		ScreenGui.Name = "PetSpawnerGUI"
+		ScreenGui.Parent = player:WaitForChild("PlayerGui")
+		ScreenGui.ResetOnSpawn = false
 
-		local frame = Instance.new("Frame")
-		frame.Size = UDim2.new(0, 350, 0, 270)
-		frame.Position = UDim2.new(0.5, -175, 0.25, 0)
-		frame.Active = true
-		frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-		frame.BorderSizePixel = 0
-		frame.ClipsDescendants = false
-		frame.Parent = gui
-		Instance.new("UICorner", frame)
+		local Frame = Instance.new("Frame")
+		Frame.Size = UDim2.new(0, 380, 0, 250)
+		Frame.Position = UDim2.new(0.5, -190, 0.5, -125)
+		Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+		Frame.BorderSizePixel = 0
+		Frame.Parent = ScreenGui
+		Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 12)
+		local UIStroke = Instance.new("UIStroke", Frame)
+		UIStroke.Color = Color3.fromRGB(0, 255, 0)
+		UIStroke.Thickness = 3
 
-		-- Top Bar
-		local top = Instance.new("Frame")
-		top.Size = UDim2.new(1, 0, 0, 40)
-		top.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-		top.Parent = frame
-		Instance.new("UICorner", top)
+		--// HEADER (DRAG & MINIMIZE)
+		local Header = Instance.new("Frame")
+		Header.Size = UDim2.new(1, 0, 0, 40)
+		Header.BackgroundTransparency = 1
+		Header.Parent = Frame
 
-		local title = Instance.new("TextLabel")
-		title.Size = UDim2.new(1, -140, 1, 0)
-		title.Position = UDim2.new(0, 10, 0, 0)
-		title.BackgroundTransparency = 1
-		title.Font = Enum.Font.GothamBold
-		title.TextScaled = true
-		title.TextColor3 = Color3.fromRGB(255, 255, 255)
-		title.Text = "Pet Spawner By Shxdrag"
-		title.Parent = top
+		local Title = Instance.new("TextLabel")
+		Title.Size = UDim2.new(1, 0, 1, 0)
+		Title.BackgroundTransparency = 1
+		Title.Text = "Pet Spawner By Shxdrag"
+		Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Title.Font = Enum.Font.GothamBold
+		Title.TextScaled = true
+		Title.Parent = Header
 
-		-- Dragging
-		local dragging = false
-		local dragStart, startPos
-		local function updateDrag(input)
-			local delta = input.Position - dragStart
-			frame.Position = UDim2.new(
-				startPos.X.Scale, startPos.X.Offset + delta.X,
-				startPos.Y.Scale, startPos.Y.Offset + delta.Y
-			)
-		end
+		--// MINIMIZE BUTTON
+		local MinBtn = Instance.new("TextButton")
+		MinBtn.Size = UDim2.new(0, 30, 0, 30)
+		MinBtn.Position = UDim2.new(1, -35, 0, 5) -- top-right corner
+		MinBtn.Text = "_"
+		MinBtn.Font = Enum.Font.GothamBold
+		MinBtn.TextScaled = true
+		MinBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+		MinBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		MinBtn.Parent = Header
+		Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 4)
 
-		local moveBtn = Instance.new("TextButton")
-		moveBtn.Size = UDim2.new(0, 30, 0, 30)
-		moveBtn.Position = UDim2.new(1, -80, 0, 5)
-		moveBtn.Text = "↕"
-		moveBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-		moveBtn.TextScaled = true
-		moveBtn.Font = Enum.Font.GothamBold
-		moveBtn.TextColor3 = Color3.new(1,1,1)
-		moveBtn.Parent = top
-		Instance.new("UICorner", moveBtn)
+		local minimized = false
+		MinBtn.MouseButton1Click:Connect(function()
+			minimized = not minimized
+			for _, child in pairs(Frame:GetChildren()) do
+				if child ~= Header then
+					child.Visible = not minimized
+				end
+			end
+		end)
 
-		moveBtn.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		--// DRAG LOGIC
+		local dragging, dragInput, dragStart, startPos
+
+		Header.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 then
 				dragging = true
 				dragStart = input.Position
-				startPos = frame.Position
+				startPos = Frame.Position
 				input.Changed:Connect(function()
 					if input.UserInputState == Enum.UserInputState.End then
 						dragging = false
@@ -549,29 +563,38 @@ task.spawn(
 			end
 		end)
 
-		UserInputService.InputChanged:Connect(function(input)
-			if dragging then
-				if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-					updateDrag(input)
-				end
+		Header.InputChanged:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseMovement then
+				dragInput = input
 			end
 		end)
 
-		-- Pet Name Input
-		local petName = Instance.new("TextBox")
-		petName.Size = UDim2.new(1, -20, 0, 40)
-		petName.Position = UDim2.new(0, 10, 0, 60)
-		petName.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-		petName.BorderSizePixel = 0
-		petName.Font = Enum.Font.GothamBold
-		petName.TextScaled = true
-		petName.TextColor3 = Color3.fromRGB(255, 255, 255)
-		petName.PlaceholderText = "Enter Pet Name"
-		petName.ClearTextOnFocus = false
-		petName.Parent = frame
-		Instance.new("UICorner", petName)
+		UIS.InputChanged:Connect(function(input)
+			if input == dragInput and dragging then
+				local delta = input.Position - dragStart
+				Frame.Position = UDim2.new(
+					startPos.X.Scale,
+					startPos.X.Offset + delta.X,
+					startPos.Y.Scale,
+					startPos.Y.Offset + delta.Y
+				)
+			end
+		end)
 
-		-- Type Buttons
+		--// PET NAME INPUT
+		local PetBox = Instance.new("TextBox")
+		PetBox.Size = UDim2.new(0.9, 0, 0, 40)
+		PetBox.Position = UDim2.new(0.05, 0, 0, 60)
+		PetBox.PlaceholderText = "Enter Pet Name"
+		PetBox.Text = ""
+		PetBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+		PetBox.Font = Enum.Font.Gotham
+		PetBox.TextScaled = true
+		PetBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+		PetBox.Parent = Frame
+		Instance.new("UICorner", PetBox).CornerRadius = UDim.new(0, 8)
+
+		--// TYPE BUTTONS
 		local selectedType = "FR"
 		local function makeTypeButton(txt, color, xPos)
 			local btn = Instance.new("TextButton")
@@ -582,40 +605,42 @@ task.spawn(
 			btn.Font = Enum.Font.GothamBold
 			btn.BackgroundColor3 = color
 			btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-			btn.Parent = frame
-			Instance.new("UICorner", btn)
+			btn.Parent = Frame
+			Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
 			btn.MouseButton1Click:Connect(function()
 				selectedType = txt
-				print("Selected Type:", txt)
+				print("Selected:", txt)
 			end)
+			return btn
 		end
 
-		makeTypeButton("MFR", Color3.fromRGB(255, 100, 100), 20)
-		makeTypeButton("NFR", Color3.fromRGB(100, 255, 100), 145)
-		makeTypeButton("FR", Color3.fromRGB(100, 100, 255), 270)
+		local MFR = makeTypeButton("MFR", Color3.fromRGB(255, 100, 100), 20)
+		local NFR = makeTypeButton("NFR", Color3.fromRGB(100, 255, 100), 145)
+		local FR  = makeTypeButton("FR",  Color3.fromRGB(120, 120, 255), 270)
 
-		-- Spawn Button
-		local spawnBtn = Instance.new("TextButton")
-		spawnBtn.Size = UDim2.new(1, -20, 0, 45)
-		spawnBtn.Position = UDim2.new(0, 10, 0, 170)
-		spawnBtn.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
-		spawnBtn.BorderSizePixel = 0
-		spawnBtn.Font = Enum.Font.GothamBold
-		spawnBtn.TextScaled = true
-		spawnBtn.TextColor3 = Color3.fromRGB(255,255,255)
-		spawnBtn.Text = "Spawn Pet"
-		spawnBtn.Parent = frame
-		Instance.new("UICorner", spawnBtn)
+		--// SPAWN BUTTON
+		local SpawnBtn = Instance.new("TextButton")
+		SpawnBtn.Size = UDim2.new(0.9, 0, 0, 45)
+		SpawnBtn.Position = UDim2.new(0.05, 0, 0, 170)
+		SpawnBtn.Text = "Spawn Pet"
+		SpawnBtn.Font = Enum.Font.GothamBold
+		SpawnBtn.TextScaled = true
+		SpawnBtn.BackgroundColor3 = Color3.fromRGB(50, 100, 255)
+		SpawnBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		SpawnBtn.Parent = Frame
+		Instance.new("UICorner", SpawnBtn).CornerRadius = UDim.new(0, 8)
 
-		local selectedLabel = Instance.new("TextLabel")
-		selectedLabel.Size = UDim2.new(1, -20, 0, 30)
-		selectedLabel.Position = UDim2.new(0, 10, 0, 225)
-		selectedLabel.BackgroundTransparency = 1
-		selectedLabel.Font = Enum.Font.GothamSemibold
-		selectedLabel.TextScaled = true
-		selectedLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-		selectedLabel.Text = "Selected: None"
-		selectedLabel.Parent = frame
+		--// SPAWN CONFIRMATION LABEL
+		local ConfirmLabel = Instance.new("TextLabel")
+		ConfirmLabel.Size = UDim2.new(0.9, 0, 0, 30)
+		ConfirmLabel.Position = UDim2.new(0.05, 0, 0, 225)
+		ConfirmLabel.BackgroundTransparency = 1
+		ConfirmLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+		ConfirmLabel.Font = Enum.Font.GothamBold
+		ConfirmLabel.TextScaled = true
+		ConfirmLabel.Text = ""
+		ConfirmLabel.Parent = Frame
 
 		----------------------------------------------------------
 
