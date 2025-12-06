@@ -478,19 +478,18 @@ task.spawn(
 			return false
 		end
 
-		-- Full, robust LocalScript: draggable header/title + minimize/expand + content
+		--// LocalScript: Pet Spawner GUI
+
 		local Players = game:GetService("Players")
-		local RunService = game:GetService("RunService")
 		local UIS = game:GetService("UserInputService")
 		local player = Players.LocalPlayer
 
-		-- GUI root
+		-- GUI
 		local ScreenGui = Instance.new("ScreenGui")
 		ScreenGui.Name = "PetSpawnerGUI"
 		ScreenGui.Parent = player:WaitForChild("PlayerGui")
 		ScreenGui.ResetOnSpawn = false
 
-		-- Main frame
 		local Frame = Instance.new("Frame")
 		Frame.Size = UDim2.new(0, 380, 0, 250)
 		Frame.Position = UDim2.new(0.5, -190, 0.5, -125)
@@ -499,11 +498,10 @@ task.spawn(
 		Frame.Parent = ScreenGui
 		Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 12)
 
-		-- Header + title
+		-- HEADER
 		local Header = Instance.new("Frame")
 		Header.Size = UDim2.new(1, 0, 0, 40)
 		Header.BackgroundTransparency = 1
-		Header.Active = true
 		Header.Parent = Frame
 
 		local Title = Instance.new("TextLabel")
@@ -514,10 +512,8 @@ task.spawn(
 		Title.Font = Enum.Font.GothamBold
 		Title.TextScaled = true
 		Title.Parent = Header
-		-- let pointer events pass through the label so Header receives them
-		Title.InputTransparent = true
 
-		-- Minimize / Expand buttons
+		-- MINIMIZE / EXPAND BUTTONS
 		local MinBtn = Instance.new("TextButton")
 		MinBtn.Size = UDim2.new(0, 30, 0, 30)
 		MinBtn.Position = UDim2.new(1, -70, 0, 5)
@@ -541,7 +537,72 @@ task.spawn(
 		ExpandBtn.Parent = Header
 		Instance.new("UICorner", ExpandBtn).CornerRadius = UDim.new(0, 4)
 
-		-- CONTENT (PetBox, rarity buttons, spawn, label)
+		-- DRAG LOGIC (HEADER or TITLE)
+		local dragging = false
+		local dragInput, dragStart, startPos
+
+		local function update(input)
+			if not dragging then return end
+			local delta = input.Position - dragStart
+			Frame.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X.Offset + delta.X,
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
+		end
+
+		-- Connect both Header and Title to drag
+		for _, dragObj in pairs({Header, Title}) do
+			dragObj.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+					dragging = true
+					dragStart = input.Position
+					startPos = Frame.Position
+					input.Changed:Connect(function()
+						if input.UserInputState == Enum.UserInputState.End then
+							dragging = false
+						end
+					end)
+				end
+			end)
+
+			dragObj.InputChanged:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+					dragInput = input
+				end
+			end)
+		end
+
+		UIS.InputChanged:Connect(function(input)
+			if input == dragInput and dragging then
+				update(input)
+			end
+		end)
+
+		-- MINIMIZE / EXPAND LOGIC
+		local function toggleContent(visible)
+			for _, obj in pairs(Frame:GetChildren()) do
+				if obj ~= Header and obj ~= MinBtn and obj ~= ExpandBtn then
+					obj.Visible = visible
+				end
+			end
+		end
+
+		MinBtn.MouseButton1Click:Connect(function()
+			toggleContent(false)
+			MinBtn.Visible = false
+			ExpandBtn.Visible = true
+		end)
+
+		ExpandBtn.MouseButton1Click:Connect(function()
+			toggleContent(true)
+			MinBtn.Visible = true
+			ExpandBtn.Visible = false
+		end)
+
+
+		--// PET NAME INPUT
 		local PetBox = Instance.new("TextBox")
 		PetBox.Size = UDim2.new(0.9, 0, 0, 40)
 		PetBox.Position = UDim2.new(0.05, 0, 0, 60)
@@ -554,27 +615,22 @@ task.spawn(
 		PetBox.Parent = Frame
 		Instance.new("UICorner", PetBox).CornerRadius = UDim.new(0, 8)
 
+		--// TYPE BUTTONS
 		local selectedType = "FR"
 		local function makeTypeButton(txt, color, xPos)
 			local btn = Instance.new("TextButton")
 			btn.Size = UDim2.new(0, 90, 0, 40)
 			btn.Position = UDim2.new(0, xPos, 0, 115)
 			btn.Text = txt
-			btn.Font = Enum.Font.GothamBold
 			btn.TextScaled = true
+			btn.Font = Enum.Font.GothamBold
 			btn.BackgroundColor3 = color
 			btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 			btn.Parent = Frame
 			Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
 			btn.MouseButton1Click:Connect(function()
 				selectedType = txt
-				-- visual feedback
-				for _, child in pairs(Frame:GetChildren()) do
-					if child:IsA("TextButton") and (child.Text == "MFR" or child.Text == "NFR" or child.Text == "FR") then
-						child.BackgroundColor3 = Color3.fromRGB(60,60,60)
-					end
-				end
-				btn.BackgroundColor3 = color -- keep selected color
 				print("Selected:", txt)
 			end)
 			return btn
@@ -584,6 +640,7 @@ task.spawn(
 		local NFR = makeTypeButton("NFR", Color3.fromRGB(100, 255, 100), 145)
 		local FR  = makeTypeButton("FR",  Color3.fromRGB(120, 120, 255), 270)
 
+		--// SPAWN BUTTON
 		local SpawnBtn = Instance.new("TextButton")
 		SpawnBtn.Size = UDim2.new(0.9, 0, 0, 45)
 		SpawnBtn.Position = UDim2.new(0.05, 0, 0, 170)
@@ -595,6 +652,7 @@ task.spawn(
 		SpawnBtn.Parent = Frame
 		Instance.new("UICorner", SpawnBtn).CornerRadius = UDim.new(0, 8)
 
+		--// SPAWN CONFIRMATION LABEL
 		local ConfirmLabel = Instance.new("TextLabel")
 		ConfirmLabel.Size = UDim2.new(0.9, 0, 0, 30)
 		ConfirmLabel.Position = UDim2.new(0.05, 0, 0, 225)
@@ -604,125 +662,6 @@ task.spawn(
 		ConfirmLabel.TextScaled = true
 		ConfirmLabel.Text = ""
 		ConfirmLabel.Parent = Frame
-
-		-- MINIMIZE/EXPAND: robust saved visibility
-		local savedVisibility = {}
-		local function hideContent()
-			savedVisibility = {}
-			for _, obj in ipairs(Frame:GetChildren()) do
-				if obj ~= Header and obj ~= MinBtn and obj ~= ExpandBtn then
-					savedVisibility[obj] = obj.Visible
-					obj.Visible = false
-				end
-			end
-		end
-		local function restoreContent()
-			for obj, wasVisible in pairs(savedVisibility) do
-				if obj and obj.Parent then
-					obj.Visible = wasVisible
-				end
-			end
-			savedVisibility = {}
-		end
-
-		MinBtn.MouseButton1Click:Connect(function()
-			hideContent()
-			MinBtn.Visible = false
-			ExpandBtn.Visible = true
-		end)
-		ExpandBtn.MouseButton1Click:Connect(function()
-			restoreContent()
-			MinBtn.Visible = true
-			ExpandBtn.Visible = false
-		end)
-
-		-- ========= Robust dragging using RenderStepped =========
-		-- idea: use AbsolutePosition so we can set UDim2 offset directly (works across platforms)
-		local dragging = false
-		local dragStartPos = nil        -- Vector2 pointer pos at drag start
-		local frameStartAbs = nil       -- Vector2 frame.AbsolutePosition at drag start
-		local dragConnection = nil
-
-		local function isInteractionGuiObject(obj)
-			-- return true if obj is a button / textbox etc — we should NOT start dragging when clicking these
-			if not obj then return false end
-			return obj:IsA("TextBox") or obj:IsA("TextButton") or obj:IsA("ImageButton") or obj:IsA("GuiButton")
-		end
-
-		local function beginDrag(input)
-			-- prevent drag if user clicked a control inside header (like MinBtn/ExpandBtn) or clicked textbox
-			if input.Target and isInteractionGuiObject(input.Target) then
-				return
-			end
-			if input.UserInputType ~= Enum.UserInputType.MouseButton1 and input.UserInputType ~= Enum.UserInputType.Touch then
-				return
-			end
-
-			dragging = true
-			dragStartPos = (input.Position or UIS:GetMouseLocation())
-			frameStartAbs = Frame.AbsolutePosition
-
-			-- connect RenderStepped to move frame every frame while dragging
-			dragConnection = RunService.RenderStepped:Connect(function()
-				if not dragging or not dragStartPos or not frameStartAbs then return end
-				local current = UIS:GetMouseLocation()
-				local delta = current - dragStartPos
-				local newAbs = frameStartAbs + delta
-				-- clamp: keep inside screen (optional)
-				-- set frame position using offset-only UDim2 to avoid messing with scale
-				Frame.Position = UDim2.new(0, math.floor(newAbs.X), 0, math.floor(newAbs.Y))
-			end)
-
-			-- stop dragging when input ends
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-					if dragConnection then
-						dragConnection:Disconnect()
-						dragConnection = nil
-					end
-					dragStartPos = nil
-					frameStartAbs = nil
-				end
-			end)
-		end
-
-		-- connect both header and title (title is transparent to input so header gets it, but connect both for safety)
-		Header.InputBegan:Connect(beginDrag)
-		Title.InputBegan:Connect(beginDrag)
-
-		-- fallback: also allow dragging if pointer moves on header (some platforms)
-		Header.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-				-- set dragStartPos if dragging started elsewhere
-				if dragging and not dragStartPos then
-					dragStartPos = UIS:GetMouseLocation()
-					frameStartAbs = Frame.AbsolutePosition
-				end
-			end
-		end)
-
-		-- Spawn button behavior (example: show confirm label and change color)
-		SpawnBtn.MouseButton1Click:Connect(function()
-			local name = (PetBox.Text ~= "" and PetBox.Text) or "Unknown Pet"
-			local rarity = selectedType or "None"
-
-			-- visual feedback: set SpawnBtn green briefly
-			SpawnBtn.BackgroundColor3 = Color3.fromRGB(0,200,0)
-			ConfirmLabel.Text = "Pet Spawned: " .. name .. " (" .. rarity .. ")"
-
-			-- reset button color after 0.35s
-			delay(0.35, function()
-				if SpawnBtn and SpawnBtn.Parent then
-					SpawnBtn.BackgroundColor3 = Color3.fromRGB(50, 100, 255)
-				end
-			end)
-
-			-- Here you would call createPet/GetPetByName if available
-			-- local petId = GetPetByName(name)
-			-- if petId then createPet(petId, properties) end
-		end)
-
 		----------------------------------------------------------
 
 		SpawnBtn.MouseButton1Click:Connect(function()
