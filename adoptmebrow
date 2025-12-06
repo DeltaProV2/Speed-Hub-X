@@ -501,9 +501,17 @@ task.spawn(
 		-- Neon Outline
 		local outline = Instance.new("UIStroke")
 		outline.Thickness = 3
-		outline.Color = Color3.fromRGB(0, 255, 255) -- neon cyan color
 		outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		outline.Parent = Frame
+
+		-- Rainbow neon effect
+		local RunService = game:GetService("RunService")
+		local hue = 0
+		RunService.RenderStepped:Connect(function(deltaTime)
+			hue = (hue + deltaTime * 0.2) % 1
+			outline.Color = Color3.fromHSV(hue, 1, 1)
+		end)
+
 
 		-- HEADER
 		local Header = Instance.new("Frame")
@@ -514,7 +522,7 @@ task.spawn(
 		local Title = Instance.new("TextLabel")
 		Title.Size = UDim2.new(1, 0, 1, 0)
 		Title.BackgroundTransparency = 1
-		Title.Text = "Pet Spawner By tite"
+		Title.Text = "ROYAL SPAWNER⭐"
 		Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		Title.Font = Enum.Font.GothamBold
 		Title.TextScaled = true
