@@ -647,38 +647,36 @@ task.spawn(
 				return
 			end
 
+			-- Shared base data
+			local baseData = {
+				pet_trick_level = 0,
+				rideable = true,
+				flyable = true,
+				friendship_level = 0,
+				age = 1,
+				rp_name = "",
+				ailments_completed = 0, -- ⭐ FIXED / ADDED
+			}
+
 			if selectedType == "FR" then
-				createPet(petId, {
-					pet_trick_level = 0,
-					rideable = true,
-					flyable = true,
-					friendship_level = 0,
-					age = 1,
-					rp_name = ""
-				})
+
+				createPet(petId, baseData)
+
 			elseif selectedType == "NFR" then
-				createPet(petId, {
-					pet_trick_level = 0,
-					neon = true,
-					rideable = true,
-					flyable = true,
-					friendship_level = 0,
-					age = 1,
-					rp_name = ""
-				})
+
+				local data = baseData
+				data.neon = true
+				createPet(petId, data)
+
 			elseif selectedType == "MFR" then
-				createPet(petId, {
-					pet_trick_level = 0,
-					mega_neon = true,
-					rideable = true,
-					flyable = true,
-					friendship_level = 0,
-					age = 1,
-					rp_name = ""
-				})
+
+				local data = baseData
+				data.mega_neon = true
+				createPet(petId, data)
+
 			end
 
 			print("Spawning:", petName, selectedType)
 		end)
-    end
+	end	
 )
