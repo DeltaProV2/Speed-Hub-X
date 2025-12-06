@@ -493,10 +493,17 @@ task.spawn(
 		local Frame = Instance.new("Frame")
 		Frame.Size = UDim2.new(0, 380, 0, 250)
 		Frame.Position = UDim2.new(0.5, -190, 0.5, -125)
-		Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+		Frame.BackgroundColor3 = Color3.fromRGB(255, 182, 193) -- light pink
 		Frame.BorderSizePixel = 0
 		Frame.Parent = ScreenGui
 		Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 12)
+		
+		-- Neon Outline
+		local outline = Instance.new("UIStroke")
+		outline.Thickness = 3
+		outline.Color = Color3.fromRGB(0, 255, 255) -- neon cyan color
+		outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		outline.Parent = Frame
 
 		-- HEADER
 		local Header = Instance.new("Frame")
