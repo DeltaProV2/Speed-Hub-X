@@ -480,7 +480,6 @@ task.spawn(
 
 		--// LocalScript: Pet Spawner GUI
 
-		-- FUNCTIONS YOU MUST HAVE SOMEWHERE:
 		local Players = game:GetService("Players")
 		local UIS = game:GetService("UserInputService")
 		local player = Players.LocalPlayer
@@ -553,38 +552,30 @@ task.spawn(
 			)
 		end
 
-		-- When mouse button or touch begins on header
 		Header.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1
-				or input.UserInputType == Enum.UserInputType.Touch then
-				dragging = true           -- << THIS MUST BE TRUE
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = true
 				dragStart = input.Position
 				startPos = Frame.Position
 				input.Changed:Connect(function()
 					if input.UserInputState == Enum.UserInputState.End then
-						dragging = false  -- << AND THIS MUST BE FALSE when released
+						dragging = false
 					end
 				end)
 			end
 		end)
 
-		-- Track mouse movement
 		Header.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement
-				or input.UserInputType == Enum.UserInputType.Touch then
+			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 				dragInput = input
 			end
 		end)
 
-		-- Update position whenever input moves
 		UIS.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
 				update(input)
 			end
 		end)
-
-
-		
 
 		-- MINIMIZE / EXPAND LOGIC
 		local function toggleContent(visible)
@@ -606,7 +597,6 @@ task.spawn(
 			MinBtn.Visible = true
 			ExpandBtn.Visible = false
 		end)
-
 
 		--// PET NAME INPUT
 		local PetBox = Instance.new("TextBox")
