@@ -562,7 +562,7 @@ task.spawn(
 			Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
 			btn.MouseButton1Click:Connect(function()
 				selectedType = txt
-				SelectedLabel.Text = "Selected: " .. selectedType
+				print("Selected:", txt)
 			end)
 			return btn
 		end
@@ -582,17 +582,6 @@ task.spawn(
 		SpawnBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 		SpawnBtn.Parent = Frame
 		Instance.new("UICorner", SpawnBtn).CornerRadius = UDim.new(0, 8)
-		
-		-- SELECTED TYPE DISPLAY
-		local SelectedLabel = Instance.new("TextLabel")
-		SelectedLabel.Size = UDim2.new(0.9, 0, 0, 25)
-		SelectedLabel.Position = UDim2.new(0.05, 0, 0, 215)
-		SelectedLabel.BackgroundTransparency = 1
-		SelectedLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-		SelectedLabel.Font = Enum.Font.GothamBold
-		SelectedLabel.TextScaled = true
-		SelectedLabel.Text = "Selected: " .. selectedType
-		SelectedLabel.Parent = Frame
 
 		-- CONFIRMATION LABEL
 		local ConfirmLabel = Instance.new("TextLabel")
@@ -707,9 +696,6 @@ task.spawn(
 				createPet(petId, data)
 
 			end
-			
-			ConfirmLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-			ConfirmLabel.Text = "Pet Spawned: " .. petName .. " (" .. selectedType .. ")"
 
 			print("Spawning:", petName, selectedType)
 		end)
