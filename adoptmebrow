@@ -537,13 +537,7 @@ task.spawn(
 		ExpandBtn.Parent = Header
 		Instance.new("UICorner", ExpandBtn).CornerRadius = UDim.new(0, 4)
 
-		-- DRAG LOGIC
-		-- HEADER
-		Header.Active = true       -- THIS IS IMPORTANT
-
-		Title.InputTransparent = true  -- clicks go through the label
-
-		-- DRAG LOGIC
+		-- DRAG LOGIC (HEADER or TITLE)
 		local dragging = false
 		local dragInput, dragStart, startPos
 
@@ -558,33 +552,27 @@ task.spawn(
 			)
 		end
 
-		Header.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or
-				input.UserInputType == Enum.UserInputType.Touch then
-				dragging = true
-				dragStart = input.Position
-				startPos = Frame.Position
-				input.Changed:Connect(function()
-					if input.UserInputState == Enum.UserInputState.End then
-						dragging = false
-					end
-				end)
-			end
-		end)
+		-- Connect both Header and Title to drag
+		for _, dragObj in pairs({Header, Title}) do
+			dragObj.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+					dragging = true
+					dragStart = input.Position
+					startPos = Frame.Position
+					input.Changed:Connect(function()
+						if input.UserInputState == Enum.UserInputState.End then
+							dragging = false
+						end
+					end)
+				end
+			end)
 
-		Header.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement or
-				input.UserInputType == Enum.UserInputType.Touch then
-				dragInput = input
-			end
-		end)
-
-		game:GetService("UserInputService").InputChanged:Connect(function(input)
-			if input == dragInput and dragging then
-				update(input)
-			end
-		end)
-
+			dragObj.InputChanged:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+					dragInput = input
+				end
+			end)
+		end
 
 		UIS.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
@@ -612,6 +600,7 @@ task.spawn(
 			MinBtn.Visible = true
 			ExpandBtn.Visible = false
 		end)
+
 
 		--// PET NAME INPUT
 		local PetBox = Instance.new("TextBox")
