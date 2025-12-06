@@ -478,7 +478,7 @@ task.spawn(
 			return false
 		end
 
-		--// LocalScript: Pet Spawner GUI
+		--// LocalScript: Pet Spawner GUI TITE
 
 		local Players = game:GetService("Players")
 		local UIS = game:GetService("UserInputService")
