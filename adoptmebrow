@@ -578,26 +578,40 @@ task.spawn(
 			end
 		end)
 
-		-- MINIMIZE / EXPAND LOGIC
-		local function toggleContent(visible)
+		-- MINIMIZE / EXPAND LOGIC (robust)
+		local savedVisibility = {}
+
+		local function hideContent()
+			savedVisibility = {}
 			for _, obj in pairs(Frame:GetChildren()) do
 				if obj ~= Header and obj ~= MinBtn and obj ~= ExpandBtn then
-					obj.Visible = visible
+					savedVisibility[obj] = obj.Visible
+					obj.Visible = false
 				end
 			end
 		end
 
+		local function restoreContent()
+			for obj, wasVisible in pairs(savedVisibility) do
+				if obj and obj.Parent then
+					obj.Visible = wasVisible
+				end
+			end
+			savedVisibility = {}
+		end
+
 		MinBtn.MouseButton1Click:Connect(function()
-			toggleContent(false)
+			hideContent()
 			MinBtn.Visible = false
 			ExpandBtn.Visible = true
 		end)
 
 		ExpandBtn.MouseButton1Click:Connect(function()
-			toggleContent(true)
+			restoreContent()
 			MinBtn.Visible = true
 			ExpandBtn.Visible = false
 		end)
+
 
 
 
