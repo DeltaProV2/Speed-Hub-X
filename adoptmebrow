@@ -480,6 +480,7 @@ task.spawn(
 
 		--// LocalScript: Pet Spawner GUI
 
+		-- FUNCTIONS YOU MUST HAVE SOMEWHERE:
 		local Players = game:GetService("Players")
 		local UIS = game:GetService("UserInputService")
 		local player = Players.LocalPlayer
@@ -502,6 +503,7 @@ task.spawn(
 		local Header = Instance.new("Frame")
 		Header.Size = UDim2.new(1, 0, 0, 40)
 		Header.BackgroundTransparency = 1
+		Header.Active = true
 		Header.Parent = Frame
 
 		local Title = Instance.new("TextLabel")
@@ -513,7 +515,7 @@ task.spawn(
 		Title.TextScaled = true
 		Title.Parent = Header
 
-		-- MINIMIZE / EXPAND BUTTONS
+		-- MINIMIZE / EXPAND
 		local MinBtn = Instance.new("TextButton")
 		MinBtn.Size = UDim2.new(0, 30, 0, 30)
 		MinBtn.Position = UDim2.new(1, -70, 0, 5)
@@ -537,37 +539,30 @@ task.spawn(
 		ExpandBtn.Parent = Header
 		Instance.new("UICorner", ExpandBtn).CornerRadius = UDim.new(0, 4)
 
-		-- DRAG LOGIC (HEADER or TITLE)
+		-- DRAGGING
 		local dragging = false
 		local dragInput, dragStart, startPos
 
-		local function update(input)
-			if not dragging then return end
-			local delta = input.Position - dragStart
-			Frame.Position = UDim2.new(
-				startPos.X.Scale,
-				startPos.X.Offset + delta.X,
-				startPos.Y.Scale,
-				startPos.Y.Offset + delta.Y
-			)
+		local function startDrag(input)
+			dragging = true
+			dragStart = input.Position
+			startPos = Frame.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
 		end
 
-		-- Connect both Header and Title to drag
-		for _, dragObj in pairs({Header, Title}) do
-			dragObj.InputBegan:Connect(function(input)
+		-- Connect both Header and Title for dragging
+		for _, obj in pairs({Header, Title}) do
+			obj.InputBegan:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-					dragging = true
-					dragStart = input.Position
-					startPos = Frame.Position
-					input.Changed:Connect(function()
-						if input.UserInputState == Enum.UserInputState.End then
-							dragging = false
-						end
-					end)
+					startDrag(input)
 				end
 			end)
 
-			dragObj.InputChanged:Connect(function(input)
+			obj.InputChanged:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 					dragInput = input
 				end
@@ -576,13 +571,20 @@ task.spawn(
 
 		UIS.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
-				update(input)
+				local delta = input.Position - dragStart
+				Frame.Position = UDim2.new(
+					startPos.X.Scale,
+					startPos.X.Offset + delta.X,
+					startPos.Y.Scale,
+					startPos.Y.Offset + delta.Y
+				)
 			end
 		end)
 
 		-- MINIMIZE / EXPAND LOGIC
 		local function toggleContent(visible)
 			for _, obj in pairs(Frame:GetChildren()) do
+				-- Keep Header + buttons visible
 				if obj ~= Header and obj ~= MinBtn and obj ~= ExpandBtn then
 					obj.Visible = visible
 				end
@@ -600,7 +602,6 @@ task.spawn(
 			MinBtn.Visible = true
 			ExpandBtn.Visible = false
 		end)
-
 
 		--// PET NAME INPUT
 		local PetBox = Instance.new("TextBox")
