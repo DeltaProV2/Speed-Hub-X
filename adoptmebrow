@@ -478,7 +478,7 @@ task.spawn(
 			return false
 		end
 
-		--// LocalScript: Pet Spawner GUI TITE
+		--// LocalScript: Pet Spawner GUI TITE gumana kana pesteng yawa to
 
 		local Players = game:GetService("Players")
 		local UIS = game:GetService("UserInputService")
