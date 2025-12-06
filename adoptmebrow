@@ -581,32 +581,66 @@ task.spawn(
 		end)
 
 		-- MINIMIZE / EXPAND LOGIC
-		-- FIXED MINIMIZE / EXPAND LOGIC
-		local function toggleContent(visible)
-			for _, obj in pairs(Frame:GetChildren()) do
-				-- Keep only Header visible at all times
-				if obj ~= Header then
-					obj.Visible = visible
+		-- ==========================
+		-- FIXED MINIMIZE SYSTEM
+		-- ==========================
+
+		local TweenService = game:GetService("TweenService")
+		local savedVisibility = {}
+
+		local fullSize = UDim2.new(0, 380, 0, 250)
+		local minimizedSize = UDim2.new(0, 380, 0, 40)
+
+		local function hideAllContent()
+			savedVisibility = {}
+			for _, obj in ipairs(Frame:GetDescendants()) do
+				if obj:IsA("GuiObject")
+					and obj ~= Header
+					and obj ~= MinBtn
+					and obj ~= ExpandBtn
+					and not obj:IsDescendantOf(Header) then
+
+					savedVisibility[obj] = obj.Visible
+					obj.Visible = false
 				end
 			end
 		end
 
+		local function restoreAllContent()
+			for obj, state in pairs(savedVisibility) do
+				if obj and obj.Parent then
+					obj.Visible = state
+				end
+			end
+			savedVisibility = {}
+		end
+
+		MinBtn.MouseButton1Click:Connect(function()
+			TweenService:Create(Frame, TweenInfo.new(0.25), {Size = minimizedSize}):Play()
+			hideAllContent()
+			MinBtn.Visible = false
+			ExpandBtn.Visible = true
+		end)
+
+		ExpandBtn.MouseButton1Click:Connect(function()
+			TweenService:Create(Frame, TweenInfo.new(0.25), {Size = fullSize}):Play()
+			restoreAllContent()
+			MinBtn.Visible = true
+			ExpandBtn.Visible = false
+		end)
+
+
 		MinBtn.MouseButton1Click:Connect(function()
 			toggleContent(false)
-			-- keep header visible
-			Header.Visible = true
-
 			MinBtn.Visible = false
 			ExpandBtn.Visible = true
 		end)
 
 		ExpandBtn.MouseButton1Click:Connect(function()
 			toggleContent(true)
-
 			MinBtn.Visible = true
 			ExpandBtn.Visible = false
 		end)
-
 
 
 		--// PET NAME INPUT
