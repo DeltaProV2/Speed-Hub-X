@@ -481,16 +481,11 @@ task.spawn(
 		--// LocalScript: Pet Spawner GUI
 
 		-- FUNCTIONS YOU MUST HAVE SOMEWHERE:
-		-- createPet(petId, data)
-		-- GetPetByName(petName)
-
-		--// SERVICES
-		--// LocalScript: Pet Spawner GUI (Drag + Minimize Fixed)
 		local Players = game:GetService("Players")
 		local UIS = game:GetService("UserInputService")
 		local player = Players.LocalPlayer
 
-		-- GUI Creation (same as yours)
+		-- GUI
 		local ScreenGui = Instance.new("ScreenGui")
 		ScreenGui.Name = "PetSpawnerGUI"
 		ScreenGui.Parent = player:WaitForChild("PlayerGui")
@@ -503,15 +498,12 @@ task.spawn(
 		Frame.BorderSizePixel = 0
 		Frame.Parent = ScreenGui
 		Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 12)
-		local UIStroke = Instance.new("UIStroke", Frame)
-		UIStroke.Color = Color3.fromRGB(0, 255, 0)
-		UIStroke.Thickness = 3
 
-		-- HEADER (DRAG & MINIMIZE)
+		-- HEADER
 		local Header = Instance.new("Frame")
 		Header.Size = UDim2.new(1, 0, 0, 40)
 		Header.BackgroundTransparency = 1
-		Header.Active = true  -- important!
+		Header.Active = true
 		Header.Parent = Frame
 
 		local Title = Instance.new("TextLabel")
@@ -521,13 +513,13 @@ task.spawn(
 		Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		Title.Font = Enum.Font.GothamBold
 		Title.TextScaled = true
-		Title.Active = true  -- important so it can detect input
 		Title.Parent = Header
 
+		-- MINIMIZE / EXPAND
 		local MinBtn = Instance.new("TextButton")
 		MinBtn.Size = UDim2.new(0, 30, 0, 30)
-		MinBtn.Position = UDim2.new(1, -35, 0, 5)
-		MinBtn.Text = "_"
+		MinBtn.Position = UDim2.new(1, -70, 0, 5)
+		MinBtn.Text = "-"
 		MinBtn.Font = Enum.Font.GothamBold
 		MinBtn.TextScaled = true
 		MinBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
@@ -535,18 +527,19 @@ task.spawn(
 		MinBtn.Parent = Header
 		Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 4)
 
-		-- MINIMIZE LOGIC
-		local minimized = false
-		MinBtn.MouseButton1Click:Connect(function()
-			minimized = not minimized
-			for _, obj in pairs(Frame:GetChildren()) do
-				if obj ~= Header then
-					obj.Visible = not minimized
-				end
-			end
-		end)
+		local ExpandBtn = Instance.new("TextButton")
+		ExpandBtn.Size = UDim2.new(0, 30, 0, 30)
+		ExpandBtn.Position = UDim2.new(1, -70, 0, 5)
+		ExpandBtn.Text = "+"
+		ExpandBtn.Visible = false
+		ExpandBtn.Font = Enum.Font.GothamBold
+		ExpandBtn.TextScaled = true
+		ExpandBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+		ExpandBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		ExpandBtn.Parent = Header
+		Instance.new("UICorner", ExpandBtn).CornerRadius = UDim.new(0, 4)
 
-		-- DRAG LOGIC
+		-- Dragging
 		local dragging, dragInput, dragStart, startPos
 
 		local function startDrag(input)
@@ -560,20 +553,17 @@ task.spawn(
 			end)
 		end
 
-		-- Connect both Header and Title for dragging
-		for _, obj in pairs({Header, Title}) do
-			obj.InputBegan:Connect(function(input)
-				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-					startDrag(input)
-				end
-			end)
+		Header.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				startDrag(input)
+			end
+		end)
 
-			obj.InputChanged:Connect(function(input)
-				if input.UserInputType == Enum.UserInputType.MouseMovement then
-					dragInput = input
-				end
-			end)
-		end
+		Header.InputChanged:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseMovement then
+				dragInput = input
+			end
+		end)
 
 		UIS.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
@@ -585,6 +575,29 @@ task.spawn(
 					startPos.Y.Offset + delta.Y
 				)
 			end
+		end)
+
+		-- Minimize / Expand Logic
+		local contentVisible = true
+		local function toggleContent(visible)
+			for _, obj in pairs(Frame:GetChildren()) do
+				if obj ~= Header then
+					obj.Visible = visible
+				end
+			end
+			contentVisible = visible
+		end
+
+		MinBtn.MouseButton1Click:Connect(function()
+			toggleContent(false)
+			MinBtn.Visible = false
+			ExpandBtn.Visible = true
+		end)
+
+		ExpandBtn.MouseButton1Click:Connect(function()
+			toggleContent(true)
+			MinBtn.Visible = true
+			ExpandBtn.Visible = false
 		end)
 
 
