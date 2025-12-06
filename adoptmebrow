@@ -522,7 +522,7 @@ task.spawn(
 		local Title = Instance.new("TextLabel")
 		Title.Size = UDim2.new(1, 0, 1, 0)
 		Title.BackgroundTransparency = 1
-		Title.Text = "Pet Spawner By tite"
+		Title.Text = "Pet Spawner By puta"
 		Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		Title.Font = Enum.Font.GothamBold
 		Title.TextScaled = true
@@ -687,7 +687,6 @@ task.spawn(
 
 			btn.MouseButton1Click:Connect(function()
 				selectedType = txt
-				SelectedLabel.Text = "Selected: " .. txt
 				print("Selected:", txt)
 			end)
 			return btn
@@ -719,21 +718,16 @@ task.spawn(
 		ConfirmLabel.TextScaled = true
 		ConfirmLabel.Text = ""
 		ConfirmLabel.Parent = Frame
-		
-		--// SELECTED TYPE LABEL
-		local SelectedLabel = Instance.new("TextLabel")
-		SelectedLabel.Size = UDim2.new(0.9, 0, 0, 25)
-		SelectedLabel.Position = UDim2.new(0.05, 0, 0, 150)
-		SelectedLabel.BackgroundTransparency = 1
-		SelectedLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-		SelectedLabel.Font = Enum.Font.GothamBold
-		SelectedLabel.TextScaled = true
-		SelectedLabel.Text = "Selected: FR"
-		SelectedLabel.Parent = Frame
 
 		----------------------------------------------------------
 
 		SpawnBtn.MouseButton1Click:Connect(function()
+
+			if not selectedType then
+				ConfirmLabel.Text = "Select FR / NFR / MFR first!"
+				ConfirmLabel.TextColor3 = Color3.fromRGB(255, 120, 120)
+				return
+			end
 
 			local petName = PetBox.Text
 			if petName == "" then
@@ -778,6 +772,9 @@ task.spawn(
 			ConfirmLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 			ConfirmLabel.Text = "Pet Spawned: " .. petName .. " (" .. selectedType .. ")"
 
+			-- Make SelectedLabel turn GREEN after spawn
+			SelectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 		end)
+
 	end	
 )
