@@ -581,9 +581,11 @@ task.spawn(
 		end)
 
 		-- MINIMIZE / EXPAND LOGIC
+		-- FIXED MINIMIZE / EXPAND LOGIC
 		local function toggleContent(visible)
 			for _, obj in pairs(Frame:GetChildren()) do
-				if obj ~= Header and obj ~= MinBtn and obj ~= ExpandBtn then
+				-- Keep only Header visible at all times
+				if obj ~= Header then
 					obj.Visible = visible
 				end
 			end
@@ -591,15 +593,20 @@ task.spawn(
 
 		MinBtn.MouseButton1Click:Connect(function()
 			toggleContent(false)
+			-- keep header visible
+			Header.Visible = true
+
 			MinBtn.Visible = false
 			ExpandBtn.Visible = true
 		end)
 
 		ExpandBtn.MouseButton1Click:Connect(function()
 			toggleContent(true)
+
 			MinBtn.Visible = true
 			ExpandBtn.Visible = false
 		end)
+
 
 
 		--// PET NAME INPUT
