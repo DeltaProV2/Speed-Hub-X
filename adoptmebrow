@@ -681,7 +681,7 @@ task.spawn(
 		local NFR = makeTypeButton("NFR", Color3.fromRGB(100, 255, 100), 145)
 		local FR  = makeTypeButton("FR",  Color3.fromRGB(120, 120, 255), 270)
 
-		--// SPAWN BUTTON
+		--// SPAWN BUTTO
 		local SpawnBtn = Instance.new("TextButton")
 		SpawnBtn.Size = UDim2.new(0.9, 0, 0, 45)
 		SpawnBtn.Position = UDim2.new(0.05, 0, 0, 170)
