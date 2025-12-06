@@ -484,7 +484,7 @@ task.spawn(
 		local UIS = game:GetService("UserInputService")
 		local player = Players.LocalPlayer
 
-		-- GUI
+		-- GUI bruh
 		local ScreenGui = Instance.new("ScreenGui")
 		ScreenGui.Name = "PetSpawnerGUI"
 		ScreenGui.Parent = player:WaitForChild("PlayerGui")
