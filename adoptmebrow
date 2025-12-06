@@ -543,6 +543,7 @@ task.spawn(
 		local dragInput, dragStart, startPos
 
 		local function update(input)
+			if not dragging then return end
 			local delta = input.Position - dragStart
 			Frame.Position = UDim2.new(
 				startPos.X.Scale,
@@ -552,34 +553,36 @@ task.spawn(
 			)
 		end
 
+		-- When mouse button or touch begins on header
 		Header.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				-- Don't start dragging if clicking a button
-				if input.Target:IsA("TextButton") then return end
-
-				dragging = true
+			if input.UserInputType == Enum.UserInputType.MouseButton1
+				or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = true           -- << THIS MUST BE TRUE
 				dragStart = input.Position
 				startPos = Frame.Position
-
 				input.Changed:Connect(function()
 					if input.UserInputState == Enum.UserInputState.End then
-						dragging = false
+						dragging = false  -- << AND THIS MUST BE FALSE when released
 					end
 				end)
 			end
 		end)
 
+		-- Track mouse movement
 		Header.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			if input.UserInputType == Enum.UserInputType.MouseMovement
+				or input.UserInputType == Enum.UserInputType.Touch then
 				dragInput = input
 			end
 		end)
 
+		-- Update position whenever input moves
 		UIS.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
 				update(input)
 			end
 		end)
+
 
 		
 
