@@ -507,7 +507,7 @@ task.spawn(
 		local Title = Instance.new("TextLabel")
 		Title.Size = UDim2.new(1, 0, 1, 0)
 		Title.BackgroundTransparency = 1
-		Title.Text = "Pet Spawner By Shxdrag"
+		Title.Text = "Pet Spawner By tite"
 		Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		Title.Font = Enum.Font.GothamBold
 		Title.TextScaled = true
@@ -727,7 +727,7 @@ task.spawn(
 				friendship_level = 0,
 				age = 1,
 				rp_name = "",
-				ailments_completed = 0, -- ⭐ FIXED / ADDED
+				ailments_completed = 0, -- ⭐ shxdrag / ADDD
 			}
 
 			if selectedType == "FR" then
