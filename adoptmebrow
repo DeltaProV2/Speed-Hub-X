@@ -482,9 +482,6 @@ task.spawn(
 		-- ROBUST MINIMIZE / EXPAND LOGIC
 		local savedVisibility = {}
 
-		-- ROBUST MINIMIZE / EXPAND LOGIC
-		local savedVisibility = {}
-
 		local function hideContent()
 			savedVisibility = {}
 			for _, obj in pairs(Frame:GetChildren()) do
@@ -515,7 +512,6 @@ task.spawn(
 			MinBtn.Visible = true
 			ExpandBtn.Visible = false
 		end)
-
 
 
 
