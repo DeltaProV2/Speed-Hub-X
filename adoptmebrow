@@ -525,9 +525,10 @@ task.spawn(
 		Title.TextScaled = true
 		Title.Parent = Header
 
+		--// MINIMIZE BUTTON
 		local MinBtn = Instance.new("TextButton")
 		MinBtn.Size = UDim2.new(0, 30, 0, 30)
-		MinBtn.Position = UDim2.new(1, -35, 0, 5)
+		MinBtn.Position = UDim2.new(1, -35, 0, 5) -- top-right corner
 		MinBtn.Text = "_"
 		MinBtn.Font = Enum.Font.GothamBold
 		MinBtn.TextScaled = true
@@ -539,9 +540,9 @@ task.spawn(
 		local minimized = false
 		MinBtn.MouseButton1Click:Connect(function()
 			minimized = not minimized
-			for _, obj in pairs(Frame:GetChildren()) do
-				if obj ~= Header then
-					obj.Visible = not minimized
+			for _, child in pairs(Frame:GetChildren()) do
+				if child ~= Header then
+					child.Visible = not minimized
 				end
 			end
 		end)
