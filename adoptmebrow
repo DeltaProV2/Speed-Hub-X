@@ -595,63 +595,106 @@ task.spawn(
 		ConfirmLabel.Parent = Frame
 
 		--// Dragging Logic
-		local dragging, dragInput, dragStart, startPos
+		-- ===== REPLACE YOUR DRAG + MINIMIZE/EXPAND SECTION WITH THIS =====
 
-		local function startDrag(input)
-			dragging = true
-			dragStart = input.Position
-			startPos = Frame.Position
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
+		-- allow clicks to pass through the title so header can receive input
+		Title.InputTransparent = true
+		Header.Active = true
+
+		-- Dragging (robust for mouse & touch)
+		local dragging = false
+		local dragInput = nil
+		local dragStart = nil
+		local startPos = nil
+
+		local function beginDrag(input)
+			-- don't start dragging if clicking the minimize/expand buttons
+			if input.Target and (input.Target == MinBtn or input.Target == ExpandBtn) then
+				return
+			end
+
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = true
+				dragStart = input.Position
+				startPos = Frame.Position
+				dragInput = input -- ensure dragInput is set immediately for touch/mouse
+				-- stop dragging when the input ends
+				input.Changed:Connect(function()
+					if input.UserInputState == Enum.UserInputState.End then
+						dragging = false
+						dragInput = nil
+					end
+				end)
+			end
+		end
+
+		local function updateDrag(input)
+			if not dragging or not dragStart or not startPos then return end
+			local delta = input.Position - dragStart
+			Frame.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X.Offset + delta.X,
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
+		end
+
+		-- Connect both header and title so either area can start the drag
+		for _, obj in pairs({Header, Title}) do
+			obj.InputBegan:Connect(function(input)
+				beginDrag(input)
+			end)
+			obj.InputChanged:Connect(function(input)
+				-- set dragInput if it's a movement/touch input (helps on some platforms)
+				if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+					dragInput = input
 				end
 			end)
 		end
 
-		Header.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				startDrag(input)
-			end
-		end)
-
-		Header.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement then
-				dragInput = input
-			end
-		end)
-
+		-- global input changed updates position when dragging
 		UIS.InputChanged:Connect(function(input)
+			-- only respond while we're dragging and the event is from the same input
 			if input == dragInput and dragging then
-				local delta = input.Position - dragStart
-				Frame.Position = UDim2.new(
-					startPos.X.Scale,
-					startPos.X.Offset + delta.X,
-					startPos.Y.Scale,
-					startPos.Y.Offset + delta.Y
-				)
+				updateDrag(input)
 			end
 		end)
 
-		-- Minimize / Expand Logic
-		local function toggleContent(visible)
-			for _, obj in pairs(Frame:GetChildren()) do
+		-- Minimize / Expand (robust: keep header + buttons visible)
+		local savedVisibility = {}
+		local function hideContent()
+			savedVisibility = {}
+			for _, obj in ipairs(Frame:GetChildren()) do
 				if obj ~= Header and obj ~= MinBtn and obj ~= ExpandBtn then
-					obj.Visible = visible
+					savedVisibility[obj] = obj.Visible
+					obj.Visible = false
 				end
 			end
 		end
 
+		local function restoreContent()
+			for obj, wasVisible in pairs(savedVisibility) do
+				if obj and obj.Parent then
+					obj.Visible = wasVisible
+				end
+			end
+			savedVisibility = {}
+		end
+
 		MinBtn.MouseButton1Click:Connect(function()
-			toggleContent(false)
+			hideContent()
 			MinBtn.Visible = false
 			ExpandBtn.Visible = true
 		end)
 
 		ExpandBtn.MouseButton1Click:Connect(function()
-			toggleContent(true)
+			restoreContent()
 			MinBtn.Visible = true
 			ExpandBtn.Visible = false
 		end)
+
+		-- ===== end replacement block =====
+
 
 
 		SpawnBtn.MouseButton1Click:Connect(function()
