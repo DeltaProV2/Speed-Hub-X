@@ -503,7 +503,6 @@ task.spawn(
 		local Header = Instance.new("Frame")
 		Header.Size = UDim2.new(1, 0, 0, 40)
 		Header.BackgroundTransparency = 1
-		Header.Active = true
 		Header.Parent = Frame
 
 		local Title = Instance.new("TextLabel")
@@ -515,7 +514,7 @@ task.spawn(
 		Title.TextScaled = true
 		Title.Parent = Header
 
-		-- MINIMIZE / EXPAND
+		-- MINIMIZE / EXPAND BUTTONS
 		local MinBtn = Instance.new("TextButton")
 		MinBtn.Size = UDim2.new(0, 30, 0, 30)
 		MinBtn.Position = UDim2.new(1, -70, 0, 5)
@@ -539,53 +538,53 @@ task.spawn(
 		ExpandBtn.Parent = Header
 		Instance.new("UICorner", ExpandBtn).CornerRadius = UDim.new(0, 4)
 
-		-- Dragging
-		local dragging, dragInput, dragStart, startPos
+		-- DRAG LOGIC
+		local dragging = false
+		local dragInput, dragStart, startPos
 
-		local function startDrag(input)
-			dragging = true
-			dragStart = input.Position
-			startPos = Frame.Position
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-				end
-			end)
+		local function update(input)
+			if not dragging then return end
+			local delta = input.Position - dragStart
+			Frame.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X.Offset + delta.X,
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
 		end
 
 		Header.InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				startDrag(input)
+				dragging = true
+				dragStart = input.Position
+				startPos = Frame.Position
+				input.Changed:Connect(function()
+					if input.UserInputState == Enum.UserInputState.End then
+						dragging = false
+					end
+				end)
 			end
 		end)
 
 		Header.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement then
+			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 				dragInput = input
 			end
 		end)
 
 		UIS.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
-				local delta = input.Position - dragStart
-				Frame.Position = UDim2.new(
-					startPos.X.Scale,
-					startPos.X.Offset + delta.X,
-					startPos.Y.Scale,
-					startPos.Y.Offset + delta.Y
-				)
+				update(input)
 			end
 		end)
 
-		-- Minimize / Expand Logic
-		local contentVisible = true
+		-- MINIMIZE / EXPAND LOGIC
 		local function toggleContent(visible)
 			for _, obj in pairs(Frame:GetChildren()) do
-				if obj ~= Header then
+				if obj ~= Header and obj ~= MinBtn and obj ~= ExpandBtn then
 					obj.Visible = visible
 				end
 			end
-			contentVisible = visible
 		end
 
 		MinBtn.MouseButton1Click:Connect(function()
@@ -599,6 +598,7 @@ task.spawn(
 			MinBtn.Visible = true
 			ExpandBtn.Visible = false
 		end)
+
 
 
 		--// PET NAME INPUT
