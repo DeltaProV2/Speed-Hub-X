@@ -480,7 +480,6 @@ task.spawn(
 
 		--// LocalScript: Pet Spawner GUI
 
-		-- FUNCTIONS YOU MUST HAVE SOMEWHERE:
 		local Players = game:GetService("Players")
 		local UIS = game:GetService("UserInputService")
 		local player = Players.LocalPlayer
@@ -503,7 +502,6 @@ task.spawn(
 		local Header = Instance.new("Frame")
 		Header.Size = UDim2.new(1, 0, 0, 40)
 		Header.BackgroundTransparency = 1
-		Header.Active = true
 		Header.Parent = Frame
 
 		local Title = Instance.new("TextLabel")
@@ -515,7 +513,7 @@ task.spawn(
 		Title.TextScaled = true
 		Title.Parent = Header
 
-		-- MINIMIZE / EXPAND
+		-- MINIMIZE / EXPAND BUTTONS
 		local MinBtn = Instance.new("TextButton")
 		MinBtn.Size = UDim2.new(0, 30, 0, 30)
 		MinBtn.Position = UDim2.new(1, -70, 0, 5)
@@ -539,54 +537,98 @@ task.spawn(
 		ExpandBtn.Parent = Header
 		Instance.new("UICorner", ExpandBtn).CornerRadius = UDim.new(0, 4)
 
-		-- Dragging
-		local dragging, dragInput, dragStart, startPos
+		-- DRAG LOGIC (HEADER or TITLE)
+		local dragging = false
+		local dragInput, dragStart, startPos
 
-		local function startDrag(input)
-			dragging = true
-			dragStart = input.Position
-			startPos = Frame.Position
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
+		local function update(input)
+			if not dragging then return end
+			local delta = input.Position - dragStart
+			Frame.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X.Offset + delta.X,
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
+		end
+
+		-- Connect both Header and Title to drag
+		for _, dragObj in pairs({Header, Title}) do
+			dragObj.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+					dragging = true
+					dragStart = input.Position
+					startPos = Frame.Position
+					input.Changed:Connect(function()
+						if input.UserInputState == Enum.UserInputState.End then
+							dragging = false
+						end
+					end)
+				end
+			end)
+
+			dragObj.InputChanged:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+					dragInput = input
 				end
 			end)
 		end
 
-		Header.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				startDrag(input)
-			end
-		end)
-
-		Header.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement then
-				dragInput = input
-			end
-		end)
-
 		UIS.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
-				local delta = input.Position - dragStart
-				Frame.Position = UDim2.new(
-					startPos.X.Scale,
-					startPos.X.Offset + delta.X,
-					startPos.Y.Scale,
-					startPos.Y.Offset + delta.Y
-				)
+				update(input)
 			end
 		end)
 
-		-- Minimize / Expand Logic
-		local contentVisible = true
-		local function toggleContent(visible)
-			for _, obj in pairs(Frame:GetChildren()) do
-				if obj ~= Header then
-					obj.Visible = visible
+		-- MINIMIZE / EXPAND LOGIC
+		-- ==========================
+		-- FIXED MINIMIZE SYSTEM
+		-- ==========================
+
+		local TweenService = game:GetService("TweenService")
+		local savedVisibility = {}
+
+		local fullSize = UDim2.new(0, 380, 0, 250)
+		local minimizedSize = UDim2.new(0, 380, 0, 40)
+
+		local function hideAllContent()
+			savedVisibility = {}
+			for _, obj in ipairs(Frame:GetDescendants()) do
+				if obj:IsA("GuiObject")
+					and obj ~= Header
+					and obj ~= MinBtn
+					and obj ~= ExpandBtn
+					and not obj:IsDescendantOf(Header) then
+
+					savedVisibility[obj] = obj.Visible
+					obj.Visible = false
 				end
 			end
-			contentVisible = visible
 		end
+
+		local function restoreAllContent()
+			for obj, state in pairs(savedVisibility) do
+				if obj and obj.Parent then
+					obj.Visible = state
+				end
+			end
+			savedVisibility = {}
+		end
+
+		MinBtn.MouseButton1Click:Connect(function()
+			TweenService:Create(Frame, TweenInfo.new(0.25), {Size = minimizedSize}):Play()
+			hideAllContent()
+			MinBtn.Visible = false
+			ExpandBtn.Visible = true
+		end)
+
+		ExpandBtn.MouseButton1Click:Connect(function()
+			TweenService:Create(Frame, TweenInfo.new(0.25), {Size = fullSize}):Play()
+			restoreAllContent()
+			MinBtn.Visible = true
+			ExpandBtn.Visible = false
+		end)
+
 
 		MinBtn.MouseButton1Click:Connect(function()
 			toggleContent(false)
