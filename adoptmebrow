@@ -522,7 +522,7 @@ task.spawn(
 		local Title = Instance.new("TextLabel")
 		Title.Size = UDim2.new(1, 0, 1, 0)
 		Title.BackgroundTransparency = 1
-		Title.Text = "Pet Spawner By puta"
+		Title.Text = "⭐ROYAL SPAWNER"
 		Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		Title.Font = Enum.Font.GothamBold
 		Title.TextScaled = true
